@@ -1,6 +1,6 @@
 ---
 import Default from '@astrojs/starlight/components/PageTitle.astro';
-import { chatgptUrl, claudeUrl, markdownPath, site } from '../lib/markdown-url';
+import { chatgptUrl, claudeUrl, hasMarkdown, markdownPath, site } from '../lib/markdown-url';
 
 const { entry } = Astro.locals.starlightRoute;
 const md = `${site}${markdownPath(Astro.url.pathname)}`;
@@ -9,6 +9,7 @@ const ask = `Read the Caplo documentation page "${entry.data.title}" at ${md} an
 
 <div class="caplo-title-row">
 	<Default />
+	{hasMarkdown(Astro.locals.starlightRoute) && (
 	<div class="caplo-page-actions" data-page-actions data-markdown={markdownPath(Astro.url.pathname)}>
 		<button type="button" class="caplo-action-main" data-copy-page>
 			<svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M8 3h9a2 2 0 0 1 2 2v12h-2V5H8V3Zm-3 4h9a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Zm0 2v11h9V9H5Z"/></svg>
@@ -42,6 +43,7 @@ const ask = `Read the Caplo documentation page "${entry.data.title}" at ${md} an
 			</ul>
 		</details>
 	</div>
+	)}
 </div>
 
 <script>
