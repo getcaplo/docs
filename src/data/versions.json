@@ -14,6 +14,7 @@
     "platform-console": "1.0.39",
     "production-agents": "1.0.0",
     "tool-catalog": "1.1.7",
-    "tool-runner": "1.0.40"
+    "tool-runner": "1.0.40",
+    "tool-sdk": "0.1.8"
   }
 }

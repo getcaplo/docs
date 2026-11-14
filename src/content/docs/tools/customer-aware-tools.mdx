@@ -92,7 +92,7 @@ Passing the customer ID to your API with a shared API key means your API trusts 
 
 2. On the same page, under **Customer context tokens**, copy the **Issuer** (and the **JWKS URL**, if your API needs it). Give them to whoever runs the API.
 
-3. In the website channel's settings, under **Customer verification**, find the tool's operation in **Verified tool operations** and choose your API in its **customer token audience**.
+3. In the website channel's settings, under **Customer verification**, find the tool's operation in **Verified tool operations** and choose your API in its **customer token audience**. Adding an operation to a channel is not yet available in the console or the CLI: [contact support](/resources/support/) with the channel and the tools, then set the audience here. See [Customer identity](/identity/).
 
 4. In the tool, send the token as a bearer token. It is not an enumerable property, so spreading or logging the subject does not leak it, but never log it yourself:
 

@@ -1,0 +1,63 @@
+---
+title: Data retention and privacy
+description: What Caplo keeps about your conversations, how long transcripts and traces are kept, how to limit call length, and how conversation data is removed.
+sidebar:
+  order: 3
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Open **Settings**, then **Data & privacy**, to choose how long Caplo keeps conversation data and how long a voice call may last. Every member can see these settings; only Owners and Admins can change them. Each change is recorded in the [audit log](/operate/audit-log/).
+
+## What Caplo stores
+
+| Data | What it holds | Kept for |
+| --- | --- | --- |
+| **Transcripts** | The messages between the customer, the agent and your team, internal notes, and the customer's identity, which the console masks until someone [reveals](/operate/conversations-inbox/#reveal-a-participant) it. | **Transcript retention** |
+| **Traces** | What each turn did: steps, models, tools and sub-agents called, statuses, error codes, timings, token counts and cost estimates. The conversation list, its counts and the [analytics](/operate/monitor-and-analytics/) are built from them. | **Trace retention** |
+| **Test traces** | The trace data of live tests and eval runs. | 7 days |
+| **Usage and billing records** | Quantities and charges for your [statements](/usage/usage-and-statements/). | Kept for billing, separately from these settings |
+| **Audit log** | Administrative and sensitive actions. | Append-only: entries cannot be changed or deleted |
+
+## Retention
+
+| Setting | Choices | Default | Applies to |
+| --- | --- | --- | --- |
+| **Transcript retention** | 7 days, 30 days, 90 days, 1 year | 30 days | Channel conversations, counted from their last message or from when they closed. |
+| **Trace retention** | 7 days, 30 days, 90 days | 90 days | Production execution timelines and analytics. |
+
+<Steps>
+
+1. Open **Settings** > **Data & privacy**.
+2. Under **Retention & content**, choose **Transcript retention** and **Trace retention**.
+3. Save. If someone else changed retention since you opened the page, Caplo refuses the save; discard, review the current values and save again.
+
+</Steps>
+
+How it takes effect:
+
+- A shorter period also applies to records you already have. Older transcripts are deleted on the next cleanup run, and older trace data within minutes.
+- A transcript is never deleted while its conversation is still open, and a conversation that is waiting for the outcome of a tool write is kept until that outcome is settled.
+- Conversations only appear in **Conversations** and in analytics while their trace data is kept. If you keep transcripts longer than traces, older conversations drop out of the list before their transcripts are deleted.
+
+<Aside type="caution" title="Shortening retention deletes data">
+When you shorten either period, everything older than the new period is permanently deleted at the next cleanup. Export what you need first, for example with **Download transcript** in the inbox or a CSV from the [Usage](/usage/usage-and-statements/#export) page.
+</Aside>
+
+## Maximum call duration
+
+Under **Voice calls**, **Maximum call duration (minutes)** limits every voice call in the workspace, on the phone and in the website widget. Enter a whole number from 5 to 240. Until you set one, the platform default of 60 minutes applies.
+
+The caller hears a warning one minute before the limit and a goodbye when the call reaches it. The call then ends with the reason **Time limit reached** in the inbox. A change applies to calls that start after it; a call in progress keeps the limit it started with.
+
+## Deleting conversation data
+
+The console has no control to delete a single conversation or one customer's data. Conversations are removed when their retention period ends. To shorten how long everything is kept, lower **Transcript retention** and **Trace retention**.
+
+If you need a specific conversation erased before then, for example to honor a customer's request, contact [support](/resources/support/) with its conversation ID; **Copy conversation ID** is in the conversation's **More actions** menu. To remove what Caplo holds about a verified customer's link to your accounts, see [Account links and revocation](/identity/account-links-and-revocation/).
+
+## Related
+
+- [Work in the Conversations inbox](/operate/conversations-inbox/)
+- [Audit log](/operate/audit-log/)
+- [Workspaces and roles](/concepts/workspaces-and-roles/)

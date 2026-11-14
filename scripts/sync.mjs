@@ -17,6 +17,7 @@ import { parseArgs } from 'node:util';
 import { renderCli } from './lib/cli-markdown.mjs';
 import { downloadCli } from './lib/cli-release.mjs';
 import { createRenderer } from './lib/schema-markdown.mjs';
+import { renderSdk } from './lib/sdk-markdown.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const { values: args } = parseArgs({ options: { cli: { type: 'string' }, argocd: { type: 'string' } } });
@@ -99,6 +100,8 @@ try {
 	const exported = exportCli(binary);
 	if (!semver.test(exported.version)) throw new Error(`the CLI reports version ${exported.version}; use a release build`);
 	versions['caplo-cli'] = exported.version;
+	const sdk = await renderSdk(join(work, 'sdk'));
+	versions['tool-sdk'] = sdk.version;
 
 	const sorted = Object.fromEntries(Object.entries(versions).sort(([a], [b]) => a.localeCompare(b)));
 	write(join(root, 'src/data/versions.json'), json({ versions: sorted }));
@@ -110,6 +113,7 @@ try {
 
 	rmSync(join(root, 'src/content/docs/reference'), { recursive: true, force: true });
 	for (const [name, content] of Object.entries(renderCli(exported))) write(join(root, 'src/content/docs/reference/cli', name), content);
+	for (const [name, content] of Object.entries(sdk.files)) write(join(root, 'src/content/docs/reference/sdk', name), content);
 
 	const agentName = Object.keys(schemas).find((n) => n.startsWith('agent-'));
 	const agent = schemas[agentName];
@@ -154,7 +158,7 @@ try {
 		[['Fields', schemas['fixture.schema.json']]],
 	);
 
-	console.log(`synced: caplo ${exported.version}, ${Object.keys(versions).length - 1} production images`);
+	console.log(`synced: caplo ${exported.version}, @caplo/tools ${sdk.version}, ${Object.keys(versions).length - 2} production images`);
 } finally {
 	rmSync(work, { recursive: true, force: true });
 }
