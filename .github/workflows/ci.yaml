@@ -29,5 +29,5 @@ jobs:
       - name: External links
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --no-progress --root-dir "${{ github.workspace }}/dist" --exclude-path dist/_llms-txt --exclude '^https://(claude\.ai|chatgpt\.com)/' --exclude '^https://docs\.caplo\.si/' 'dist/**/*.html'
+          args: --no-progress --root-dir "${{ github.workspace }}/dist" --exclude-path dist/_llms-txt --exclude '^https://(claude\.ai|chatgpt\.com)/' --exclude '^https://docs\.caplo\.si/' --exclude '^https://api\.caplo\.si/?$' 'dist/**/*.html'
           fail: true
