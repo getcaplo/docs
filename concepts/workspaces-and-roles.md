@@ -8,7 +8,7 @@ The first time you sign in to the console, Caplo creates a workspace for you and
 
 ## Members and roles
 
-Each member has exactly one role in a workspace. Owners and Admins invite people from **Settings** > **Members** with **Invite member**: enter the email addresses, choose a **Role**, and select **Send invitations**. They can also limit invitations to **Allowed email domains** and change or remove members later. A workspace always has at least one active Owner, and only an Owner can transfer ownership.
+Each member has exactly one role in a workspace. Owners and Admins invite people from **Settings** > **Members** with **Invite member**: enter the email addresses, choose a **Role**, and select **Send invitations**. They can also limit invitations to **Allowed email domains** and change or remove members later. A workspace has exactly one Owner, and only the Owner can transfer ownership.
 
 | What you can do                                                                            | Owner | Admin | Builder | Developer | Supervisor | Auditor | Viewer | Billing |
 | ------------------------------------------------------------------------------------------ | ----- | ----- | ------- | --------- | ---------- | ------- | ------ | ------- |

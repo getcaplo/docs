@@ -17,7 +17,7 @@ Who sees what depends on the [role](/concepts/workspaces-and-roles/):
 
 ## Taking over
 
-Owners, Admins and Supervisors can step into an open text conversation at any time. Select **Take over**: the agent stops replying, the customer sees “A member of our team has joined and will reply here.”, and you reply from the console. When you are done, select **Return to agent** and the agent answers the customer’s next message.
+Owners, Admins and Supervisors can step into an open text conversation at any time. Select **Take over**: the agent stops replying, the transcript notes “A member of our team has joined and will reply here.” (website visitors see it; on WhatsApp, Messenger and Instagram it is not sent), and you reply from the console. When you are done, select **Return to agent** and the agent answers the customer’s next message.
 
 Taking over needs no setup. Voice calls cannot be taken over from the console.
 
@@ -25,10 +25,10 @@ Taking over needs no setup. Voice calls cannot be taken over from the console.
 
 An agent can also decide to hand a conversation to your team, for example when the customer asks for a person or the request is outside what the agent should handle. This works only when the channel’s entry point allows the **transfer** conversation action and names a destination:
 
-| Channel               | Destination                                                                   | What happens                                                                                                    |
-| --------------------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Website and messaging | A Chatwoot inbox, connected under **Integrations** > **Handoff destinations** | The conversation opens in Chatwoot with a summary, and messages are relayed both ways until your team finishes. |
-| Telephone             | A phone number or SIP address set in **Transfer calls to**                    | The call is transferred, either straight away (cold) or after briefing the person who answers (warm).           |
+| Channel        | Destination                                                                   | What happens                                                                                                                                                                                                                                                   |
+| -------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Website widget | A Chatwoot inbox, connected under **Integrations** > **Handoff destinations** | The conversation opens in Chatwoot with a summary, and messages are relayed both ways until your team finishes. WhatsApp, Messenger and Instagram conversations are mirrored into Chatwoot instead; see [Handoff to Chatwoot](/channels/handoff-to-chatwoot/). |
+| Telephone      | A phone number or SIP address set in **Transfer calls to**                    | The call is transferred, either straight away (cold) or after briefing the person who answers (warm).                                                                                                                                                          |
 
 What the customer sees during a text handoff:
 

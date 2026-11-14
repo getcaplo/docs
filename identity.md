@@ -1,0 +1,99 @@
+# Customer identity
+
+> Verify who your customers are in the website widget, so tools can act on their own accounts and only verified customers see private content.
+
+An agent on your website talks to anonymous visitors. Before a tool shows someone their orders or changes their address, Caplo must know who that person is, and the answer must not come from the model or the chat: a visitor can type any name or account number. **Customer identity** lets visitors prove who they are through a sign-in you control. Caplo records the result as a verified binding for the conversation, and tools receive the verified customer from Caplo, never from the model.
+
+Verification is available in the [website widget](/channels/website-widget/install/), in text and voice. WhatsApp, Messenger, Instagram and phone conversations are always anonymous.
+
+## What verification unlocks
+
+* **Customer-aware tools** act for the verified customer and can send your API a signed customer context token. See [Build customer-aware tools](/tools/customer-aware-tools/).
+* **Knowledge for verified customers only**: knowledge bases with the audience **Verified customers only** answer only after the visitor verifies. See [Knowledge](/agents/knowledge/).
+* **Previous conversation**: the channel can show a verified customer their most recent earlier conversation.
+
+## Connection types
+
+You set up the ways customers can verify as **connections** in the console under **Settings** then **Customer identity**. Each connection says how a customer proves who they are and which ID in your system they become (the `sub`). Managing customer identity needs the Owner or Admin role.
+
+| Connection type       | How the customer verifies                                                                                                                                        | Use it when                                                                                                                                                                              |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Host sign-in**      | Your website’s backend signs a short-lived assertion for the person already signed in on your site. The widget gets it from your page; the visitor does nothing. | Customers use the widget on pages where they are already signed in. This is the strongest and smoothest option. See [Host sign-in with signed assertions](/identity/signed-assertions/). |
+| **Provider sign-in**  | The visitor signs in with your OpenID Connect provider in a popup window.                                                                                        | Your customers have accounts at an OpenID Connect provider, and the widget runs on pages where they are not signed in. See [Provider sign-in with OpenID Connect](/identity/oidc/).      |
+| **Verification code** | The visitor enters their email, phone number or account number. Caplo asks your webhook to send a one-time code to the contact details you have on file.         | You have no customer sign-in, or need a fallback. Codes always verify at the lowest level. See [Verification codes](/identity/verification-codes/).                                      |
+
+Connections that share a **Subject namespace** identify the same customers, so a customer who verifies with a code and later with host sign-in is the same person to Caplo. The namespace defaults to the connection’s issuer (a verification code connection gets a namespace of its own) and cannot change after the connection exists, so set it when you create the connection if several connections should share customers.
+
+## Assurance levels
+
+Each verification has a level that says how strongly the customer proved who they are.
+
+| Level      | Typical source                                                                                                                                                         |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `low`      | A verification code. A sign-in your mapping rates low.                                                                                                                 |
+| `standard` | A normal password sign-in. Host and provider sign-ins without an `acr` claim get this level by default.                                                                |
+| `high`     | A sign-in with multi-factor authentication. A `high` requirement also needs the customer to have authenticated within the last 15 minutes, unless you set a freshness. |
+
+For host and provider sign-in, the level comes from the `acr` claim through the connection’s **Assurance mapping**: you list each `acr` value your sign-in sends and the level it means, and choose what happens **When acr is absent** (**Low**, **Standard** or **Reject the sign-in**). An `acr` value you did not list is refused. Verification codes are always `low`.
+
+When an operation needs a higher level or a more recent sign-in than the customer has, the widget asks them to **Confirm it’s you**, and the operation waits until they do. This is called step-up.
+
+## The verification policy
+
+The **Verification policy** panel on the same page decides whether visitors can verify at all and what a verification grants:
+
+* **Verify customers in support conversations** must be on.
+* **Connections, in order**: up to 8 connections customers may use. A connection must be listed here and on the channel to be offered.
+* **Allowed scopes**: what a verification may grant. `identity:bind` is required.
+* **Minimum level per scope**: the level each scope needs. Without a row, `identity:bind`, `knowledge:verified` and tool reads need `low`; tool writes and memory need `standard`.
+* **Session timeouts**: how long a verification lasts at each level, idle and absolute. The defaults are 30 minutes idle and 4 hours absolute for `low`, and 60 minutes idle and 12 hours absolute for `standard` and `high`.
+
+| Scope                                               | Grants                                             |
+| --------------------------------------------------- | -------------------------------------------------- |
+| `identity:bind`                                     | Verifying at all.                                  |
+| `knowledge:verified`                                | Knowledge bases for verified customers only.       |
+| `memory:read`, `memory:write`                       | Long-term customer memory, for agents that use it. |
+| `tools:read:<operation>`, `tools:write:<operation>` | One verified tool operation on a channel.          |
+
+Caution
+
+Saving the policy ends every current verification: verified visitors must verify again. Change it outside busy hours.
+
+With **Require a second approver** on (under **Trust changes**), creating a connection, enabling it, or changing its issuer, keys, endpoints, webhook, mappings, attributes or API audiences waits as a pending trust change until another Owner or Admin approves it. Disabling a connection and revoking a key always apply at once. Trust changes are recorded in the [audit log](/operate/audit-log/); nobody is notified, so tell the approver.
+
+## How verification works in the widget
+
+Each website channel decides who may verify. In the console, open the channel, select **Configure & install**, and go to the **Conversation** tab. Under **Customer verification**, choose **Anonymous visitors only**, **Visitors may verify who they are** or **Visitors must verify before chatting**, then select **Choose sign-in methods and consent for this channel** to pick the connections and consent. See [Website widget settings](/channels/website-widget/settings/#customer-verification).
+
+1. The widget offers the channel’s provider sign-in and verification code methods in order, as buttons labelled with the button label you set on the channel or, without one, the connection’s name.
+2. With the consent mode **Ask for agreement before the first verification**, the visitor agrees to your consent text first. With **Show a notice after verification**, they verify straight away and then see a notice, such as “Signed in. This chat can see your account.”, with **Not you? Sign out**.
+3. Host sign-in is never a button. It runs on its own when your page has registered a token provider and the consent mode is **Show a notice after verification**.
+4. Once verified, the widget shows who is signed in, and tools, knowledge and history unlock as the policy allows.
+5. Visitors can **Sign out** at any time. You can also revoke verifications from the console or from your own systems. See [Account links and revocation](/identity/account-links-and-revocation/).
+
+## How the customer reaches your tools
+
+A tool that declares `subject` in `caplo.yaml` receives the verified customer in `ctx.subject`: `externalSubject` is the `sub` your sign-in asserted, and `level` is the assurance level. For a stronger guarantee, Caplo can also give the tool a **customer context token**: a 60-second JWT, signed by your workspace’s issuer, that your own API verifies before acting. See [Build customer-aware tools](/tools/customer-aware-tools/) and [Verify customers in your API](/identity/verify-in-your-api/).
+
+Caution
+
+A customer-aware tool runs only when its operation is listed in the channel’s **Verified tool operations**, with a scope such as `tools:read:list_my_orders` that the policy allows. The console shows those operations and lets you change their level, freshness and token audience, but adding an operation to a channel is not yet available in the console or the CLI. Contact [support](/resources/support/) with the channel and the tools to set it up.
+
+## Setup checklist
+
+1. Choose a connection type and create the connection in **Settings**, **Customer identity**: [host sign-in](/identity/signed-assertions/), [provider sign-in](/identity/oidc/) or [verification codes](/identity/verification-codes/).
+2. Set the **Assurance mapping** so each `acr` value your sign-in sends gives the right level.
+3. In **Verification policy**, turn verification on, add the connection, allow `identity:bind` and the scopes you need, and save.
+4. On the website channel, allow verification, choose the sign-in methods and consent mode, and select **Save entry point**.
+5. For host sign-in, add the token endpoint to your backend and call `identity.configure` on your page. See the [JavaScript API](/channels/website-widget/javascript-api/#sign-visitors-in-from-your-page).
+6. For tools that act on the customer’s account, follow [Build customer-aware tools](/tools/customer-aware-tools/), and verify customer context tokens in your API.
+7. Decide how sign-outs and revoked accounts reach Caplo: [Account links and revocation](/identity/account-links-and-revocation/).
+8. Test the whole flow on a test channel, and watch **Activity** on the **Customer identity** page for failed verifications and their reasons.
+
+[Host sign-in](/identity/signed-assertions/)Sign visitors in from your own backend with a short-lived assertion.
+
+[Provider sign-in](/identity/oidc/)Let visitors sign in with your OpenID Connect provider.
+
+[Verification codes](/identity/verification-codes/)Send one-time codes through your own webhook.
+
+[Verify in your API](/identity/verify-in-your-api/)Check Caplo's customer context token before acting.

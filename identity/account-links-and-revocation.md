@@ -1,0 +1,93 @@
+# Account links and revocation
+
+> End customer verifications from the console or from your own identity systems, handle sign-out in the widget, and rename or merge customer IDs.
+
+A verification lasts until the visitor signs out, the session timeout for its level runs out, or something ends it early. This page covers the ways to end it early: from the console, from your identity provider or backend with back-channel logout and Shared Signals, and from the widget. It also covers renaming and merging customer IDs, and account links.
+
+Revoking a verification never deletes a conversation. The visitor loses verified access at their next turn and is asked to verify again.
+
+## Revoke from the console
+
+On **Settings**, **Customer identity** (Owner or Admin):
+
+* **Revoke bindings**, on the **Activity** panel, opens a dialog where you choose what to revoke, the **Connection** and a **Reason**:
+
+  * **Every binding of one customer**: enter the **Customer subject (sub)**.
+  * **Every binding verified under a key**: enter the **Key ID (kid)**.
+  * **Every binding of a connection**.
+
+* **Revoke subject**, next to a binding under **Recent bindings**, revokes that customer.
+
+* **Disable** on a connection stops new verifications through it and revokes every binding made through it. **Enable** brings it back, as a trust change; earlier visitors must verify again.
+
+* **Revoke key** on a host sign-in connection refuses that key from now on and revokes the bindings verified with it. See [Rotate keys](/identity/signed-assertions/#rotate-keys).
+
+Revocations take effect at once, even when **Require a second approver** is on, and are recorded in the [audit log](/operate/audit-log/).
+
+## Back-channel logout
+
+When a customer signs out of your site or your provider, you can end their verification in Caplo too, with an OpenID Connect back-channel logout token. This works for host sign-in and provider sign-in connections.
+
+1. On the connection, turn on **Back-channel logout** and save. Approve the trust change if your workspace requires a second approver.
+2. Open the connection again with **Configure** and copy the **Back-channel logout URL**: `https://api.caplo.si/v1/identity/customer-signals/<CONNECTION_ID>/backchannel-logout`.
+3. Register it as the client’s back-channel logout URL at your provider, or have your backend call it when a session ends.
+
+Caplo expects a form `POST` with one field, `logout_token`, holding a JWT that:
+
+| Part         | Rule                                                                                                                                                                                                        |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Header `typ` | `logout+jwt`.                                                                                                                                                                                               |
+| Signature    | A key Caplo already trusts for the connection: your host sign-in keys (not revoked, with an allowed algorithm) or your provider’s JWKS.                                                                     |
+| `iss`        | The connection’s issuer, or the provider’s issuer.                                                                                                                                                          |
+| `aud`        | For host sign-in, the connection’s audience (`urn:caplo:customer-identity:<CONNECTION_ID>`). For provider sign-in, the client ID.                                                                           |
+| `iat`, `exp` | `iat` within the last 24 hours and not in the future; `exp` optional.                                                                                                                                       |
+| `jti`        | Required and unique. Each token works once.                                                                                                                                                                 |
+| `events`     | Contains `http://schemas.openid.net/event/backchannel-logout`.                                                                                                                                              |
+| `sid`, `sub` | At least one. With `sid`, only verifications from that session end; it must match the `sid` of the assertion or ID token. With only `sub`, every verification of that customer through the connection ends. |
+| `nonce`      | Must be absent.                                                                                                                                                                                             |
+
+Caplo answers `200` when the token is accepted, and `400` without detail when it is not.
+
+## Shared Signals
+
+If your identity provider or backend can transmit Shared Signals (OpenID SSF) events, Caplo can react to them as they happen.
+
+1. On the connection, turn on **Shared Signals (SSF)** and save.
+2. Open it again and copy the **SSF push URL** and the **SSF stream audience**.
+3. Configure your transmitter to push (RFC 8935) to that URL, with that audience, signed with the same keys as above.
+
+Each Security Event Token is sent with `Content-Type: application/secevent+jwt`, has header `typ` `secevent+jwt`, `iss` the connection’s issuer, `aud` the stream audience, a unique `jti` and an `iat` within the last 24 hours, and up to 8 events. It must not have a top-level `sub`. Name the customer in `sub_id` or each event’s `subject`, in the format `iss_sub` (with `iss` the connection’s issuer and `sub` the customer’s ID) or `opaque` (with `id` the customer’s ID).
+
+| Event                         | What Caplo does                                                                                                                                                                              |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CAEP `session-revoked`        | Revokes the customer’s verifications through the connection.                                                                                                                                 |
+| RISC `account-disabled`       | Revokes the customer’s verifications through the connection.                                                                                                                                 |
+| CAEP `credential-change`      | Revokes verifications authenticated before the event’s `event_timestamp`.                                                                                                                    |
+| CAEP `assurance-level-change` | Lowers the level of current verifications to the level `current_level` maps to through the connection’s **Assurance mapping**. It never raises a level, and a value you did not map revokes. |
+| RISC `identifier-changed`     | Proposes renaming the customer to `new-value`. The proposal waits under **Subject changes** until an Owner or Admin selects **Confirm**.                                                     |
+
+Other event types are accepted and ignored. Caplo answers `202` when the token is accepted, and `400` without detail when it is not. Every signal is recorded in the audit log.
+
+## Sign-out in the widget
+
+Visitors can end their own verification:
+
+* **Sign out** in the widget, or **Not you? Sign out** on the notice shown after verifying.
+* **New conversation**, which signs them out first.
+
+When the visitor was signed in by your page with host sign-in, the widget does not sign them out on its own. It dispatches `caplo:identity-signout-requested` on the widget control, so your page can sign the user out of your site and then call `identity.signOut()`. Call `identity.signOut()` too whenever your user signs out on your site. See the [JavaScript API](/channels/website-widget/javascript-api/#sign-visitors-in-from-your-page).
+
+## Rename or merge customers
+
+When a customer’s ID changes in your system, or two IDs turn out to be the same person, select **Rename or merge** under **Subject changes**:
+
+* **Rename: the customer’s ID changed** moves the customer from **Current subject** to **New subject**.
+* **Merge: two IDs are the same customer** folds the **Subject to merge away** into the **Subject to keep**.
+
+Choose the **Subject namespace** and give a **Reason**. Memory, account links and conversation history move with the customer, the old ID’s active sessions end, and the change is audited. Use this instead of sending a new `sub` from your sign-in: a new `sub` is a new customer to Caplo.
+
+## Account links
+
+An account link maps a verified customer to an account in one of your backend systems, named by a namespace such as `billing`, and can hold a credential for that account. A verified tool operation that names the namespace then acts on the linked account, and Caplo passes the credential to the tool as one of its declared package secrets, only for that customer and only for that call. The value is never shown again after it is stored, and revoking a link destroys it. If a customer has no active link, the operation is refused, but they stay verified.
+
+Account links work together with verified tool operations on a channel. Neither can be set up from the console or the CLI yet; contact [support](/resources/support/) if you need them.

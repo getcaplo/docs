@@ -1,0 +1,76 @@
+# Manage workspace secrets
+
+> Create, rotate and delete the workspace secrets that tool packages use, see where each is bound, and know who can manage them.
+
+A **workspace secret** is a credential, such as an API key for your store, that you save once and bind to every tool package that needs it. Rotating it updates every bound package. This page covers managing the secrets themselves; to declare secrets in a package and bind them, see [Secrets and network access](/tools/secrets-and-egress/).
+
+Values are write-only. Once saved, neither the console nor the CLI shows a value again, and the [audit log](/operate/audit-log/) records changes without values.
+
+## Who can do what
+
+| Action                                                                        | Roles                                                         |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| See the list of workspace secrets and where they are bound                    | Owner, Admin, Builder, Developer, Supervisor, Viewer, Billing |
+| Create, rotate and delete workspace secrets; bind and unbind them to packages | Owner, Admin                                                  |
+
+API keys can list secrets with `tools:read` but cannot create, rotate, delete or bind them.
+
+## Create a secret
+
+**Console**
+
+1. Open **Settings** > **Secrets** (under **Developer**) and select **Create secret**.
+2. Enter a **Name**: lowercase letters, digits and hyphens, starting with a letter, 2 to 64 characters, such as `shop-prod`.
+3. Optionally add a **Description** (up to 500 characters) of what it is for.
+4. Enter the **Value** (up to 8,192 bytes) and select **Create secret**.
+
+**CLI**
+
+The value is read from a hidden prompt, or from standard input when it is not a terminal, so it never appears in your shell history:
+
+```sh
+caplo secret set shop-prod --description "Shop API production key"
+```
+
+In a script, pipe it from your secret store: `printf '%s' "$SHOP_KEY" | caplo secret set shop-prod`.
+
+A new secret is **Not bound** until you bind it to a package from **Tools**, in the package’s **Secrets** dialog, or with `caplo tool secret bind`. See [Provide the values](/tools/secrets-and-egress/#provide-the-values).
+
+## Rotate a secret
+
+**Console**
+
+Select **Rotate** next to the secret, enter the **New value**, and select **Rotate value**.
+
+**CLI**
+
+Run `caplo secret set` with the existing name. Without `--description`, it keeps the current description.
+
+```sh
+caplo secret set shop-prod
+```
+
+Every bound package uses the new value in live calls within a minute. There is no overlap period, so if your provider supports two active credentials, create the new one there, rotate the secret in Caplo, wait a minute, then revoke the old credential at the provider.
+
+## See where a secret is used
+
+The list shows each secret with **Bound** and the number of package secrets that use it, or **Not bound**, and when it was last updated. For the packages and names behind the count:
+
+```sh
+caplo secret list
+caplo secret usage shop-prod
+```
+
+## Delete a secret
+
+You can delete a secret only when no package secret is bound to it. In the console, select **Delete**: if it is in use, Caplo lists the package secrets to unbind first; otherwise confirm **Delete secret**. With the CLI, `caplo secret delete shop-prod` refuses a bound secret and lists its bindings.
+
+Deleting cannot be undone
+
+The value is removed for good. Unbinding a package secret first means live calls of tools that need it fail until you set or bind a value again.
+
+## Related
+
+* [Secrets and network access](/tools/secrets-and-egress/)
+* [`caplo secret` reference](/reference/cli/secret/)
+* [Manage API keys](/admin/api-keys/)

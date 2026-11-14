@@ -16,7 +16,7 @@ New conversations use the release the channel serves when they start. Conversati
 | Instagram      | **Instagram**          | Messages to a connected Instagram professional account.                                                                  |
 | Phone          | **Telephone**          | Inbound calls to a Twilio or Telnyx number you connect.                                                                  |
 
-For WhatsApp, Messenger, Instagram and phone, you first connect the provider account in the console under **Integrations** then **Communication channels**. Caplo verifies the account before you can choose it in a channel. Detailed setup guides for these channel types will be added to these docs later.
+For WhatsApp, Messenger, Instagram and phone, you first connect the provider account in the console under **Integrations** then **Communication channels**. Caplo verifies the account before you can choose it in a channel. Setup guides: [WhatsApp](/channels/whatsapp/), [Messenger and Instagram](/channels/messenger-and-instagram/) and [phone](/channels/phone/). To have your team answer in Chatwoot, see [Hand off to Chatwoot](/channels/handoff-to-chatwoot/).
 
 ## Before you start
 

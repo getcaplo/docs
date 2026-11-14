@@ -13,7 +13,10 @@
 - [Build agents](https://docs.caplo.si/_llms-txt/build-agents.txt): agent configuration, knowledge, sub-agents, evals and publishing
 - [Tools](https://docs.caplo.si/_llms-txt/tools.txt): writing, testing and publishing tool packages and remote MCP servers
 - [CLI](https://docs.caplo.si/_llms-txt/cli.txt): installing and using the caplo CLI, with the full command reference
-- [Website widget](https://docs.caplo.si/_llms-txt/website-widget.txt): installing, designing and scripting the website widget
+- [Channels](https://docs.caplo.si/_llms-txt/channels.txt): the website widget, WhatsApp, Messenger, Instagram, phone channels and Chatwoot handoff
+- [Customer identity](https://docs.caplo.si/_llms-txt/customer-identity.txt): verifying customers and letting tools act on their accounts
+- [Workspace administration](https://docs.caplo.si/_llms-txt/workspace-administration.txt): members, SSO, API keys, secrets, provider keys, usage, the inbox and data settings
+- [SDK](https://docs.caplo.si/_llms-txt/sdk.txt): the @caplo/tools API and tool package guides
 
 ## Notes
 

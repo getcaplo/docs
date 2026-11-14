@@ -21,7 +21,7 @@ suggestedReplies:
 
 Where they appear:
 
-* The website widget, the console’s live test, and messaging channels that can show them. `caplo agent chat` does not print them. WhatsApp and Messenger show at most 3, as reply buttons, whatever `maxCount` says.
+* The website widget, the console’s live test, and messaging channels that can show them. `caplo agent chat` does not print them. WhatsApp, Messenger and Instagram show at most 3, as reply buttons, whatever `maxCount` says.
 * Never on voice calls.
 * Only under replies the agent writes itself. A sub-agent that [takes over the conversation](/agents/sub-agents-and-routing/#modes) uses its own setting; a sub-agent the agent asks for an answer never offers any.
 
