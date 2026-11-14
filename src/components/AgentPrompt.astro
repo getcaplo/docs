@@ -1,0 +1,115 @@
+---
+import { getEntry } from 'astro:content';
+import { chatgptUrl, claudeUrl } from '../lib/markdown-url';
+
+interface Props {
+	id: string;
+}
+
+const prompt = await getEntry('prompts', Astro.props.id);
+if (!prompt) throw new Error(`AgentPrompt: src/content/prompts/${Astro.props.id}.md does not exist`);
+const text = (prompt.body ?? '').trim();
+---
+
+<section class="caplo-prompt not-content" aria-label={`AI prompt: ${prompt.data.title}`} data-agent-prompt>
+	<div class="caplo-prompt-head">
+		<span class="caplo-prompt-kicker">AI prompt</span>
+		<p class="caplo-prompt-title">{prompt.data.title}</p>
+		<p class="caplo-prompt-description">{prompt.data.description}</p>
+	</div>
+	<div class="caplo-prompt-actions">
+		<button type="button" class="caplo-prompt-copy" data-copy-prompt><span data-label>Copy prompt</span></button>
+		<a href={claudeUrl(text)} target="_blank" rel="noopener">Open in Claude</a>
+		<a href={chatgptUrl(text)} target="_blank" rel="noopener">Open in ChatGPT</a>
+	</div>
+	<details>
+		<summary>Show prompt</summary>
+		<pre data-prompt-text>{text}</pre>
+	</details>
+</section>
+
+<script>
+	import { copyText, flash } from '../lib/clipboard';
+
+	for (const card of document.querySelectorAll<HTMLElement>('[data-agent-prompt]')) {
+		const button = card.querySelector('[data-copy-prompt]')!;
+		const label = card.querySelector<HTMLElement>('[data-label]')!;
+		const text = card.querySelector<HTMLElement>('[data-prompt-text]')!.textContent ?? '';
+		button.addEventListener('click', async () => flash(label, (await copyText(text)) ? 'Copied' : 'Copy failed', 'Copy prompt'));
+	}
+</script>
+
+<style>
+	.caplo-prompt {
+		margin-block: 1.5rem;
+		padding: 1rem 1.1rem;
+		border: 1px solid var(--sl-color-gray-5);
+		border-left: 3px solid var(--caplo-signal);
+		border-radius: 0.6rem;
+		background: var(--caplo-prompt-bg);
+	}
+	.caplo-prompt-kicker {
+		font-size: var(--sl-text-xs);
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--caplo-signal-ink);
+	}
+	.caplo-prompt-title {
+		margin: 0.15rem 0 0;
+		font-weight: 600;
+		color: var(--sl-color-white);
+	}
+	.caplo-prompt-description {
+		margin: 0.15rem 0 0;
+		color: var(--sl-color-gray-2);
+		font-size: var(--sl-text-sm);
+	}
+	.caplo-prompt-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-top: 0.8rem;
+	}
+	.caplo-prompt-actions > * {
+		padding: 0.35rem 0.75rem;
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 0.45rem;
+		background: var(--sl-color-bg);
+		color: var(--sl-color-white);
+		font: inherit;
+		font-size: var(--sl-text-sm);
+		text-decoration: none;
+		cursor: pointer;
+	}
+	.caplo-prompt-actions > .caplo-prompt-copy {
+		background: var(--sl-color-accent);
+		border-color: var(--sl-color-accent);
+		color: var(--sl-color-text-invert);
+		font-weight: 600;
+	}
+	.caplo-prompt-actions > *:hover {
+		border-color: var(--sl-color-accent);
+	}
+	details {
+		margin-top: 0.8rem;
+		font-size: var(--sl-text-sm);
+	}
+	summary {
+		cursor: pointer;
+		color: var(--sl-color-gray-2);
+	}
+	pre {
+		margin-top: 0.6rem;
+		max-height: 24rem;
+		overflow: auto;
+		padding: 0.8rem;
+		border-radius: 0.45rem;
+		background: var(--sl-color-gray-7);
+		color: var(--sl-color-white);
+		font-family: var(--sl-font-mono);
+		font-size: var(--sl-text-xs);
+		white-space: pre-wrap;
+		word-break: break-word;
+	}
+</style>

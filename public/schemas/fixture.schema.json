@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:caplo:tools:fixture:v1",
+  "title": "Caplo tool test fixture",
+  "description": "One tools/call and its expectations. Fixture files match the package's `tests` glob.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "tool",
+    "arguments",
+    "expect"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "tool": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{0,47}$"
+    },
+    "arguments": {
+      "type": "object"
+    },
+    "secrets": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Test values for declared secrets."
+    },
+    "expect": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "isError": {
+          "type": "boolean"
+        },
+        "structuredContent": {
+          "type": "object",
+          "description": "Every listed field must equal the result's field; extra result fields are allowed."
+        },
+        "textIncludes": {
+          "type": "string",
+          "description": "Substring of the joined text content."
+        }
+      }
+    }
+  }
+}

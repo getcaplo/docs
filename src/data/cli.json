@@ -1,0 +1,3383 @@
+{
+  "version": "0.4.0",
+  "commands": [
+    {
+      "path": "caplo",
+      "use": "caplo [flags]",
+      "short": "Build, test, and publish Caplo agents and tool packages, and manage workspaces, remote MCP servers, secrets, and customer identity keys",
+      "long": "caplo builds, tests, and publishes Caplo agents and tool packages from a project folder, and manages a\nworkspace's agents, tool packages, remote MCP servers, secrets, knowledge bases, channels, API clients, and\ncustomer identity keys.\n\nA person logs in with caplo auth login. CI and automation set CAPLO_API_KEY to an API client's key and\nCAPLO_WORKSPACE to its workspace ID instead; see caplo workspace api-client. Commands act on the workspace that\n--workspace or CAPLO_WORKSPACE names, else the one selected with caplo workspace use.\n\nThe configuration directory is CAPLO_CONFIG_DIR, else ~/.config/caplo ($XDG_CONFIG_HOME/caplo), or %AppData%\\caplo\non Windows. It holds config.yaml: the API URL, issuer, OAuth client, credential storage, and selected workspace.\nUse a separate CAPLO_CONFIG_DIR for each Caplo installation you log in to.\n\nExit codes: 0 for success, 1 for an error, 2 for a usage error (including a confirmation that needs --yes when\nthere is no terminal), 3 when a check fails (validation, tool fixtures, eval cases, or assertion checks), 130 when\nCtrl-C interrupts a command or a prompt, and 143 for SIGTERM. A second Ctrl-C ends the process at once.",
+      "example": "caplo auth login\n  caplo init shop --template summit\n  caplo publish --env prod --yes",
+      "runnable": false,
+      "subcommands": [
+        "caplo agent",
+        "caplo auth",
+        "caplo channel",
+        "caplo completion",
+        "caplo config",
+        "caplo diff",
+        "caplo eval",
+        "caplo identity",
+        "caplo init",
+        "caplo knowledge",
+        "caplo mcp",
+        "caplo publish",
+        "caplo pull",
+        "caplo push",
+        "caplo secret",
+        "caplo test",
+        "caplo tool",
+        "caplo validate",
+        "caplo version",
+        "caplo workspace"
+      ],
+      "flags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo agent",
+      "use": "caplo agent",
+      "short": "Build, test, evaluate, and publish one agent",
+      "long": "Commands for a single agent file or workspace agent. A workspace agent is named by its name or ID. To push and\npublish the agents of a project together, children first, use caplo push and caplo publish.",
+      "example": "caplo agent init -f support.yaml\n  caplo agent push -f support.yaml\n  caplo agent chat \"Support\"\n  caplo agent publish \"Support\"",
+      "group": "Workspace resources",
+      "runnable": false,
+      "subcommands": [
+        "caplo agent chat",
+        "caplo agent eval",
+        "caplo agent get",
+        "caplo agent init",
+        "caplo agent list",
+        "caplo agent publish",
+        "caplo agent pull",
+        "caplo agent push",
+        "caplo agent release",
+        "caplo agent test",
+        "caplo agent validate"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo agent chat",
+      "use": "caplo agent chat <agent> [flags]",
+      "short": "Chat with the agent's saved draft, or a release, in a private test conversation",
+      "long": "Starts a private test conversation with the agent's saved draft, or with a release named by --release, and reads\none message per line from standard input. Each reply is printed with the sub-agents and tools the turn used. End\nwith Ctrl-D, /exit, or /quit; the test session is closed when the chat ends.\n\nA write awaiting a decision is shown as its review, as a review of the whole plan, or as a write that can only be\ndeclined: one with no review here, or one waiting for the customer to sign in. /confirm or /cancel decides the write\nshown last, as the widget's buttons do; ordinary text never approves a write. If the write changed meanwhile, the\ncurrent one is shown to answer again, and a refused (409) message or decision is reported without ending the chat.\nA message or decision that was not sent makes the command exit 1 at its end; without a terminal, a failed turn\nmakes it exit 3.\n\nReplies arrive on the agent-test event stream. It resumes after the last event when it reconnects, reloads the\nhistory on a reset, reconnects with a fresh token when asked to reauthenticate, and retries network failures, 429,\nand 5xx, but not an unknown host, a rejected TLS certificate, or another 4xx. When no test session is free, caplo\nagent test list and caplo agent test close free one.",
+      "example": "caplo agent chat \"Shop Concierge\"\n  caplo agent chat \"Shop Concierge\" --release 2.1.0\n  printf 'Where is order 1042?\\n/confirm\\n' | caplo agent chat \"Shop Concierge\"",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "release",
+          "type": "string",
+          "usage": "chat with this release, by number or version, instead of the draft"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo agent eval",
+      "use": "caplo agent eval",
+      "short": "Run and inspect an agent's evaluations",
+      "example": "caplo agent eval run \"Shop Concierge\"\n  caplo agent eval list \"Shop Concierge\"",
+      "runnable": false,
+      "subcommands": [
+        "caplo agent eval get",
+        "caplo agent eval list",
+        "caplo agent eval run"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo agent eval get",
+      "use": "caplo agent eval get <agent> <run> [flags]",
+      "short": "Show an evaluation run and its cases",
+      "example": "caplo agent eval get \"Shop Concierge\" 0c9e7a52-1d4b-4e8f-a3c6-5b2d9f0e1a47",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo agent eval list",
+      "use": "caplo agent eval list <agent> [flags]",
+      "short": "List the agent's evaluation runs, newest first",
+      "example": "caplo agent eval list \"Shop Concierge\"\n  caplo agent eval list \"Shop Concierge\" -n 5 -o json",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "limit",
+          "shorthand": "n",
+          "type": "int",
+          "default": "20",
+          "usage": "most runs to show (at most 100)"
+        },
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo agent eval run",
+      "use": "caplo agent eval run <agent>",
+      "short": "Run the agent's eval cases against its saved draft",
+      "long": "Runs every case of the agent's eval suite against its saved draft in isolated test conversations, as publishing\ndoes, and prints each case with its failed checks and the grader's rationale. A passing run for the same draft and\nsuite is reused. It waits up to 12 minutes for the run and exits 3 when a case fails.",
+      "example": "caplo agent eval run \"Shop Concierge\"",
+      "runnable": true,
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo agent get",
+      "use": "caplo agent get <agent> [flags]",
+      "short": "Show an agent: draft, model, tools, sub-agents, and latest release",
+      "example": "caplo agent get \"Shop Concierge\"\n  caplo agent get 6f1d2c3b-8a4e-4f0a-9b7c-2d1e0f3a4b5c -o yaml",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo agent init",
+      "use": "caplo agent init [flags]",
+      "short": "Write a new agent file to edit, validate, and push",
+      "long": "Writes a starter agent file with one eval case. The file must not exist. Without --name, the agent is named\nafter the file: its first letter capitalized and dashes as spaces.",
+      "example": "caplo agent init\n  caplo agent init -f agents/help-desk.yaml\n  caplo agent init -f support.yaml --name \"Support Desk\"",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "file",
+          "shorthand": "f",
+          "type": "string",
+          "default": "agent.yaml",
+          "usage": "agent file to write"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "usage": "agent name (default: from the file name)"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo agent list",
+      "use": "caplo agent list [flags]",
+      "short": "List the workspace's agents",
+      "long": "Lists the workspace's agents with their latest release, draft revision, and status. Archived agents are left\nout unless --archived.",
+      "example": "caplo agent list\n  caplo agent list --archived -o json",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "archived",
+          "type": "bool",
+          "usage": "include archived agents"
+        },
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo agent publish",
+      "use": "caplo agent publish <agent> [flags]",
+      "short": "Pin tools, run the evals, and publish the agent's saved draft as a release",
+      "long": "Publishes the saved draft of a workspace agent: it pins the draft's tool versions, checks that the draft is\nready, runs its eval cases, and publishes it. The agent needs at least one eval case, and every case must pass. Its\nsub-agents must have releases already; caplo publish releases a project's agents together.\n\nA released draft is published again only when its packages have newer versions. When its eval cases changed since\nits release, they run against it and the release is kept.\n\nWithout --bump the version follows the console: a first release, or a change of sub-agents, provider, or model, or\na removed tool, action, or knowledge base, is major; an added one is minor; anything else is a patch. It asks before\npublishing; --yes skips the question.",
+      "example": "caplo agent publish \"Shop Concierge\"\n  caplo agent publish \"Shop Concierge\" --bump minor --yes",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "bump",
+          "type": "string",
+          "usage": "version bump: major, minor, or patch (default: suggested from the changes)"
+        },
+        {
+          "name": "yes",
+          "shorthand": "y",
+          "type": "bool",
+          "usage": "publish without asking"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo agent pull",
+      "use": "caplo agent pull <agent> [flags]",
+      "short": "Write an agent's draft as the console's Export YAML, to --file or standard output",
+      "long": "Writes the agent's draft byte for byte as the console's Export YAML. Sub-agents are linked by agentId, and the\neval cases are not included; caplo pull writes an agent with its sub-agents and eval cases into a project.",
+      "example": "caplo agent pull \"Shop Concierge\"\n  caplo agent pull \"Shop Concierge\" -f concierge.yaml",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "file",
+          "shorthand": "f",
+          "type": "string",
+          "usage": "file to write (default: standard output)"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo agent push",
+      "use": "caplo agent push [flags]",
+      "short": "Save an agent file as the agent's draft, creating the agent if needed, and its evals as the eval suite",
+      "long": "Saves the file as the draft of the workspace agent with its name, creating the agent when there is none. The\nfile's evals replace the agent's eval suite; without an evals key the suite is left alone. Inside a project, local\nreferences resolve, and the sub-agents and packages they name must exist in the workspace already. --dry-run prints\nthe draft diff without saving.",
+      "example": "caplo agent push -f agent.yaml\n  caplo agent push -f agent.yaml --dry-run",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dry-run",
+          "type": "bool",
+          "usage": "show the draft diff without saving"
+        },
+        {
+          "name": "file",
+          "shorthand": "f",
+          "type": "string",
+          "usage": "agent file"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo agent release",
+      "use": "caplo agent release",
+      "short": "List, show, and revoke an agent's releases",
+      "long": "A release is a published draft revision with its tool versions and sub-agent releases pinned. Channels serve\nreleases, and parents link them. A release is named by its number, its version with or without a leading v, or its\nID.",
+      "example": "caplo agent release list \"Shop Concierge\"\n  caplo agent release revoke \"Shop Concierge\" 2.1.0 --reason \"wrong refund policy\"",
+      "runnable": false,
+      "subcommands": [
+        "caplo agent release get",
+        "caplo agent release list",
+        "caplo agent release revoke"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo agent release get",
+      "use": "caplo agent release get <agent> <release> [flags]",
+      "short": "Show a release: version, tools, sub-agent releases, and eval gate",
+      "example": "caplo agent release get \"Shop Concierge\" 2.1.0\n  caplo agent release get \"Shop Concierge\" 7 -o json",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo agent release list",
+      "use": "caplo agent release list <agent> [flags]",
+      "short": "List the agent's releases, newest first",
+      "example": "caplo agent release list \"Shop Concierge\"",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo agent release revoke",
+      "use": "caplo agent release revoke <agent> <release> [flags]",
+      "short": "Permanently revoke a release, so channels and parents can no longer run it",
+      "long": "Revokes a release permanently; it cannot be undone. Channels that serve it and parents that link it can no longer\nrun it, and links at release: latest and channel deploys skip it. It needs --reason and asks first; --yes skips the\nquestion.",
+      "example": "caplo agent release revoke \"Shop Concierge\" 2.1.0 --reason \"wrong refund policy\"",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "reason",
+          "type": "string",
+          "usage": "why the release is revoked (required)"
+        },
+        {
+          "name": "yes",
+          "shorthand": "y",
+          "type": "bool",
+          "usage": "do not ask for confirmation"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo agent test",
+      "use": "caplo agent test",
+      "short": "Manage your private test sessions",
+      "long": "Each caplo agent chat runs in a private test session, which holds test capacity until it is closed. The chat\ncloses its session when it ends; list and close find and free sessions left open.",
+      "example": "caplo agent test list\n  caplo agent test close 4d2f8b1e-6c3a-4f7e-9d05-1a2b3c4d5e6f",
+      "runnable": false,
+      "subcommands": [
+        "caplo agent test close",
+        "caplo agent test list"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo agent test close",
+      "use": "caplo agent test close <session-id>",
+      "short": "Close one of your private test sessions and release its capacity",
+      "example": "caplo agent test close 4d2f8b1e-6c3a-4f7e-9d05-1a2b3c4d5e6f",
+      "runnable": true,
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo agent test list",
+      "use": "caplo agent test list",
+      "short": "List your open test sessions across agents in this workspace",
+      "example": "caplo agent test list",
+      "runnable": true,
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo agent validate",
+      "use": "caplo agent validate [flags]",
+      "short": "Check an agent file offline: schema, references, and link policies",
+      "long": "Checks the file against the agent schema and its references without calling the workspace. When the file is\nan agent of a project, by the project's agents glob, local references resolve and the project's problems with the\nfile are reported too. Outside a project, sub-agents are linked by agentId and tools name a package ID or a remote\nMCP server. Problems are printed and the command exits 3.",
+      "example": "caplo agent validate -f agent.yaml\n  caplo agent validate -f agents/orders.yaml",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "file",
+          "shorthand": "f",
+          "type": "string",
+          "usage": "agent file"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo auth",
+      "use": "caplo auth",
+      "short": "Log in, log out, and show the session",
+      "long": "A login session authenticates a person. CI and automation use an API client's key in CAPLO_API_KEY instead;\nsee caplo workspace api-client.",
+      "example": "caplo auth login\n  caplo auth status",
+      "group": "Account",
+      "runnable": false,
+      "subcommands": [
+        "caplo auth login",
+        "caplo auth logout",
+        "caplo auth status"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo auth login",
+      "use": "caplo auth login [flags]",
+      "short": "Log in through the browser, or with --device on a machine without one",
+      "long": "Logs in with the caplo-cli OpenID client: in the browser with the authorization code flow and PKCE, answered on\na 127.0.0.1 port, or with --device through the device authorization grant. The refresh token is stored in the OS\nkeychain, or with --insecure-storage (or credential-storage file) in a 0600 file in the configuration directory;\naccess tokens stay in memory. Refresh tokens rotate on every use, and caplo processes share a lock so that none\nreuses a token another has used.\n\nThe API and issuer are --api-url and --issuer, else CAPLO_API_URL and CAPLO_ISSUER, else the saved settings, else\nproduction (https://api.caplo.si and https://auth.caplo.si/realms/caplo). A successful login saves them, so the\nvariables affect login only and never redirect an existing session. Login keeps the selected workspace while you\nstill belong to it, and otherwise selects your only workspace.",
+      "example": "caplo auth login\n  caplo auth login --device\n  caplo auth login --api-url https://api.staging.example.com --issuer https://auth.staging.example.com/realms/caplo",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "api-url",
+          "type": "string",
+          "usage": "Caplo API URL, for example https://api.caplo.si"
+        },
+        {
+          "name": "device",
+          "type": "bool",
+          "usage": "use the device authorization grant"
+        },
+        {
+          "name": "insecure-storage",
+          "type": "bool",
+          "usage": "keep the refresh token in a 0600 file instead of the OS keychain (default: the saved credential-storage)"
+        },
+        {
+          "name": "issuer",
+          "type": "string",
+          "usage": "OpenID issuer URL, for example https://auth.caplo.si/realms/caplo"
+        },
+        {
+          "name": "no-browser",
+          "type": "bool",
+          "usage": "print the login URL without opening a browser"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo auth logout",
+      "use": "caplo auth logout",
+      "short": "Revoke the session and delete the stored refresh token",
+      "long": "Deletes the stored refresh token, then revokes the session at the issuer. When the revocation fails, the local\ntoken is deleted all the same and the command reports the failure.",
+      "example": "caplo auth logout",
+      "runnable": true,
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo auth status",
+      "use": "caplo auth status [flags]",
+      "short": "Show the logged-in user, API, and selected workspace",
+      "long": "Shows the logged-in user, the API and issuer, where the credentials are stored, and the selected workspace. With\nCAPLO_API_KEY it shows the API client, its workspace, and its scopes instead.",
+      "example": "caplo auth status\n  caplo auth status -o json",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo channel",
+      "use": "caplo channel",
+      "short": "List channels and deploy agent releases to them",
+      "long": "A channel is a website widget, WhatsApp number, Messenger or Instagram account, Outlook mailbox, or phone number,\nand serves one agent release. Channels are created in the console; deploy and rollback change the release they serve.\nNew conversations get the new release, and open ones keep the release they started with. A channel is named by its\nID, its name, or <kind>/<name>. Every other setting of a channel stays as it is, and its revision guards a deploy\nagainst a concurrent change in the console.",
+      "example": "caplo channel list\n  caplo channel deploy Website --agent \"Shop Concierge\"",
+      "group": "Workspace resources",
+      "runnable": false,
+      "subcommands": [
+        "caplo channel deploy",
+        "caplo channel get",
+        "caplo channel list",
+        "caplo channel rollback"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo channel deploy",
+      "use": "caplo channel deploy <channel>... [--agent <agent>[@<version>]] [flags]",
+      "short": "Point channels at an agent release, by default their agent's newest release",
+      "long": "Points each channel at the release: --agent names the agent and, after @, its version (1.4.0) or release number;\nwithout a version it is the agent's newest release that is not revoked. Without --agent each channel keeps its agent.\nA revoked release is never deployed. It asks for confirmation; --yes skips it.",
+      "example": "caplo channel deploy Website\n  caplo channel deploy Website \"twilio/Support line\" --agent \"Shop Concierge@2.1.0\" --yes",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "agent",
+          "type": "string",
+          "usage": "agent name or ID, with @version or @number to pick a release"
+        },
+        {
+          "name": "yes",
+          "shorthand": "y",
+          "type": "bool",
+          "usage": "deploy without asking"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo channel get",
+      "use": "caplo channel get <channel> [flags]",
+      "short": "Show a channel and the release it serves",
+      "example": "caplo channel get Website\n  caplo channel get \"twilio/Support line\"",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo channel list",
+      "use": "caplo channel list [flags]",
+      "short": "List the workspace's channels and the release each serves",
+      "example": "caplo channel list\n  caplo channel list --agent \"Shop Concierge\" -o json",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "agent",
+          "type": "string",
+          "usage": "only the channels serving this agent (name or ID)"
+        },
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo channel rollback",
+      "use": "caplo channel rollback <channel>... [flags]",
+      "short": "Point channels back at their agent's release before the one they serve",
+      "long": "Points each channel at the newest release of its agent, older than the one it serves, that is not revoked. The\nrelease is served as it was published; publish again to move forward. It asks for confirmation; --yes skips it.",
+      "example": "caplo channel rollback Website --yes",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "yes",
+          "shorthand": "y",
+          "type": "bool",
+          "usage": "roll back without asking"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo completion",
+      "use": "caplo completion",
+      "short": "Generate the autocompletion script for the specified shell",
+      "long": "Generate the autocompletion script for caplo for the specified shell.\nSee each sub-command's help for details on how to use the generated script.",
+      "runnable": false,
+      "subcommands": [
+        "caplo completion bash",
+        "caplo completion fish",
+        "caplo completion powershell",
+        "caplo completion zsh"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo completion bash",
+      "use": "caplo completion bash",
+      "short": "Generate the autocompletion script for bash",
+      "long": "Generate the autocompletion script for the bash shell.\n\nThis script depends on the 'bash-completion' package.\nIf it is not installed already, you can install it via your OS's package manager.\n\nTo load completions in your current shell session:\n\n\tsource <(caplo completion bash)\n\nTo load completions for every new session, execute once:\n\n#### Linux:\n\n\tcaplo completion bash > /etc/bash_completion.d/caplo\n\n#### macOS:\n\n\tcaplo completion bash > $(brew --prefix)/etc/bash_completion.d/caplo\n\nYou will need to start a new shell for this setup to take effect.",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "no-descriptions",
+          "type": "bool",
+          "usage": "disable completion descriptions"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo completion fish",
+      "use": "caplo completion fish [flags]",
+      "short": "Generate the autocompletion script for fish",
+      "long": "Generate the autocompletion script for the fish shell.\n\nTo load completions in your current shell session:\n\n\tcaplo completion fish | source\n\nTo load completions for every new session, execute once:\n\n\tcaplo completion fish > ~/.config/fish/completions/caplo.fish\n\nYou will need to start a new shell for this setup to take effect.",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "no-descriptions",
+          "type": "bool",
+          "usage": "disable completion descriptions"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo completion powershell",
+      "use": "caplo completion powershell [flags]",
+      "short": "Generate the autocompletion script for powershell",
+      "long": "Generate the autocompletion script for powershell.\n\nTo load completions in your current shell session:\n\n\tcaplo completion powershell | Out-String | Invoke-Expression\n\nTo load completions for every new session, add the output of the above command\nto your powershell profile.",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "no-descriptions",
+          "type": "bool",
+          "usage": "disable completion descriptions"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo completion zsh",
+      "use": "caplo completion zsh [flags]",
+      "short": "Generate the autocompletion script for zsh",
+      "long": "Generate the autocompletion script for the zsh shell.\n\nIf shell completion is not already enabled in your environment you will need\nto enable it.  You can execute the following once:\n\n\techo \"autoload -U compinit; compinit\" >> ~/.zshrc\n\nTo load completions in your current shell session:\n\n\tsource <(caplo completion zsh)\n\nTo load completions for every new session, execute once:\n\n#### Linux:\n\n\tcaplo completion zsh > \"${fpath[1]}/_caplo\"\n\n#### macOS:\n\n\tcaplo completion zsh > $(brew --prefix)/share/zsh/site-functions/_caplo\n\nYou will need to start a new shell for this setup to take effect.",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "no-descriptions",
+          "type": "bool",
+          "usage": "disable completion descriptions"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo config",
+      "use": "caplo config",
+      "short": "Show and change CLI settings",
+      "long": "Settings are saved in config.yaml in the configuration directory: CAPLO_CONFIG_DIR, else ~/.config/caplo\n($XDG_CONFIG_HOME/caplo), or %AppData%\\caplo on Windows. caplo workspace use saves the selected workspace there too.",
+      "example": "caplo config list\n  caplo config set credential-storage file",
+      "group": "Account",
+      "runnable": false,
+      "subcommands": [
+        "caplo config get",
+        "caplo config list",
+        "caplo config set"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo config get",
+      "use": "caplo config get <key>",
+      "short": "Show one setting",
+      "example": "caplo config get api-url",
+      "runnable": true,
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo config list",
+      "use": "caplo config list [flags]",
+      "short": "Show every setting",
+      "long": "Shows the saved settings, the production defaults for those not saved, and the selected workspace. Defaults are\nnot saved.",
+      "example": "caplo config list\n  caplo config list -o json",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo config set",
+      "use": "caplo config set <key> <value>",
+      "short": "Change one setting: api-url, issuer, client-id, credential-storage",
+      "long": "Changes a saved setting: api-url, issuer, client-id (the OAuth client, caplo-cli by default), or\ncredential-storage (keychain or file). Changing api-url clears the selected workspace. Run caplo auth login\nafterwards to start a session with the new setting.",
+      "example": "caplo config set credential-storage file\n  caplo config set api-url https://api.staging.example.com",
+      "runnable": true,
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo diff",
+      "use": "caplo diff [agent/<name> | tool/<name>]... [flags]",
+      "short": "Show how the project differs from the workspace drafts",
+      "long": "Compares each selected package's files with its workspace draft, and each agent file and its evals with the\nagent's draft and eval suite. It prints the plan, one line per resource, and a unified diff per changed agent; a new\nagent diffs against nothing. It changes nothing.\n\nSelectors are agent/<file key or name>, where a file key wins over a name, and tool/<package>. An agent brings\nits project sub-agents and the project packages they use. Without selectors the command acts on the whole project.\n\nWith -o json or yaml the plan is one document: the project, workspace, environment, whether anything changes,\nand per resource its steps (create, update, save-evals, build, test, evaluate, publish, archive, deploy; none when\nunchanged), summary, changed files, reasons, current and next versions, and diff. A pipeline can post it on a pull\nrequest or check it with a policy. push and publish print it only with --dry-run.",
+      "example": "caplo diff\n  caplo diff agent/concierge tool/order-desk\n  caplo diff --env prod -o json",
+      "group": "Project",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "start looking for the project's caplo.yaml here"
+        },
+        {
+          "name": "env",
+          "shorthand": "e",
+          "type": "string",
+          "usage": "environment from caplo.yaml: its workspace, agent fields, channels, and promotion (default: $CAPLO_ENV)"
+        },
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo eval",
+      "use": "caplo eval [agent/<name> | tool/<name>]... [flags]",
+      "short": "Push the selection, then run each selected agent's eval cases against its draft",
+      "long": "Pushes the selection like caplo push, then runs each selected agent's eval cases against its saved draft in\nisolated test conversations and prints every case. A passing run for the same draft and suite is reused. Exits 3\nwhen a case fails or an agent has no eval cases.\n\nAn agent file's evals list cases with the console's fields: name, input, desiredOutcome, uncertainty,\nprohibitedAction, answerContains, answerExcludes, subAgent, avoidSubAgent, routedBy, and tool. A push matches them\nto the suite's cases by name and replaces the agent's eval suite with them; without an evals key the suite is left\nalone. In every run a grader model also judges each case's desiredOutcome. A failed case prints the grader's\nrationale, and a case the grader could not judge reads desired outcome not graded and does not pass. routedBy\n(fast, model, or any) checks how an agent with fast routing routed the case.\n\nSelectors are agent/<file key or name>, where a file key wins over a name, and tool/<package>. An agent brings\nits project sub-agents and the project packages they use. Without selectors the command acts on the whole project.",
+      "example": "caplo eval\n  caplo eval agent/concierge\n  caplo eval --env staging",
+      "group": "Project",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "start looking for the project's caplo.yaml here"
+        },
+        {
+          "name": "env",
+          "shorthand": "e",
+          "type": "string",
+          "usage": "environment from caplo.yaml: its workspace, agent fields, channels, and promotion (default: $CAPLO_ENV)"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo identity",
+      "use": "caplo identity",
+      "short": "Generate keys and sign or check host sign-in assertions locally",
+      "long": "Local helpers for a host that signs its customers in to Caplo with signed assertions, through a customer\nidentity connection of type signed_assertion. Nothing is sent to Caplo. Only verify-assertion makes a request,\nto fetch a JWKS from an https URL as Identity does: within 3 seconds, at most 64 KiB, and without redirects.",
+      "example": "caplo identity keygen --out keys\n  caplo identity sign-assertion --key keys/<kid>.private.jwk.json --iss https://shop.example.com \\\n    --aud urn:caplo:customer-identity:<id> --sub cust-1042 --nonce <nonce> > assertion.jwt\n  caplo identity verify-assertion --jwks keys/<kid>.public.jwk.json --iss https://shop.example.com \\\n    --aud urn:caplo:customer-identity:<id> - < assertion.jwt",
+      "group": "Workspace resources",
+      "runnable": false,
+      "subcommands": [
+        "caplo identity keygen",
+        "caplo identity sign-assertion",
+        "caplo identity verify-assertion"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo identity keygen",
+      "use": "caplo identity keygen [flags]",
+      "short": "Write a new signing key: private JWK and PEM, and the public JWK to give the connection; nothing is sent",
+      "long": "Writes <kid>.private.jwk.json and <kid>.private.pem, readable only by you, and <kid>.public.jwk.json, with kid,\nalg, and use sig, into --out. Add the public JWK to the connection's keys or your JWKS, and keep the private key on\nyour server. RSA keys have 3072 bits, and the key ID defaults to the key's RFC 7638 thumbprint. Existing files are\nnever overwritten.",
+      "example": "caplo identity keygen\n  caplo identity keygen --alg EdDSA --kid shop-2026 --out keys",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "alg",
+          "type": "string",
+          "default": "ES256",
+          "usage": "algorithm: ES256, ES384, PS256, RS256, EdDSA; RSA keys have 3072 bits"
+        },
+        {
+          "name": "kid",
+          "type": "string",
+          "usage": "key ID (default: the RFC 7638 thumbprint)"
+        },
+        {
+          "name": "out",
+          "type": "string",
+          "default": ".",
+          "usage": "directory to write the key files in"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo identity sign-assertion",
+      "use": "caplo identity sign-assertion [flags]",
+      "short": "Print a signed caplo-customer+jwt assertion, as a host backend would make one, for local tests",
+      "long": "Signs a caplo-customer+jwt assertion with a private JWK or PEM key and prints it as a compact JWS, as a host's\nbackend would for a challenge nonce. --key, --iss, --aud, --sub, and --nonce are required. The assertion lives\n--ttl seconds, at most 300. An --attr value that is a JSON number, boolean, or quoted string keeps its type; any\nother value is a string.",
+      "example": "caplo identity sign-assertion --key keys/shop-2026.private.jwk.json --iss https://shop.example.com \\\n    --aud urn:caplo:customer-identity:<id> --sub cust-1042 --nonce <nonce>\n  caplo identity sign-assertion --key key.pem --alg PS256 --kid shop-rsa --iss https://shop.example.com \\\n    --aud urn:caplo:customer-identity:<id> --sub cust-1042 --nonce <nonce> --amr pwd,otp --auth-time now \\\n    --attr tier=gold --attr orders=12 --act-for cust-7:guardian",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "acr",
+          "type": "string",
+          "usage": "authentication context class, mapped to a level by the connection"
+        },
+        {
+          "name": "act-for",
+          "type": "string",
+          "usage": "subject the customer acts for, as sub:relationship"
+        },
+        {
+          "name": "alg",
+          "type": "string",
+          "usage": "algorithm (default: the JWK's alg, or the one an EC or Ed25519 PEM key fits)"
+        },
+        {
+          "name": "amr",
+          "type": "stringSlice",
+          "usage": "authentication methods, comma separated, e.g. pwd,otp"
+        },
+        {
+          "name": "attr",
+          "type": "stringArray",
+          "usage": "verified attribute k=v, repeatable; a JSON number, boolean or \"quoted string\" keeps its type"
+        },
+        {
+          "name": "aud",
+          "type": "string",
+          "usage": "audience: the connection's urn:caplo:customer-identity:<id>"
+        },
+        {
+          "name": "auth-time",
+          "type": "string",
+          "usage": "when the customer last authenticated: Unix time or now"
+        },
+        {
+          "name": "iss",
+          "type": "string",
+          "usage": "issuer: the connection's issuer"
+        },
+        {
+          "name": "key",
+          "type": "string",
+          "usage": "private key file: JWK or PEM"
+        },
+        {
+          "name": "kid",
+          "type": "string",
+          "usage": "key ID (default: the JWK's kid)"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "usage": "display name"
+        },
+        {
+          "name": "nonce",
+          "type": "string",
+          "usage": "the challenge nonce"
+        },
+        {
+          "name": "sid",
+          "type": "string",
+          "usage": "the host's session ID, for back-channel logout"
+        },
+        {
+          "name": "sub",
+          "type": "string",
+          "usage": "the customer's stable, opaque ID"
+        },
+        {
+          "name": "ttl",
+          "type": "int64",
+          "default": "60",
+          "usage": "lifetime in seconds, at most 300"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo identity verify-assertion",
+      "use": "caplo identity verify-assertion <token|-> [flags]",
+      "short": "Run Identity's assertion checks locally and print each; challenge state and connection policy are skipped",
+      "long": "Runs Identity's checks on an assertion, given as an argument or read from standard input with -, and prints each\nas pass, fail, or skip: format, typ, key, signature, issuer and audience, nonce, times, subject and the claim\nallow-list, and claim values such as amr, sid, jti, profile claims, attributes, and act_for. The nonce is compared\nonly with --nonce. Challenge state and the connection's policy (acr mapping, allowed profile claims, declared\nattributes and their types, and delegation relationships) are Identity's and are skipped. Exits 3 when a check\nfails.",
+      "example": "caplo identity verify-assertion --jwks keys/shop-2026.public.jwk.json --iss https://shop.example.com \\\n    --aud urn:caplo:customer-identity:<id> \"$ASSERTION\"\n  caplo identity sign-assertion ... | caplo identity verify-assertion --jwks https://shop.example.com/jwks.json \\\n    --iss https://shop.example.com --aud urn:caplo:customer-identity:<id> --nonce <nonce> -",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "alg",
+          "type": "stringSlice",
+          "default": "[ES256,ES384,PS256,RS256,EdDSA]",
+          "usage": "the connection's pinned algorithms"
+        },
+        {
+          "name": "aud",
+          "type": "string",
+          "usage": "the connection's audience"
+        },
+        {
+          "name": "iss",
+          "type": "string",
+          "usage": "the connection's issuer"
+        },
+        {
+          "name": "jwks",
+          "type": "string",
+          "usage": "JWKS or public JWK: a file or an https URL"
+        },
+        {
+          "name": "nonce",
+          "type": "string",
+          "usage": "the challenge nonce (default: skip the comparison)"
+        },
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo init",
+      "use": "caplo init [dir] [flags]",
+      "short": "Create a project: caplo.yaml, agent files, and tool packages",
+      "long": "Creates a project in dir (default: the current directory), which must be missing or empty. The blank\ntemplate has one agent; summit is a sample shop with a concierge agent, three sub-agents, and two tool packages.\nEach tool package gets package.json and tsconfig.json from the @caplo/tools templates; run npm install in it\nbefore testing it.\n\nA project is a folder with caplo.yaml: apiVersion v1, kind Project, a name, and the agents and tools globs\n(default agents/*.yaml and tools/*). Project commands find it by walking up from the current directory or --dir.\nEach agent file is an agent YAML document with apiVersion v2.0.0, the format of the console's Export YAML; v1\nfiles are refused. The file name without .yaml is the agent's key, which links and selectors use. Each tool\npackage is a directory with its own caplo.yaml, as caplo tool init makes it.\n\nIn an agent file:\n\n  subAgents link a project agent with local: <file key>, or any workspace agent with agentId. With release:\n  latest, or no release, the link pins the child's newest release that is not revoked whenever the parent is\n  pushed or published, so a child's new release publishes its parents again. A version pins that release. The\n  child runs with its own release's tools and knowledge.\n\n  tools name <package>/<tool> for a project package, <server>/<tool> for a published tool of a workspace remote\n  MCP server (caplo mcp), or <package ID>/<tool>; a package alone selects all its tools. A name that is no\n  project package is looked up as a remote MCP server when the project is diffed, pushed, or published.\n\n  knowledgeBases name a workspace knowledge base by name or ID. A name resolves in the workspace the command acts\n  on, so one file works in every environment.\n\n  evals are the agent's eval cases; see caplo eval.\n\nWorkspace agents and packages are matched by name: a missing one is created and an existing one updated. Nothing\nis deleted; caplo publish --prune archives agents the project no longer defines.",
+      "example": "caplo init shop --template summit\n  cd shop && (cd tools/order-desk && npm install) && (cd tools/store-stock && npm install)\n  caplo init --name support",
+      "group": "Project",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "name",
+          "type": "string",
+          "usage": "project name (default: the directory name)"
+        },
+        {
+          "name": "template",
+          "shorthand": "t",
+          "type": "string",
+          "default": "blank",
+          "usage": "project template: blank or summit"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo knowledge",
+      "use": "caplo knowledge",
+      "short": "Manage knowledge bases and sync their documents from a directory",
+      "long": "A knowledge base holds documents an agent answers from. Each upload is extracted and waits for review; a\nperson approves it in the console, or caplo knowledge approve does. Publishing snapshots the approved documents into\na version, and an agent release pins the newest ready version. Agent files name knowledge bases by name or ID, and\nso do these commands.",
+      "example": "caplo knowledge create \"Returns policy\" --owner support\n  caplo knowledge sync \"Returns policy\" ./docs/returns --approve --publish --yes",
+      "aliases": [
+        "kb"
+      ],
+      "group": "Workspace resources",
+      "runnable": false,
+      "subcommands": [
+        "caplo knowledge approve",
+        "caplo knowledge create",
+        "caplo knowledge get",
+        "caplo knowledge list",
+        "caplo knowledge publish",
+        "caplo knowledge sync"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo knowledge approve",
+      "use": "caplo knowledge approve <kb> [document]... [flags]",
+      "short": "Wait for extraction and approve documents for the next version, by default every one awaiting review",
+      "long": "Approving a document skips reviewing its extracted text in the console. It waits for documents still being extracted\nand fails when one fails to extract. It needs agents:publish.",
+      "example": "caplo knowledge approve \"Returns policy\"\n  caplo knowledge approve \"Returns policy\" refunds.md exchanges.pdf",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "timeout",
+          "type": "duration",
+          "default": "15m0s",
+          "usage": "how long to wait for extraction"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo knowledge create",
+      "use": "caplo knowledge create <name> --owner <team> [flags]",
+      "short": "Create a knowledge base",
+      "long": "Creates a knowledge base. --owner names the team that owns its content. --audience verified_customer limits its\ncontent to customers who signed in; the default is public.",
+      "example": "caplo knowledge create \"Returns policy\" --owner support --description \"Return and refund rules\"\n  caplo knowledge create \"Account help\" --owner support --audience verified_customer",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "audience",
+          "type": "string",
+          "usage": "public (default) or verified_customer, for content only signed-in customers may get"
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "usage": "what the knowledge base covers"
+        },
+        {
+          "name": "owner",
+          "type": "string",
+          "usage": "team that owns the content"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo knowledge get",
+      "use": "caplo knowledge get <kb> [flags]",
+      "short": "Show a knowledge base, its documents, and its versions",
+      "long": "Shows the knowledge base, its newest version, and its documents with their extraction and review state. -o json\nor yaml includes every version.",
+      "example": "caplo knowledge get \"Returns policy\"",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo knowledge list",
+      "use": "caplo knowledge list [flags]",
+      "short": "List the workspace's knowledge bases",
+      "example": "caplo kb list",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo knowledge publish",
+      "use": "caplo knowledge publish <kb> [flags]",
+      "short": "Publish a version from the approved documents and wait for it to index",
+      "long": "Publishes a version from the approved documents, unless the newest version holds exactly them, and waits until it\nis ready. Agent releases published from then on use it. Exits 3 when there are no approved documents or the version\ndoes not become ready.",
+      "example": "caplo knowledge publish \"Returns policy\"\n  caplo knowledge publish \"Returns policy\" --timeout 30m",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "timeout",
+          "type": "duration",
+          "default": "15m0s",
+          "usage": "how long to wait for indexing"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo knowledge sync",
+      "use": "caplo knowledge sync <kb> <dir> [flags]",
+      "short": "Make a knowledge base's documents match a directory, and optionally approve and publish them",
+      "long": "Uploads the directory's new and changed documents and removes the ones whose file is gone. The older copy of a\nchanged file is removed once the new copy is approved, so a version never lacks the document; a document a published\nversion holds stays in that version. Files are matched by name and content, so an unchanged file is not uploaded\nagain. Documents are named by file name, so two files in the tree may not share one. Supported types, up to 25 MiB\neach: .txt .md .markdown .html .pdf .docx .png .jpg .jpeg .webp.\nOther files are skipped, and so are hidden files and directories.\n\n--approve waits for extraction and approves the directory's documents, which skips reviewing their extracted text in\nthe console; it needs agents:publish. --publish then publishes a version from the approved documents and waits for it\nto index. It asks for confirmation before removing documents; --yes skips it. --dry-run prints the changes only.",
+      "example": "caplo knowledge sync \"Returns policy\" ./docs/returns --dry-run\n  caplo knowledge sync \"Returns policy\" ./docs/returns --approve --publish --yes",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "approve",
+          "type": "bool",
+          "usage": "wait for extraction and approve the directory's documents"
+        },
+        {
+          "name": "dry-run",
+          "type": "bool",
+          "usage": "show the changes without making them"
+        },
+        {
+          "name": "publish",
+          "type": "bool",
+          "usage": "publish a version from the approved documents and wait for it to index"
+        },
+        {
+          "name": "timeout",
+          "type": "duration",
+          "default": "15m0s",
+          "usage": "how long --approve and --publish wait for extraction and indexing"
+        },
+        {
+          "name": "yes",
+          "shorthand": "y",
+          "type": "bool",
+          "usage": "remove documents without asking"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo mcp",
+      "use": "caplo mcp",
+      "short": "Connect remote MCP servers and publish their reviewed tools",
+      "long": "A remote MCP server is an MCP server reachable over HTTPS whose tools agents can call. Add it with caplo mcp add,\nauthorize it with caplo mcp connect when it uses OAuth, review its discovered tools with caplo mcp review, and\npublish them with caplo mcp publish. Agent files then name them <server>/<tool>. A server is named by its name or\nID. Secrets are read only from standard input or an environment variable, so they stay out of shell history and\nprocess listings, and are never shown again.",
+      "example": "caplo mcp check https://mcp.example.com/mcp\n  caplo mcp add crm --url https://mcp.example.com/mcp --auth oauth\n  caplo mcp connect crm --open\n  caplo mcp review crm --enable search_contacts=read && caplo mcp publish crm",
+      "group": "Workspace resources",
+      "runnable": false,
+      "subcommands": [
+        "caplo mcp add",
+        "caplo mcp check",
+        "caplo mcp connect",
+        "caplo mcp get",
+        "caplo mcp list",
+        "caplo mcp publish",
+        "caplo mcp refresh",
+        "caplo mcp remove",
+        "caplo mcp review",
+        "caplo mcp tools",
+        "caplo mcp update"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo mcp add",
+      "use": "caplo mcp add <name> [flags]",
+      "short": "Add a remote MCP server; its name prefixes every tool's model name",
+      "long": "Adds a remote MCP server. Its name matches [a-z][a-z0-9-]{1,39}, must differ from every package and server in the\nworkspace, and prefixes every tool's model name. --auth is none, bearer, header (with --header-name), or oauth. A\nbearer token or header value comes from --secret-stdin or --secret-env.\n\nWith --auth oauth the client is registered through a Client ID Metadata Document or dynamic registration, unless\n--client-id names a pre-registered client; its secret comes from --client-secret-stdin or --client-secret-env, and\nit must allow the callback URL that caplo mcp get shows. --oauth-grant is authorization_code, authorized with\ncaplo mcp connect, or client_credentials. The command prints the server's status and what to do next.",
+      "example": "caplo mcp add crm --url https://mcp.example.com/mcp --auth oauth\n  CRM_TOKEN=... caplo mcp add crm --url https://mcp.example.com/mcp --auth bearer --secret-env CRM_TOKEN\n  caplo mcp add erp --url https://erp.example.com/mcp --auth header --header-name X-Api-Key --secret-stdin",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "auth",
+          "type": "string",
+          "usage": "authentication: none, bearer, header, or oauth"
+        },
+        {
+          "name": "client-id",
+          "type": "string",
+          "usage": "pre-registered OAuth client ID (default: a Client ID Metadata Document or dynamic registration)"
+        },
+        {
+          "name": "client-secret-env",
+          "type": "string",
+          "usage": "read the pre-registered client's secret from this environment variable"
+        },
+        {
+          "name": "client-secret-stdin",
+          "type": "bool",
+          "usage": "read the pre-registered client's secret from stdin"
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "usage": "what the server is for"
+        },
+        {
+          "name": "display-name",
+          "type": "string",
+          "usage": "name shown in the console (default: the name)"
+        },
+        {
+          "name": "header-name",
+          "type": "string",
+          "usage": "credential header of --auth header"
+        },
+        {
+          "name": "oauth-grant",
+          "type": "string",
+          "default": "authorization_code",
+          "usage": "OAuth grant: authorization_code or client_credentials; update keeps the current one unless set"
+        },
+        {
+          "name": "scope",
+          "type": "stringArray",
+          "usage": "OAuth scope to request, repeatable (default: the server's)"
+        },
+        {
+          "name": "secret-env",
+          "type": "string",
+          "usage": "read the bearer token or header value from this environment variable"
+        },
+        {
+          "name": "secret-stdin",
+          "type": "bool",
+          "usage": "read the bearer token or header value from stdin (a hidden prompt on a terminal)"
+        },
+        {
+          "name": "token-auth-method",
+          "type": "string",
+          "usage": "token endpoint authentication: none, client_secret_basic, or client_secret_post"
+        },
+        {
+          "name": "transport",
+          "type": "string",
+          "usage": "auto, streamable_http, or sse (default auto)"
+        },
+        {
+          "name": "url",
+          "type": "string",
+          "usage": "HTTPS endpoint of the server"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo mcp check",
+      "use": "caplo mcp check <url> [flags]",
+      "short": "Check a remote MCP server without saving it: transport, protocol, tools, and OAuth discovery",
+      "long": "Has Caplo probe a server URL without saving anything: whether it is reachable, its transport, protocol, and\ntool count, and, when it needs authorization, what OAuth discovery found. A bearer token or header value for the\ncheck is read from standard input and not stored.",
+      "example": "caplo mcp check https://mcp.example.com/mcp\n  printf %s \"$CRM_TOKEN\" | caplo mcp check https://mcp.example.com/mcp --bearer-stdin",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "bearer-stdin",
+          "type": "bool",
+          "usage": "check with a bearer token read from stdin; it is not stored"
+        },
+        {
+          "name": "header",
+          "type": "string",
+          "usage": "check with a credential in this header, its value read with --value-stdin"
+        },
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        },
+        {
+          "name": "transport",
+          "type": "string",
+          "usage": "auto, streamable_http, or sse (default auto)"
+        },
+        {
+          "name": "value-stdin",
+          "type": "bool",
+          "usage": "read the --header value from stdin; it is not stored"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo mcp connect",
+      "use": "caplo mcp connect <name|id> [flags]",
+      "short": "Authorize a remote MCP server that uses OAuth",
+      "long": "Authorize a remote MCP server that uses OAuth. For the authorization code grant, open the printed URL in a\nbrowser signed in to the Caplo console: the authorization server redirects to the console, which completes the\nauthorization. The command waits for it unless --wait is 0, retrying network and 5xx failures while it\nchecks. The client credentials grant completes at once.",
+      "example": "caplo mcp connect crm --open\n  caplo mcp connect crm --wait 0",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "open",
+          "type": "bool",
+          "usage": "open the authorization URL in the default browser"
+        },
+        {
+          "name": "wait",
+          "type": "duration",
+          "default": "10m0s",
+          "usage": "how long to wait for the authorization; 0 returns at once"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo mcp get",
+      "use": "caplo mcp get <name|id> [flags]",
+      "short": "Show a remote MCP server: status, authentication, last error, and its discovered tools",
+      "long": "Shows the server's status, transport and protocol, authentication without secrets, last error, published\nversion, and its discovered tools with their review, change, and published state. For OAuth it shows the callback\nURL a pre-registered client must allow.",
+      "example": "caplo mcp get crm\n  caplo mcp get crm -o json",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo mcp list",
+      "use": "caplo mcp list [flags]",
+      "short": "List the workspace's remote MCP servers",
+      "example": "caplo mcp list",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo mcp publish",
+      "use": "caplo mcp publish <name|id>",
+      "short": "Pin the enabled tools of the latest tool list as a new version that agents can use",
+      "long": "Pins the enabled tools of the latest tool list, as reviewed, as a new version. It fails when the tool list changed\nsince the review; check it with caplo mcp tools, review it again, and publish. Agent files name the tools\n<server>/<tool>.",
+      "example": "caplo mcp publish crm",
+      "runnable": true,
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo mcp refresh",
+      "use": "caplo mcp refresh <name|id>",
+      "short": "Test a remote MCP server and refresh its tool list against the published version",
+      "long": "Connects to the server, lists its tools again, and marks each new, changed, or removed against the published\nversion. Published tools that changed on the server are blocked until they are reviewed and published again.",
+      "example": "caplo mcp refresh crm",
+      "runnable": true,
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo mcp remove",
+      "use": "caplo mcp remove <name|id> [flags]",
+      "short": "Remove a remote MCP server: its published tools stop working and its credentials are deleted",
+      "long": "Removes a remote MCP server. Its published tools stop working for every agent that uses them, its stored\ncredentials are deleted, and its name stays reserved. It asks first; --yes skips the question.",
+      "example": "caplo mcp remove crm --yes",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "yes",
+          "shorthand": "y",
+          "type": "bool",
+          "usage": "do not ask for confirmation"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo mcp review",
+      "use": "caplo mcp review <name|id> [flags]",
+      "short": "Enable, classify, and configure discovered tools; nothing reaches agents until caplo mcp publish",
+      "long": "Enable, classify, and configure discovered tools by their remote name. --enable without an effect keeps the\ntool's effect, or takes the one the server's hints suggest. Write tools ask the customer to confirm unless\n--confirmation <tool>=none. --timeout takes 1 to 30 seconds. Tools not named keep their review. Nothing reaches\nagents until caplo mcp publish.",
+      "example": "caplo mcp review crm --enable search_contacts=read --enable create_note=write\n  caplo mcp review crm --confirmation create_note=none --timeout create_note=20\n  caplo mcp review crm --disable delete_contact",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "confirmation",
+          "type": "stringArray",
+          "usage": "for a write tool, <remote tool>=required|none, repeatable"
+        },
+        {
+          "name": "disable",
+          "type": "stringArray",
+          "usage": "disable a tool by its remote name, repeatable"
+        },
+        {
+          "name": "enable",
+          "type": "stringArray",
+          "usage": "enable a tool, as <remote tool>[=read|write], repeatable"
+        },
+        {
+          "name": "timeout",
+          "type": "stringArray",
+          "usage": "<remote tool>=<seconds from 1 to 30>, repeatable"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo mcp tools",
+      "use": "caplo mcp tools <name|id> [flags]",
+      "short": "List a remote MCP server's discovered tools with their review and publish state",
+      "example": "caplo mcp tools crm",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo mcp update",
+      "use": "caplo mcp update <name|id> [flags]",
+      "short": "Change a remote MCP server's endpoint, transport, or authentication",
+      "long": "Change a remote MCP server's endpoint, transport, or authentication. Authentication flags change the current\nsetup; a stored secret is kept unless a new one is given. A new URL or authentication setup discards stored OAuth\ntokens and clients, so the server must be authorized again with caplo mcp connect.",
+      "example": "caplo mcp update crm --url https://mcp.example.com/v2/mcp\n  caplo mcp update crm --scope contacts.read --scope contacts.write\n  printf %s \"$NEW_TOKEN\" | caplo mcp update erp --secret-stdin",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "auth",
+          "type": "string",
+          "usage": "authentication: none, bearer, header, or oauth"
+        },
+        {
+          "name": "client-id",
+          "type": "string",
+          "usage": "pre-registered OAuth client ID (default: a Client ID Metadata Document or dynamic registration)"
+        },
+        {
+          "name": "client-secret-env",
+          "type": "string",
+          "usage": "read the pre-registered client's secret from this environment variable"
+        },
+        {
+          "name": "client-secret-stdin",
+          "type": "bool",
+          "usage": "read the pre-registered client's secret from stdin"
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "usage": "what the server is for"
+        },
+        {
+          "name": "display-name",
+          "type": "string",
+          "usage": "name shown in the console"
+        },
+        {
+          "name": "header-name",
+          "type": "string",
+          "usage": "credential header of --auth header"
+        },
+        {
+          "name": "oauth-grant",
+          "type": "string",
+          "default": "authorization_code",
+          "usage": "OAuth grant: authorization_code or client_credentials; update keeps the current one unless set"
+        },
+        {
+          "name": "scope",
+          "type": "stringArray",
+          "usage": "OAuth scope to request, repeatable (default: the server's)"
+        },
+        {
+          "name": "secret-env",
+          "type": "string",
+          "usage": "read the bearer token or header value from this environment variable"
+        },
+        {
+          "name": "secret-stdin",
+          "type": "bool",
+          "usage": "read the bearer token or header value from stdin (a hidden prompt on a terminal)"
+        },
+        {
+          "name": "token-auth-method",
+          "type": "string",
+          "usage": "token endpoint authentication: none, client_secret_basic, or client_secret_post"
+        },
+        {
+          "name": "transport",
+          "type": "string",
+          "usage": "auto, streamable_http, or sse"
+        },
+        {
+          "name": "url",
+          "type": "string",
+          "usage": "HTTPS endpoint of the server"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo publish",
+      "use": "caplo publish [agent/<name> | tool/<name>]... [flags]",
+      "short": "Validate, push, test, evaluate, and publish bottom up: tools, then child agents, then parents",
+      "long": "Publishes the selection, or the whole project, bottom up. Changed packages are pushed, built, tested with their\nfixtures on the workspace's test runner, and published first. Then agents publish with children before parents:\neach draft is saved pinned to its children's new releases, its eval cases run, and it is published. An agent\npublishes when its file changed, its saved draft is unpublished, or a package or release: latest sub-agent it uses\npublishes. A release does not pin eval cases, so an agent whose cases alone changed since its release is evaluated\nand keeps the release. A published agent needs at least one eval case, and every case must pass.\n\nIt validates the project, prints the plan and diffs, and asks before publishing; --yes skips the question. Without\na terminal, and on a project's first publish to a workspace, it needs --yes. --dry-run prints the plan only.\n--prune archives the agents an earlier publish of this project created that it no longer defines; it takes no\nselectors.\n\nSelectors are agent/<file key or name>, where a file key wins over a name, and tool/<package>. An agent brings\nits project sub-agents and the project packages they use. Without selectors the command acts on the whole project.\n\nSelecting an agent also selects the project agents that link it at release: latest, since its new release\npublishes them again.\n\nEnvironments. caplo.yaml may define environments, each a workspace the project publishes to:\n\n  environments:\n    staging:\n      workspace: 5b1e9c2a-...        # an ID, or a name when you log in rather than use an API key\n      apiKeyEnv: CAPLO_STAGING_KEY   # optional: the variable with this environment's API key\n    prod:\n      workspace: 0d6a3c87-...\n      apiKeyEnv: CAPLO_PROD_KEY\n      promoteFrom: staging           # publish only what staging released from the same source\n      agents:                        # agent fields by file key, merged over the agent file\n        front: {model: {name: claude-sonnet-4-5}}\n      channels:                      # channels a publish points at the agent's newest release\n        front: [Website, twilio/Support line]\n\n--env, or CAPLO_ENV, selects one for validate, diff, push, eval, and publish: its workspace (a different\n--workspace or CAPLO_WORKSPACE is refused), its API key when its apiKeyEnv variable is set (used instead of\nCAPLO_API_KEY), and its agent fields, which merge like a JSON merge patch: mappings merge, null removes a key, and\nanything else replaces.\n\nEach release's note names the project and the agent's source digest: its file as written, the files of the project\npackages it uses, and its project sub-agents. With promoteFrom, the publish exits 3 unless every agent it publishes\nhas a release in that environment, not revoked, with the same digest. That environment is read with its own\napiKeyEnv key, else the login session; a publish that uses an API key needs the other environment's key, with\nagents:read. After publishing, it deploys the environment's channels that do not serve their agent's newest\nrelease, which needs channels:write; the plan lists them as channel/<kind>/<name>.\n\nWith -o json or yaml the plan is one document: the project, workspace, environment, whether anything changes,\nand per resource its steps (create, update, save-evals, build, test, evaluate, publish, archive, deploy; none when\nunchanged), summary, changed files, reasons, current and next versions, and diff. A pipeline can post it on a pull\nrequest or check it with a policy. push and publish print it only with --dry-run.",
+      "example": "caplo publish\n  caplo publish agent/orders --dry-run\n  caplo publish --env prod --yes\n  caplo publish --prune",
+      "group": "Project",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "start looking for the project's caplo.yaml here"
+        },
+        {
+          "name": "dry-run",
+          "type": "bool",
+          "usage": "show the plan and diffs without publishing"
+        },
+        {
+          "name": "env",
+          "shorthand": "e",
+          "type": "string",
+          "usage": "environment from caplo.yaml: its workspace, agent fields, channels, and promotion (default: $CAPLO_ENV)"
+        },
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        },
+        {
+          "name": "prune",
+          "type": "bool",
+          "usage": "archive agents an earlier publish of this project created that it no longer defines"
+        },
+        {
+          "name": "yes",
+          "shorthand": "y",
+          "type": "bool",
+          "usage": "publish without asking"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo pull",
+      "use": "caplo pull agent/<name> [dir] [flags]",
+      "short": "Write a workspace agent, its sub-agents, and their packages into a project",
+      "long": "Writes a workspace agent, named by name or ID, and every sub-agent it links, with their drafts and eval cases, as\nagent files of a project. The project is the one at dir; a dir without caplo.yaml becomes a new project unless it is\ninside another one. Without dir it is the project above --dir, or a new one in --dir. Agents the project defines\nare written to their own files, others to new files in the directory the agents glob names.\n\nPackages the agents use that the project lacks are pulled from their workspace drafts into the directory the tools\nglob names; remote MCP server tools stay <server>/<tool>. Links name the release the draft pins, since a draft does\nnot record release: latest.",
+      "example": "caplo pull \"agent/Shop Concierge\"\n  caplo pull agent/concierge ./shop",
+      "group": "Project",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "start looking for the project's caplo.yaml here"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo push",
+      "use": "caplo push [agent/<name> | tool/<name>]... [flags]",
+      "short": "Create or update the workspace drafts, children first, so you can live test them",
+      "long": "Prints the plan, then uploads and builds each changed package as its workspace draft, and saves each agent file\nas its agent's draft and its evals as the agent's eval suite, children before parents. A missing package or agent is\ncreated. Nothing is published.\n\nA live test runs linked sub-agents from their releases, so push names the project sub-agents that have no release\nyet and the caplo publish that releases them. --dry-run prints the plan and diffs without pushing.\n\nSelectors are agent/<file key or name>, where a file key wins over a name, and tool/<package>. An agent brings\nits project sub-agents and the project packages they use. Without selectors the command acts on the whole project.\n\nWith -o json or yaml the plan is one document: the project, workspace, environment, whether anything changes,\nand per resource its steps (create, update, save-evals, build, test, evaluate, publish, archive, deploy; none when\nunchanged), summary, changed files, reasons, current and next versions, and diff. A pipeline can post it on a pull\nrequest or check it with a policy. push and publish print it only with --dry-run.",
+      "example": "caplo push\n  caplo push agent/concierge\n  caplo push --dry-run -o json",
+      "group": "Project",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "start looking for the project's caplo.yaml here"
+        },
+        {
+          "name": "dry-run",
+          "type": "bool",
+          "usage": "show the changes and diffs without pushing"
+        },
+        {
+          "name": "env",
+          "shorthand": "e",
+          "type": "string",
+          "usage": "environment from caplo.yaml: its workspace, agent fields, channels, and promotion (default: $CAPLO_ENV)"
+        },
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo secret",
+      "use": "caplo secret",
+      "short": "Manage workspace secrets that package secrets bind to",
+      "long": "A workspace secret holds one value for many packages: each package secret bound to it with caplo tool secret\nbind receives its value. Rotating it with caplo secret set changes the value for every bound package within a\nminute. Values are never shown again. Names match [a-z][a-z0-9-]{1,63}.",
+      "example": "caplo secret set orders-api-key\n  caplo secret usage orders-api-key",
+      "group": "Workspace resources",
+      "runnable": false,
+      "subcommands": [
+        "caplo secret delete",
+        "caplo secret list",
+        "caplo secret set",
+        "caplo secret usage"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo secret delete",
+      "use": "caplo secret delete <name> [flags]",
+      "short": "Delete a workspace secret that no package secret binds",
+      "long": "Deletes a workspace secret. A secret that package secrets are bound to is not deleted; the command lists the\nbindings to remove first with caplo tool secret unbind. It asks first; --yes skips the question.",
+      "example": "caplo secret delete orders-api-key --yes",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "yes",
+          "shorthand": "y",
+          "type": "bool",
+          "usage": "do not ask for confirmation"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo secret list",
+      "use": "caplo secret list [flags]",
+      "short": "List the workspace secrets and how many package secrets bind each",
+      "example": "caplo secret list",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo secret set",
+      "use": "caplo secret set <name> [flags]",
+      "short": "Create a workspace secret or rotate its value, from a hidden prompt or from stdin when it is not a terminal",
+      "long": "Creates a workspace secret, or rotates the value of an existing one for every package secret bound to it. The\nvalue comes from a hidden prompt, or from standard input without its final newline when that is not a terminal,\nand is 1 to 8192 bytes. --description sets what it is for; without it, a rotation keeps the current description.",
+      "example": "caplo secret set orders-api-key --description \"Orders API key\"\n  printf %s \"$ORDERS_API_KEY\" | caplo secret set orders-api-key",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "description",
+          "type": "string",
+          "usage": "what the secret is for (default: keep the current one)"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo secret usage",
+      "use": "caplo secret usage <name> [flags]",
+      "short": "List the package secrets bound to a workspace secret",
+      "example": "caplo secret usage orders-api-key",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo test",
+      "use": "caplo test [agent/<name> | tool/<name>]... [flags]",
+      "short": "Run the selected tool packages' fixtures locally, like caplo tool test",
+      "long": "Runs caplo tool test in each selected package: it bundles the package like the builder and runs its fixtures in\nlocal Node 24. It calls no workspace. Exits 3 when a fixture fails.\n\nSelectors are agent/<file key or name>, where a file key wins over a name, and tool/<package>. An agent brings\nits project sub-agents and the project packages they use. Without selectors the command acts on the whole project.",
+      "example": "caplo test\n  caplo test tool/order-desk -v\n  caplo test agent/orders",
+      "group": "Project",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "start looking for the project's caplo.yaml here"
+        },
+        {
+          "name": "verbose",
+          "shorthand": "v",
+          "type": "bool",
+          "usage": "print log lines for passing fixtures too"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool",
+      "use": "caplo tool",
+      "short": "Build, test, publish, and run tool packages",
+      "long": "A tool package is a TypeScript package of tools that agents call, of type function or mcp. Its caplo.yaml\nnames it and declares its tools' policy, egress, secrets, and fixtures. caplo tool init creates one, caplo tool test\nruns its fixtures locally, caplo tool push uploads and builds its workspace draft, and caplo tool publish makes a\nbuild a version that agents can use. Writing tools is covered at https://docs.caplo.si/tools/.\n\nCommands that act on a workspace package take its name, or read caplo.yaml in --dir (default: the current\ndirectory). Inside a project, caplo push and caplo publish handle its packages.",
+      "example": "caplo tool init orders --type mcp\n  cd orders && npm install\n  caplo tool test\n  caplo tool push && caplo tool publish",
+      "group": "Workspace resources",
+      "runnable": false,
+      "subcommands": [
+        "caplo tool archive",
+        "caplo tool build",
+        "caplo tool delete",
+        "caplo tool dev",
+        "caplo tool get",
+        "caplo tool init",
+        "caplo tool list",
+        "caplo tool logs",
+        "caplo tool publish",
+        "caplo tool pull",
+        "caplo tool push",
+        "caplo tool restore",
+        "caplo tool secret",
+        "caplo tool test",
+        "caplo tool version"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool archive",
+      "use": "caplo tool archive [package] [flags]",
+      "short": "Archive a package: no more pushes, builds, or publishes; its versions stay live until revoked",
+      "long": "Archives a package: it can no longer be pushed, built, or published. Its published versions stay live for the\nagents that use them until they are revoked with caplo tool version revoke. caplo tool restore undoes it. It asks\nfirst; --yes skips the question.",
+      "example": "caplo tool archive orders --yes",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "package directory"
+        },
+        {
+          "name": "yes",
+          "shorthand": "y",
+          "type": "bool",
+          "usage": "do not ask for confirmation"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool build",
+      "use": "caplo tool build",
+      "short": "Show, follow, and cancel builds",
+      "long": "A build is named by its ID; [package] defaults to the one caplo.yaml in --dir names.",
+      "example": "caplo tool build list orders\n  caplo tool build logs orders 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f",
+      "runnable": false,
+      "subcommands": [
+        "caplo tool build cancel",
+        "caplo tool build get",
+        "caplo tool build list",
+        "caplo tool build logs"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool build cancel",
+      "use": "caplo tool build cancel [package] <build> [flags]",
+      "short": "Cancel a queued or running build",
+      "example": "caplo tool build cancel orders 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "package directory"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool build get",
+      "use": "caplo tool build get [package] <build> [flags]",
+      "short": "Show a build: status, bundle, tools, and diagnostics",
+      "example": "caplo tool build get orders 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "package directory"
+        },
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool build list",
+      "use": "caplo tool build list [package] [flags]",
+      "short": "List a package's builds, newest first",
+      "example": "caplo tool build list orders\n  caplo tool build list orders --status failed -n 5",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "package directory"
+        },
+        {
+          "name": "limit",
+          "shorthand": "n",
+          "type": "int",
+          "default": "20",
+          "usage": "most builds to show (at most 100)"
+        },
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "usage": "only builds with this status, for example failed"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool build logs",
+      "use": "caplo tool build logs [package] <build> [flags]",
+      "short": "Print a build's log, following it until the build finishes",
+      "example": "caplo tool build logs orders 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "package directory"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool delete",
+      "use": "caplo tool delete [package] [flags]",
+      "short": "Delete a package that was never published; archive a published one instead",
+      "long": "Deletes a package that has never published a version, with its draft and builds. A package with versions can\nonly be archived. It asks first; --yes skips the question.",
+      "example": "caplo tool delete orders-draft --yes",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "package directory"
+        },
+        {
+          "name": "yes",
+          "shorthand": "y",
+          "type": "bool",
+          "usage": "do not ask for confirmation"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool dev",
+      "use": "caplo tool dev [flags]",
+      "short": "Run the package over stdio in MCP Inspector, or for another MCP client with --no-inspector",
+      "long": "Runs the package's src/stdio.ts with Node 24 in MCP Inspector, started with npx, to call its tools by hand.\nThe secrets caplo.yaml declares are read from environment variables of the same name. With --no-inspector the\nserver speaks MCP on this process's standard input and output, so another MCP client can start it.",
+      "example": "caplo tool dev\n  ORDERS_API_KEY=test caplo tool dev --no-inspector --dir ~/src/orders",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "package directory"
+        },
+        {
+          "name": "no-inspector",
+          "type": "bool",
+          "usage": "serve MCP on stdio instead of opening MCP Inspector"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool get",
+      "use": "caplo tool get [package] [flags]",
+      "short": "Show a package, its latest build, and the tools of its latest active version",
+      "example": "caplo tool get orders\n  caplo tool get -o json",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "package directory"
+        },
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool init",
+      "use": "caplo tool init <directory> [flags]",
+      "short": "Create a function or mcp package from the SDK templates",
+      "long": "Creates a package in directory, which must be missing or empty, from the function or mcp template of the\n@caplo/tools SDK, which is embedded in the CLI at build time. --type is required. The package is named after the\ndirectory unless --name is given. Run npm install in it before testing it.",
+      "example": "caplo tool init orders --type mcp\n  caplo tool init tools/weather --type function",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "name",
+          "type": "string",
+          "usage": "package name (default: the directory name)"
+        },
+        {
+          "name": "type",
+          "shorthand": "t",
+          "type": "string",
+          "usage": "package type: function or mcp"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool list",
+      "use": "caplo tool list [flags]",
+      "short": "List the workspace's tool packages",
+      "long": "Lists the packages with their type, latest active version, latest build, and draft revision. Remote MCP servers\nare packages of type remote_mcp.",
+      "example": "caplo tool list\n  caplo tool list --type mcp --archived",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "archived",
+          "type": "bool",
+          "usage": "include archived packages"
+        },
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        },
+        {
+          "name": "type",
+          "shorthand": "t",
+          "type": "string",
+          "usage": "only packages of this type: function, mcp, or remote_mcp"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool logs",
+      "use": "caplo tool logs [package] [flags]",
+      "short": "Show recent live invocations of the package with their log lines; the runners keep the last hour",
+      "long": "Prints the package's recent live invocations with each tool's status, timing, error, egress\ndenials, and log lines. -n sets how many come first, and -f keeps streaming new ones.",
+      "example": "caplo tool logs orders\n  caplo tool logs orders -n 50 -f",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "package directory"
+        },
+        {
+          "name": "follow",
+          "shorthand": "f",
+          "type": "bool",
+          "usage": "keep streaming new invocations"
+        },
+        {
+          "name": "tail",
+          "shorthand": "n",
+          "type": "int",
+          "default": "20",
+          "usage": "recent invocations to show first (at most 200)"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool publish",
+      "use": "caplo tool publish [package] [flags]",
+      "short": "Publish the latest succeeded build, or --build <id>, as a new version",
+      "long": "Publishes the package's latest succeeded build, or the build --build names, as its next version. An agent pins\nits tools' versions when it is published, so agents use the new version from their next release.",
+      "example": "caplo tool publish\n  caplo tool publish orders --build 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "build",
+          "type": "string",
+          "usage": "build ID to publish"
+        },
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "package directory"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool pull",
+      "use": "caplo tool pull <package>[@version] [flags]",
+      "short": "Download the draft, or the exact source of a published version, to run it locally",
+      "long": "Writes the package's draft, or with @version the exact source of the build that version was published from,\ninto an empty or new directory (default: ./<package>). Every file is downloaded and checked against its listed\nSHA-256 before anything is written, so all files or none are written. Listed paths outside the package are refused,\nand files under .git or node_modules are left out. Run the package locally with caplo tool dev --no-inspector.",
+      "example": "caplo tool pull orders\n  caplo tool pull orders@3 --dir /tmp/orders-v3",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "usage": "directory to write, which must be empty or missing (default: ./<package>)"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool push",
+      "use": "caplo tool push [flags]",
+      "short": "Upload the package as the workspace draft, build it, and stream the build log",
+      "long": "Uploads the package directory as its workspace draft, creating the package on its first push, then builds the\ndraft and streams the build log. node_modules, .git, and what git ignores are left out, by the .gitignore files from\nthe enclosing git repository, else the project, down through the package; symlinks and other special files are\nrefused. The builder installs dependencies from the lockfile. Publish the build with caplo tool publish.",
+      "example": "caplo tool push\n  caplo tool push --dir tools/orders",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "package directory"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool restore",
+      "use": "caplo tool restore [package] [flags]",
+      "short": "Restore an archived package",
+      "long": "Restores an archived package, so it can be pushed, built, and published again.",
+      "example": "caplo tool restore orders",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "package directory"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool secret",
+      "use": "caplo tool secret",
+      "short": "Manage the secret values live calls receive",
+      "long": "A package's live calls receive the secrets its caplo.yaml declares, by name. Each one is the package's own value,\nset with caplo tool secret set, or is bound to a workspace secret that several packages can share (caplo secret).\nValues are never shown again, and live calls use a change within a minute. The commands act on the package -p\nnames, else the one caplo.yaml in --dir names.",
+      "example": "caplo tool secret list orders\n  caplo tool secret bind ORDERS_API_KEY orders-api-key -p orders",
+      "runnable": false,
+      "subcommands": [
+        "caplo tool secret bind",
+        "caplo tool secret list",
+        "caplo tool secret set",
+        "caplo tool secret unbind",
+        "caplo tool secret unset"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool secret bind",
+      "use": "caplo tool secret bind <NAME> <workspace-secret> [flags]",
+      "short": "Fill a secret from a workspace secret, replacing the package's own value",
+      "example": "caplo tool secret bind ORDERS_API_KEY orders-api-key -p orders",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "package directory"
+        },
+        {
+          "name": "package",
+          "shorthand": "p",
+          "type": "string",
+          "usage": "package name (default: the one caplo.yaml in --dir names)"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool secret list",
+      "use": "caplo tool secret list [package] [flags]",
+      "short": "List the secrets the latest active version declares and where each value comes from",
+      "long": "Lists the names the package's latest active version declares, and any other name that is set or bound, with the\nsource of each value: workspace: <secret>, package, or none.",
+      "example": "caplo tool secret list orders",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "package directory"
+        },
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool secret set",
+      "use": "caplo tool secret set <NAME> [flags]",
+      "short": "Set a secret from a hidden prompt, or from stdin when it is not a terminal",
+      "long": "Sets the package's own value of a secret for live calls. The value comes from a hidden prompt, or from standard\ninput without its final newline when that is not a terminal, and is 1 to 8192 bytes. Names match\n[A-Z][A-Z0-9_]{0,63}. A name bound to a workspace secret must be unbound first.",
+      "example": "caplo tool secret set ORDERS_API_KEY -p orders\n  printf %s \"$ORDERS_API_KEY\" | caplo tool secret set ORDERS_API_KEY -p orders",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "package directory"
+        },
+        {
+          "name": "package",
+          "shorthand": "p",
+          "type": "string",
+          "usage": "package name (default: the one caplo.yaml in --dir names)"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool secret unbind",
+      "use": "caplo tool secret unbind <NAME> [flags]",
+      "short": "Remove a secret's workspace secret binding; live calls that need it fail until it is bound or set",
+      "long": "Removes the binding and leaves the secret unset. It asks first; --yes skips the question.",
+      "example": "caplo tool secret unbind ORDERS_API_KEY -p orders",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "package directory"
+        },
+        {
+          "name": "package",
+          "shorthand": "p",
+          "type": "string",
+          "usage": "package name (default: the one caplo.yaml in --dir names)"
+        },
+        {
+          "name": "yes",
+          "shorthand": "y",
+          "type": "bool",
+          "usage": "do not ask for confirmation"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool secret unset",
+      "use": "caplo tool secret unset <NAME> [flags]",
+      "short": "Remove a secret; live calls that need it fail",
+      "long": "Removes the package's own value of a secret. It asks first; --yes skips the question.",
+      "example": "caplo tool secret unset ORDERS_API_KEY -p orders --yes",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "package directory"
+        },
+        {
+          "name": "package",
+          "shorthand": "p",
+          "type": "string",
+          "usage": "package name (default: the one caplo.yaml in --dir names)"
+        },
+        {
+          "name": "yes",
+          "shorthand": "y",
+          "type": "bool",
+          "usage": "do not ask for confirmation"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool test",
+      "use": "caplo tool test [flags]",
+      "short": "Bundle the package like the builder and run its fixtures in local Node 24, or with --remote on Caplo's test runner",
+      "long": "Bundles the package with the builder's esbuild version, options, and rejection rules, loads it through the\n@caplo/tools host harness from an empty directory with no environment, checks the tool policy in caplo.yaml, and\nruns the fixtures (tests/*.json unless caplo.yaml sets tests) in local Node 24. It prints the capabilities the\nbuilder records from the installed @caplo/tools release beside the ones the running server advertises; the runner\nrequires both. Run npm install first. Local tests run on macOS and Linux; on Windows, use WSL. The server build\nstays authoritative, since local dependencies may differ from the lockfile.\n\n--remote instead pushes and builds the draft like caplo tool push and runs the fixtures on the workspace's test\nrunner. It exits 3 when a fixture fails.",
+      "example": "caplo tool test\n  caplo tool test -v\n  caplo tool test --remote",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "package directory"
+        },
+        {
+          "name": "remote",
+          "type": "bool",
+          "usage": "push, build, and run the fixtures on the workspace's test runner"
+        },
+        {
+          "name": "verbose",
+          "shorthand": "v",
+          "type": "bool",
+          "usage": "print log lines for passing fixtures too"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool version",
+      "use": "caplo tool version",
+      "short": "Show and revoke published versions",
+      "example": "caplo tool version list orders\n  caplo tool version revoke orders@3 --reason \"leaks order notes\"",
+      "runnable": false,
+      "subcommands": [
+        "caplo tool version get",
+        "caplo tool version list",
+        "caplo tool version revoke"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool version get",
+      "use": "caplo tool version get [<package>@]<version> [flags]",
+      "short": "Show a published version and its tools",
+      "long": "Shows a published version: its status, build, bundle digest, egress, declared secrets, and tools. Without\n<package>@ the package is the one caplo.yaml in --dir names.",
+      "example": "caplo tool version get orders@3\n  caplo tool version get 3 --dir tools/orders",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "package directory"
+        },
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool version list",
+      "use": "caplo tool version list [package] [flags]",
+      "short": "List a package's published versions",
+      "example": "caplo tool version list orders\n  caplo tool version list -o json",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "package directory"
+        },
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo tool version revoke",
+      "use": "caplo tool version revoke [<package>@]<version> [flags]",
+      "short": "Revoke a published version so agents stop resolving it",
+      "long": "Revokes a published version so agents stop resolving it. It needs --reason and asks first; --yes skips the\nquestion.",
+      "example": "caplo tool version revoke orders@3 --reason \"leaks order notes\"",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "package directory"
+        },
+        {
+          "name": "reason",
+          "type": "string",
+          "usage": "why the version is revoked (required)"
+        },
+        {
+          "name": "yes",
+          "shorthand": "y",
+          "type": "bool",
+          "usage": "do not ask for confirmation"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo validate",
+      "use": "caplo validate [flags]",
+      "short": "Check the project offline: schemas, references, link cycles, and the depth limit",
+      "long": "Checks the project without calling the workspace: caplo.yaml and each package's caplo.yaml, every agent file\nagainst the agent schema, unique agent names and file keys, references to project agents and packages, the tools an\nmcp package declares, sub-agent link cycles, and each agent's depth limit: at most policy.maxDepth (1 to 4, default\n3) sub-agent links below it. Tools of remote MCP servers are checked when the project is diffed, pushed, or\npublished.\n\nAn agent with routing mode fast needs at least one sub-agent and doNotUseWhen on every link. When its file lists\nevals, each sub-agent also needs two cases that set routedBy and name it in subAgent.\n\nEvery environment in caplo.yaml is checked: the agent keys it names and its agent fields merged over each file.\nWith --env, the agents are checked as that environment publishes them. Problems are printed and the command\nexits 3.",
+      "example": "caplo validate\n  caplo validate --env prod\n  caplo validate -C ~/src/shop",
+      "group": "Project",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "dir",
+          "shorthand": "C",
+          "type": "string",
+          "default": ".",
+          "usage": "start looking for the project's caplo.yaml here"
+        },
+        {
+          "name": "env",
+          "shorthand": "e",
+          "type": "string",
+          "usage": "environment from caplo.yaml: its workspace, agent fields, channels, and promotion (default: $CAPLO_ENV)"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo version",
+      "use": "caplo version [flags]",
+      "short": "Show the caplo version",
+      "long": "Shows the CLI version, the commit it was built from, and the Go version and platform. caplo --version prints the\nversion alone.",
+      "example": "caplo version\n  caplo version -o json",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo workspace",
+      "use": "caplo workspace",
+      "short": "List, show, create, and select workspaces",
+      "long": "Commands act on the workspace that --workspace or CAPLO_WORKSPACE names, by ID or exact name, else on the one\nselected with caplo workspace use. With an API key the workspace must be named by ID, since a key cannot list\nworkspaces.",
+      "example": "caplo workspace list\n  caplo workspace use \"Shop staging\"",
+      "group": "Account",
+      "runnable": false,
+      "subcommands": [
+        "caplo workspace api-client",
+        "caplo workspace create",
+        "caplo workspace get",
+        "caplo workspace list",
+        "caplo workspace use"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo workspace api-client",
+      "use": "caplo workspace api-client",
+      "short": "Manage API clients and their keys for CI and automation",
+      "long": "An API client authenticates CI and automation without a person's login. Set CAPLO_API_KEY to one of its keys and\nCAPLO_WORKSPACE (or --workspace, or a project environment's workspace) to its workspace ID, and caplo commands act as\nthe client with its scopes, at CAPLO_API_URL, else the configured API, else production. caplo auth status shows the\nclient and its scopes. A key cannot list workspaces, so a workspace named by name is refused.\n\nScopes:\n  agents:read, agents:write, agents:publish\n  tools:read, tools:write, tools:publish\n  channels:read, channels:write\n  conversations:read, usage:read\n  endpoints:read, endpoints:write\n\nA write or publish scope includes its read scope, and a member can grant only the actions their own role holds.\nA CI publish needs agents:write and agents:publish, and tools:write and\ntools:publish when the project has packages. An environment that deploys channels needs channels:write, which a\npublish checks before it starts. Channel commands also read agents, and knowledge commands use the agent scopes.\n\nA project environment can name its own key variable with apiKeyEnv; see caplo publish.",
+      "example": "caplo workspace api-client create ci --scope agents:write,agents:publish,tools:write,tools:publish\n  CAPLO_API_KEY=... CAPLO_WORKSPACE=5b1e9c2a-... caplo publish --yes",
+      "runnable": false,
+      "subcommands": [
+        "caplo workspace api-client create",
+        "caplo workspace api-client list",
+        "caplo workspace api-client revoke",
+        "caplo workspace api-client rotate"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo workspace api-client create",
+      "use": "caplo workspace api-client create <name> --scope <scope>... [flags]",
+      "short": "Create an API client and print its first key",
+      "long": "Creates an API client with the scopes and prints its first key on standard output, once; store it at once, for\nexample as the CI secret CAPLO_API_KEY.\n\nScopes:\n  agents:read, agents:write, agents:publish\n  tools:read, tools:write, tools:publish\n  channels:read, channels:write\n  conversations:read, usage:read\n  endpoints:read, endpoints:write",
+      "example": "caplo workspace api-client create ci --scope agents:write --scope agents:publish\n  caplo workspace api-client create reports --scope conversations:read,usage:read",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        },
+        {
+          "name": "scope",
+          "type": "stringSlice",
+          "usage": "scope to grant; repeat or separate with commas"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo workspace api-client list",
+      "use": "caplo workspace api-client list [flags]",
+      "short": "List the workspace's API clients and their keys",
+      "example": "caplo workspace api-client list",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo workspace api-client revoke",
+      "use": "caplo workspace api-client revoke <client> [flags]",
+      "short": "Revoke an API client's active keys, or only the ones --key names",
+      "long": "Revokes the API client's active keys: every one, the ones --key names, or all but the one --except names. Keys\nare named by ID or prefix. Anything using a revoked key stops working. It asks first; --yes skips the question.",
+      "example": "caplo workspace api-client revoke ci --except 9d3e1f20-4b5a-4c6d-8e7f-0a1b2c3d4e5f\n  caplo workspace api-client revoke ci --key caplo_sk_3f9a6b1c --yes",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "except",
+          "type": "string",
+          "usage": "revoke every active key but this one (ID or prefix), after a rotation"
+        },
+        {
+          "name": "key",
+          "type": "stringSlice",
+          "usage": "key ID or prefix to revoke (default: every active key)"
+        },
+        {
+          "name": "yes",
+          "shorthand": "y",
+          "type": "bool",
+          "usage": "revoke without asking"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo workspace api-client rotate",
+      "use": "caplo workspace api-client rotate <client> [flags]",
+      "short": "Add a new key to an API client and print it; its other keys stay active until revoked",
+      "long": "Adds a key to the API client and prints it on standard output, once. The client's other keys stay active, so\nCI keeps working while you replace the key; then revoke the old ones with caplo workspace api-client revoke\n<client> --except <new key>.",
+      "example": "caplo workspace api-client rotate ci",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo workspace create",
+      "use": "caplo workspace create <name>",
+      "short": "Create a workspace you own and select it",
+      "example": "caplo workspace create \"Shop staging\"",
+      "runnable": true,
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo workspace get",
+      "use": "caplo workspace get [name or ID] [flags]",
+      "short": "Show a workspace, by default the selected one",
+      "example": "caplo workspace get\n  caplo workspace get \"Shop staging\" -o json",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo workspace list",
+      "use": "caplo workspace list [flags]",
+      "short": "List your workspaces",
+      "long": "Lists the workspaces you belong to with your role; * marks the selected one.",
+      "example": "caplo workspace list",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo workspace use",
+      "use": "caplo workspace use <name or ID>",
+      "short": "Select the workspace for later commands",
+      "long": "Saves the workspace, by ID or exact name, as the one later commands act on. --workspace or CAPLO_WORKSPACE\noverrides it for one command.",
+      "example": "caplo workspace use \"Shop staging\"",
+      "runnable": true,
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    }
+  ],
+  "exitCodes": [
+    {
+      "code": 0,
+      "meaning": "Success."
+    },
+    {
+      "code": 1,
+      "meaning": "An error: the API refused the request, a file could not be read, or the command failed."
+    },
+    {
+      "code": 2,
+      "meaning": "A usage error: an unknown command or flag, a wrong argument, or a publish that needs --yes."
+    },
+    {
+      "code": 3,
+      "meaning": "A failed gate: validation, tool fixtures, or eval cases did not pass."
+    },
+    {
+      "code": 130,
+      "meaning": "Interrupted with Ctrl-C (SIGINT). A second Ctrl-C ends the process at once."
+    },
+    {
+      "code": 143,
+      "meaning": "Terminated with SIGTERM."
+    }
+  ],
+  "environment": [
+    {
+      "name": "CAPLO_API_KEY",
+      "description": "Authenticate as an API client instead of the login session, for CI and automation. Create one with caplo workspace api-client."
+    },
+    {
+      "name": "CAPLO_WORKSPACE",
+      "description": "Workspace ID or name for every command, unless --workspace is given."
+    },
+    {
+      "name": "CAPLO_ENV",
+      "description": "Project environment from caplo.yaml, unless --env is given."
+    },
+    {
+      "name": "CAPLO_API_URL",
+      "description": "API base URL used by caplo auth login, unless --api-url is given."
+    },
+    {
+      "name": "CAPLO_ISSUER",
+      "description": "OpenID issuer used by caplo auth login, unless --issuer is given."
+    },
+    {
+      "name": "CAPLO_CONFIG_DIR",
+      "description": "Directory for the CLI configuration and session, instead of ~/.config/caplo ($XDG_CONFIG_HOME/caplo), or %AppData%\\caplo on Windows."
+    },
+    {
+      "name": "XDG_CONFIG_HOME",
+      "description": "Base configuration directory when CAPLO_CONFIG_DIR is not set."
+    }
+  ]
+}

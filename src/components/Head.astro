@@ -1,0 +1,8 @@
+---
+import Default from '@astrojs/starlight/components/Head.astro';
+import { markdownPath } from '../lib/markdown-url';
+---
+
+<Default />
+<link rel="alternate" type="text/markdown" href={markdownPath(Astro.url.pathname)} />
+<link rel="alternate" type="text/plain" title="llms.txt" href="/llms.txt" />

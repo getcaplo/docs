@@ -1,0 +1,96 @@
+name: Sync
+
+# Regenerates the reference from what production runs, checks every page against it, and publishes it.
+on:
+  schedule:
+    - cron: "17 * * * *" # safety net for changes that started no run
+  workflow_dispatch: # argocd-deployments starts it when production versions change; publish_release.py after a CLI release
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: docs-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+    environment: docs-sync
+    outputs:
+      merged: ${{ steps.merge.outputs.merged }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Read access to production versions
+        id: app
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.DOCS_APP_ID }}
+          private-key: ${{ secrets.DOCS_APP_PRIVATE_KEY }}
+          owner: getcaplo
+          repositories: argocd-deployments
+          permission-contents: read
+      - name: Regenerate the reference
+        run: npm run sync
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+      - name: Stop when nothing changed
+        id: diff
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then echo "changed=false" >> "$GITHUB_OUTPUT"; else echo "changed=true" >> "$GITHUB_OUTPUT"; fi
+      - name: Commit to a sync branch
+        if: steps.diff.outputs.changed == 'true'
+        id: branch
+        run: |
+          branch="sync/$(date -u +%Y%m%d-%H%M)-${GITHUB_RUN_ID}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add -A
+          git commit -q -m "Sync reference with production" -m "$(node -e 'const v=require("./src/data/versions.json").versions; console.log(Object.entries(v).map(([k,x])=>k+" "+x).join("\n"))')"
+          echo "name=$branch" >> "$GITHUB_OUTPUT"
+      - name: Check every page against the new reference
+        if: steps.diff.outputs.changed == 'true'
+        id: check
+        run: |
+          set -o pipefail
+          export CAPLO_BIN="$(node scripts/fetch-cli.mjs "$RUNNER_TEMP/caplo")"
+          { npm run check && npm run build; } 2>&1 | tee "$RUNNER_TEMP/check.log"
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Merge into main
+        if: steps.diff.outputs.changed == 'true' && steps.check.outcome == 'success'
+        id: merge
+        run: |
+          git switch main
+          git merge --no-ff -q "${{ steps.branch.outputs.name }}" -m "Merge ${{ steps.branch.outputs.name }}"
+          git push -q origin main
+          echo "merged=true" >> "$GITHUB_OUTPUT"
+          gh issue list --label docs-drift --state open --json number -q '.[].number' | xargs -r -I{} gh issue close {} -c "Fixed by $(git rev-parse --short HEAD)."
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Report drift
+        if: failure() && steps.check.outcome == 'failure'
+        run: |
+          git push -q origin "${{ steps.branch.outputs.name }}"
+          body="$(printf 'Production changed and the docs no longer match it. The regenerated reference is on branch `%s`; fix the pages there, merge it into main and the next sync deploys it.\n\nRun: %s\n\n```\n%s\n```\n' \
+            "${{ steps.branch.outputs.name }}" "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" "$(tail -c 60000 "$RUNNER_TEMP/check.log")")"
+          gh label create docs-drift --color d93f0b --description "Docs no longer match production" 2>/dev/null || true
+          issue="$(gh issue list --label docs-drift --state open --json number -q '.[0].number')"
+          if [ -n "$issue" ]; then gh issue comment "$issue" --body "$body"; else gh issue create --title "Docs drift" --label docs-drift --body "$body"; fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  deploy:
+    needs: sync
+    if: needs.sync.outputs.merged == 'true'
+    uses: ./.github/workflows/deploy.yaml

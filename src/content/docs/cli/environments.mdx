@@ -1,0 +1,145 @@
+---
+title: Publish to several environments
+description: Define staging and production environments in caplo.yaml, vary agent settings per environment, deploy channels, and promote only what passed the previous environment.
+sidebar:
+  order: 5
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+import AgentPrompt from '~/components/AgentPrompt.astro';
+
+An environment is a named workspace that a project publishes to, such as `staging` or `prod`. Keep one workspace per environment so that testing never touches what customers use. With environments, one set of agent files publishes to every workspace, with small per-environment differences, and production can be limited to exactly what staging released.
+
+## Define environments
+
+Add an `environments` map to the project's `caplo.yaml`:
+
+```yaml
+apiVersion: v1
+kind: Project
+name: shop
+agents: agents/*.yaml
+tools: tools/*
+environments:
+  staging:
+    workspace: <STAGING_WORKSPACE_ID>
+    apiKeyEnv: CAPLO_STAGING_KEY
+    channels:
+      concierge: [Staging website]
+  prod:
+    workspace: <PROD_WORKSPACE_ID>
+    apiKeyEnv: CAPLO_PROD_KEY
+    promoteFrom: staging
+    agents:
+      concierge:
+        model: {temperature: 0.2}
+        suggestedReplies: null
+    channels:
+      concierge: [Website, twilio/Support line]
+```
+
+| Field | Required | Description |
+| --- | --- | --- |
+| `workspace` | Yes | The workspace ID. A workspace name also works when you are logged in, but an [API key](/cli/authentication/#api-keys-for-automation) needs the ID. |
+| `apiKeyEnv` | No | The name of an environment variable that holds this environment's API key, such as `CAPLO_PROD_KEY`. When that variable is set, the CLI uses it instead of `CAPLO_API_KEY`. |
+| `promoteFrom` | No | Another environment. A publish here only goes ahead for agents that environment already released from the same source. See [Promote a release](#promote-a-release). |
+| `agents` | No | Agent fields by agent file key, merged over the agent files. See [Vary agents per environment](#vary-agents-per-environment). |
+| `channels` | No | Channels by agent file key. After a publish, each listed channel is pointed at the agent's newest release. See [Deploy channels](#deploy-channels). |
+
+Environment names start with a lowercase letter and use only lowercase letters, digits and hyphens. `promoteFrom` must name another environment and must not loop back.
+
+## Use an environment
+
+Pass `--env` (`-e`), or set `CAPLO_ENV`, on `caplo validate`, `diff`, `push`, `eval` and `publish`:
+
+```sh
+caplo diff --env staging
+caplo publish --env prod
+```
+
+Selecting an environment does three things:
+
+1. **Workspace.** The command acts on the environment's workspace. If `--workspace` or `CAPLO_WORKSPACE` names a different one, the command stops with exit code 2 instead of guessing.
+2. **Credentials.** If the environment's `apiKeyEnv` variable is set, the command authenticates with that key. Otherwise it uses `CAPLO_API_KEY` if set, and your login if not.
+3. **Agent fields.** The environment's `agents` fields are merged over the agent files before anything is compared or pushed.
+
+Without `--env` or `CAPLO_ENV`, project commands act on the [selected workspace](/cli/workspaces/) and use the agent files unchanged.
+
+## Vary agents per environment
+
+Under `agents`, each key is an agent file key and each value is a partial agent file. It merges over the file like a JSON merge patch:
+
+- Mappings merge key by key, so `model: {temperature: 0.2}` changes only the temperature and keeps the model name.
+- `null` removes a field, so `suggestedReplies: null` turns suggested replies off in that environment.
+- Any other value, including a list, replaces the field entirely.
+
+Use this for settings that should really differ, such as model, temperature, greeting or limits. Knowledge base and remote MCP server names already resolve in each command's own workspace, so you rarely need to override them.
+
+`caplo validate` checks every environment's fields merged over each file, whether or not you pass `--env`. With `--env`, it also checks the agents exactly as that environment publishes them.
+
+## Deploy channels
+
+An environment's `channels` lists, for each agent key, the channels that should serve that agent:
+
+```yaml
+channels:
+  concierge: [Website, twilio/Support line, <CHANNEL_ID>]
+```
+
+Name a channel by its name, by its ID, or as `<kind>/<name>` when two channels share a name. Kinds are `website`, `whatsapp`, `messenger`, `instagram`, `twilio` and `telnyx`; `caplo channel list` shows yours.
+
+After `caplo publish --env <name>` publishes, it points each listed channel at its agent's newest release, if the channel does not serve it already. That happens even when this publish made no new release. The plan lists each channel as `channel/<kind>/<name>` with a `deploy` step, and the publish confirmation covers it. New conversations get the new release; conversations already open keep theirs. Every other channel setting stays as it is. The agent must have a release in that workspace.
+
+With an API key, deploying channels needs the `channels:write` scope. The CLI checks this before it starts, so a missing scope stops the publish with exit code 2 before anything changes.
+
+## Promote a release
+
+`promoteFrom` makes an environment accept only what the previous one released. Each release the CLI publishes from a project records a **source digest** of the agent:
+
+- its agent file as written, byte for byte, before any environment's fields apply
+- the files of the project packages it uses, as `caplo push` uploads them
+- the source of its project sub-agents, in the same way
+
+`caplo.yaml` and environment fields are not part of the digest, so production can use different settings and still match staging. Any edit to the agent file, a package it uses, or a project sub-agent, even a comment, changes the digest.
+
+When you publish to an environment with `promoteFrom`, every agent the publish would release must have a release in the `promoteFrom` environment with the same digest that is not revoked. The plan prints the matching release for each agent. If one is missing, the publish stops with exit code 3 before changing anything, naming the agents that need publishing there first.
+
+<Steps>
+1. Publish to staging and test there:
+
+   ```sh
+   caplo publish --env staging
+   ```
+
+2. When staging is good, publish the same commit to production:
+
+   ```sh
+   caplo publish --env prod
+   ```
+
+   The plan shows lines such as `agent/concierge matches staging release 1.3.0`. Confirm to publish.
+
+3. If you changed anything in between, publish to staging again first. Production refuses a source staging has not released.
+</Steps>
+
+To read the `promoteFrom` environment, the CLI uses that environment's own `apiKeyEnv` key when its variable is set, and otherwise your login. A key for one workspace cannot read another, so when you publish with an API key, the `promoteFrom` environment needs `apiKeyEnv` and that variable must hold a key of its workspace with at least `agents:read`:
+
+```sh
+CAPLO_STAGING_KEY=<STAGING_KEY> CAPLO_PROD_KEY=<PROD_KEY> caplo publish --env prod --yes
+```
+
+<Aside type="caution">
+Releases are numbered per workspace, so the same source can be 1.3.0 in staging and 2.1.0 in production. Compare environments by source digest, which the plan prints, not by version number.
+</Aside>
+
+<AgentPrompt id="add-environment-promotion" />
+
+## Credentials per environment
+
+| How you run | Workspace field | Keys |
+| --- | --- | --- |
+| Logged in as yourself | ID or name; you must be a member of every environment's workspace | None needed |
+| One API key, one environment per job | ID | `CAPLO_API_KEY`, or the environment's `apiKeyEnv` variable |
+| API keys, with `promoteFrom` | ID | The target's key in `CAPLO_API_KEY` or its `apiKeyEnv` variable, and the `promoteFrom` environment's key in its `apiKeyEnv` variable |
+
+Each key belongs to one workspace, so create one API client per environment workspace. See [Run the CLI in CI/CD](/cli/ci-cd/) for a complete pipeline.

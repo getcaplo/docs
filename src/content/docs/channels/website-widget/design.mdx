@@ -1,0 +1,123 @@
+---
+title: Design the website widget
+description: Create a reusable widget design, set its brand, welcome screen, launcher and language, then publish a revision and apply it to your website channels.
+sidebar:
+  order: 2
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+A widget design controls how the website widget looks: colours, logo, fonts, welcome screen, launcher and layout. Designs are reusable. One design can serve several website channels, and each channel shows the design revision you apply to it.
+
+A design has a draft you edit and a history of published revisions. Websites never show a draft. They change only when you apply a published revision to a channel, so you can work on a design while the live widget stays the same.
+
+Who answers, which modes are offered and how visitors verify are not part of the design. Those are [entry point settings](/channels/website-widget/settings/).
+
+## Create a design
+
+<Steps>
+
+1. In the console, open **Widget designs** under **Deploy** and select **Create design**.
+
+2. Enter a **Design name**. It is internal and only shown in the console; visitors see the widget title instead.
+
+3. Choose a template to start from: **Standard**, **Concierge**, **Evergreen**, **Orbit**, **Help center** (an inline layout) or **Midnight** (dark). A template only seeds the first draft.
+
+4. Select **Create design**. The design editor opens on the draft.
+
+</Steps>
+
+You can also create a design while creating a website channel, with **Create a design here**.
+
+## Design sections
+
+The editor groups settings into sections. The preview beside them updates as you edit. Select **Save draft** to keep your changes; **Discard** returns to the last saved draft.
+
+### Brand and colours
+
+- **Header**: the **Widget title** and **Subtitle** visitors see at the top of the widget.
+- **Colours**: pick from the **Brand palette** or set **Brand colour** and **Soft surface** yourself.
+- **Style**: **Colour mode** (Light or Dark) and **Corner radius (px)**.
+
+### Logo and fonts
+
+- **Logo**: PNG or WebP, at most 256 KiB and 16 to 1024 px per side. Shown in the header and welcome area.
+- **Assistant avatar**: PNG or WebP, at most 256 KiB. Shown beside assistant replies.
+- **Body font** and **Heading font**: **DM Sans**, **Manrope**, **Device system font** or **Uploaded font**. An uploaded font is a WOFF2 file of at most 512 KiB. Visitors see the device font if it cannot load.
+
+Each upload is kept as its own version, and published revisions keep the version they used. Open **Reuse an uploaded asset** to pick a logo, avatar or font you uploaded before. Withdrawing an asset version keeps it on revisions that already use it, but stops new drafts, publications and applies from using it.
+
+### Welcome screen
+
+What visitors see before their first message:
+
+- **Welcome heading** and **Welcome description**.
+- **Suggested questions**: up to 4 shortcuts. Each has a **Suggestion label**, a **Suggestion description** and the **Message to send** when a visitor taps it.
+- **Message placeholder**: the hint text in the message box.
+
+The agent's own greeting is set on the agent, not in the design.
+
+### Launcher and layout
+
+- **Display mode**: **Floating popup** opens from a launcher button in a corner of the page. **Inline container** renders inside an element on your page, with no launcher button.
+- **Width (px)** and **Height (px)** of the widget.
+- For a popup: **Corner** (Bottom right or Bottom left) and **Edge spacing (px)**.
+- **Launcher button**: **Launcher label** and **Launcher icon** (Message or Sparkles).
+- **Open automatically on desktop**, with an **Opening delay (seconds)** from 0 to 60.
+
+<Aside type="caution">
+Popup and inline need different embed code. If you change **Display mode** and apply the revision to a live channel, update the markup on your site at the same time. See [Install the website widget](/channels/website-widget/install/).
+</Aside>
+
+### Language
+
+- **Locale**: for example `en-US`. This sets the language of the widget's own labels and buttons. Translated labels need a supported language pack.
+- **Text direction**: **Left to right** or **Right to left**.
+
+The language the agent answers in is set on the agent, not here.
+
+## Publish a revision
+
+<Steps>
+
+1. Save your draft. Only the saved draft is published.
+
+2. Open **Publish and install** and select **Publish revision** followed by the next revision number.
+
+3. Review the comparison with the previous published revision, then select **Publish revision**.
+
+</Steps>
+
+A published revision is immutable. Publishing does not change any website.
+
+## Apply a revision to a website
+
+You can apply from the design or from the channel. Either way, the change takes effect right away; you do not need to save anything else.
+
+From the design:
+
+<Steps>
+
+1. Open **Publish and install**. **Live on websites** lists the channels that use this design and the revision each shows.
+
+2. Choose the **Revision to apply** and select **Review and apply**.
+
+3. Review the before and after, then confirm.
+
+</Steps>
+
+From the channel: open the website entry point (**Configure & install**), and on the **General** tab under **Appearance**, choose the **Widget design** and **Revision**, then select **Apply revision**.
+
+Widgets that are already open keep their look until the visitor reloads the page. The widget ID and the embed code stay the same, except when the display mode changes between popup and inline.
+
+To roll a website back, apply an earlier revision. Select **Load older revisions** if the one you want is not listed.
+
+## Archive a design
+
+In **Design settings**, **Archive design** hides a design from the library and stops it being published or applied. It is available once no website uses the design. **Restore design** makes it available again.
+
+## Related
+
+- [Install the website widget](/channels/website-widget/install/)
+- [Website widget settings](/channels/website-widget/settings/)
+- [Present tool results](/tools/present-results/) for how rich results such as cards and tables appear in the widget

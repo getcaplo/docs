@@ -1,0 +1,146 @@
+---
+title: Define an agent in YAML
+description: Write an agent as a YAML file, edit it in the console's YAML editor or with caplo agent, and move a console agent into a CLI project.
+sidebar:
+  order: 11
+---
+
+import { Tabs, TabItem, Steps, Aside } from '@astrojs/starlight/components';
+import AgentPrompt from '~/components/AgentPrompt.astro';
+
+Everything on an agent's **Setup**, **Tools & actions**, **Knowledge** and **Sub-agents** tabs can be written as one YAML file. The console's YAML editor and the `caplo` CLI read the same format, so you can keep agents in a repository, review changes in pull requests, and publish from CI. Every field is listed in the [Agent YAML reference](/reference/agent-yaml/).
+
+## The agent file
+
+An agent file is one YAML document with `apiVersion: "v2.0.0"` (`v2` and `v2.0` also work; `v1` files are refused), `kind: Agent`, and the agent's fields. This file defines a support agent with two tools, a knowledge base, a returns sub-agent and human handoff:
+
+```yaml
+apiVersion: "v2.0.0"
+kind: Agent
+name: Support Desk
+description: Answers order and returns questions for Northwind customers.
+instructions: |-
+  You are the Northwind support agent.
+  Answer questions about orders, delivery and returns.
+  Look orders up with the order tools before you describe their status.
+  If you cannot find an answer, say so and offer to connect the customer with a person.
+greeting: Hi, I'm the Northwind support agent. How can I help with your order today?
+model:
+  provider: Anthropic
+  name: claude-haiku-4-5-20251001
+  temperature: 0.3
+  responseLimit: 800
+tools:
+  - order-desk/lookup_order
+  - order-desk/track_shipment
+knowledgeBases:
+  - Returns policy
+actions:
+  - transfer
+subAgents:
+  - agentId: 6f0c2a8e-4b1d-4e7a-9c3f-2d5b8a1e7f40
+    release: latest
+    useWhen: The customer asks how returns, exchanges or refunds work in general.
+    doNotUseWhen: Questions about a specific order.
+    mode: task_tool
+policy:
+  maxModelCalls: 12
+  knowledgePassages: 4
+  reasoning:
+    thinkingBudgetTokens: 2048
+suggestedReplies:
+  maxCount: 3
+visitorFeedback: true
+```
+
+| Field | Guide |
+| --- | --- |
+| `name`, `description`, `instructions`, `greeting`, `model` | [Set instructions and model](/agents/instructions-and-model/) |
+| `tools` | [Give an agent tools](/agents/tools/) |
+| `knowledgeBases` | [Add knowledge](/agents/knowledge/) |
+| `subAgents`, `routing` | [Add sub-agents and routing](/agents/sub-agents-and-routing/) |
+| `actions` | [Hand off to a person or end a call](/agents/handoff-and-end-actions/) |
+| `policy` | [Tune the agent loop](/agents/policy-and-limits/) |
+| `suggestedReplies`, `visitorFeedback` | [Offer suggested replies and collect ratings](/agents/replies-and-feedback/) |
+| `evals` | [Write and run evals](/agents/evals/) |
+
+Voice settings are set in the console and are not part of the file; applying or pushing a file keeps the agent's voice settings as they are.
+
+For validation and completion in your editor, add this first line to the file:
+
+```yaml
+# yaml-language-server: $schema=https://docs.caplo.si/schemas/agent-2.0.0.json
+```
+
+## Edit an agent as YAML in the console
+
+<Steps>
+
+1. Open the agent and, next to **Build with**, select **YAML editor**. The editor shows the current draft, with schema suggestions (Ctrl+Space).
+2. Edit the YAML, or paste a file over it. The side panel lists **Existing agent IDs** to use in `subAgents`, an **Agent map** of the links, and **Validation** problems.
+3. Select **Validate**, then **Review changes**. The review lists the fields that will change.
+4. Select **Apply to draft**, then **Save draft**. Save and publish remain separate steps.
+
+</Steps>
+
+**Export YAML** downloads the draft as `<agent-id>.yaml`. While YAML edits are not applied, the agent cannot be saved or published; apply or discard them first.
+
+The console's YAML includes the agent's eval cases as `evals: {cases: [...]}`. Applying YAML saves the cases at once, outside the draft: an empty `cases` list deletes every case, and a file without `evals` leaves them unchanged.
+
+## Work with agent files in the CLI
+
+```sh
+caplo agent init -f support.yaml --name "Support Desk"
+caplo agent validate -f support.yaml
+caplo agent push -f support.yaml --dry-run
+caplo agent push -f support.yaml
+caplo agent pull "Support Desk" -f support.yaml
+```
+
+| Command | What it does |
+| --- | --- |
+| `caplo agent init` | Writes a starter file with one eval case. |
+| `caplo agent validate` | Checks the file offline against the schema, its references and the link rules. Exits with status 3 on problems. |
+| `caplo agent push` | Saves the file as the agent's draft, creating the agent if no agent has that name, and replaces its eval cases when the file has `evals`. `--dry-run` prints the diff only. |
+| `caplo agent pull` | Writes the draft exactly as the console's **Export YAML** does, without eval cases. |
+
+To create a new agent from a file, push it with the CLI. In a project, `caplo validate`, `caplo diff`, `caplo push` and `caplo publish` work on all agent files at once; see [Projects](/cli/projects/).
+
+## Console and CLI formats
+
+The two surfaces write some fields differently. A project file is portable across workspaces; a console export names workspace IDs.
+
+| Field | Console export and `caplo agent pull` | Project agent file |
+| --- | --- | --- |
+| `tools` | Package IDs: `<package ID>/<tool>` or `<package ID>` | Names: `<package>/<tool>`, `<package>`, or `<server>/<tool>` for a remote MCP server |
+| `subAgents` | `agentId` | `local: <file key>` for project agents, `agentId` for others |
+| `knowledgeBases` | IDs | Names or IDs |
+| `evals` | `evals: {cases: [...]}`, each case with an `id` | A list of cases matched by `name` |
+
+The CLI refuses the console's `evals: {cases: ...}` form. To use a console export with the CLI, remove its `evals` block, or use `caplo pull` as described below, which converts everything.
+
+## Move a console agent into a CLI project
+
+`caplo pull` writes a workspace agent, every sub-agent it links, their eval cases, and the tool packages they use into a project:
+
+```sh
+caplo pull "agent/Support Desk" ./support
+cd support
+caplo validate
+caplo diff
+```
+
+- With a directory that has no `caplo.yaml`, it creates a new project there. Without a directory, it uses the project above the current directory, or creates one in it.
+- Each agent goes to its own file in the directory the project's `agents` glob names; an agent the project already defines is written to its existing file.
+- Tool packages the project lacks are pulled from their workspace drafts into the directory the `tools` glob names. Remote MCP server tools stay `<server>/<tool>`.
+- Sub-agent links name the release the draft pins, since a draft does not record `release: latest`. Change them to `latest` if you want children to follow their newest release.
+
+`caplo diff` should then show no changes. From here, edit the files and use `caplo push` and `caplo publish`; see [The CLI workflow](/cli/workflow/).
+
+<AgentPrompt id="console-agent-to-project" />
+
+## See also
+
+- [Agent YAML reference](/reference/agent-yaml/)
+- [`caplo agent` commands](/reference/cli/agent/)
+- [Project commands](/reference/cli/project/)

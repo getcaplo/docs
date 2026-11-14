@@ -1,0 +1,153 @@
+---
+title: Build, test and publish a project
+description: The everyday caplo loop for a project, from validating files to publishing releases bottom up, and what each step changes in the workspace.
+sidebar:
+  order: 6
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+This page walks through the loop you repeat while building a [project](/cli/projects/). Every command below acts on the whole project unless you pass [selectors](/cli/projects/#select-part-of-a-project) such as `agent/orders` or `tool/order-desk`, and on the [selected workspace](/cli/workspaces/) unless you pass [`--env`](/cli/environments/).
+
+## The loop at a glance
+
+1. **Edit** agent files and tool code in your editor.
+2. **Validate** offline with `caplo validate`.
+3. **Test tools** locally with `caplo test`.
+4. **Review** the difference from the workspace with `caplo diff`.
+5. **Push** drafts with `caplo push`, then try the agent in a test chat.
+6. **Evaluate** the drafts with `caplo eval`.
+7. **Publish** releases with `caplo publish`.
+8. **Pull** changes someone made in the console with `caplo pull`, when needed.
+
+Steps 2 to 4 change nothing in the workspace. Steps 5 and 6 change only drafts, which customers never see. Only step 7 creates releases.
+
+## Validate
+
+```sh
+caplo validate
+```
+
+Checks schemas, references, link cycles, the sub-agent depth limit, fast routing rules and every environment, without network access. It exits with code 3 and lists each problem with its file. The other project commands run the same checks first. See [Check a project offline](/cli/projects/#check-a-project-offline).
+
+## Test tool packages
+
+```sh
+caplo test
+caplo test tool/order-desk -v
+```
+
+Runs each selected package's fixtures on your machine, the same way as `caplo tool test`: it bundles the package like the Caplo builder and runs the fixtures in Node.js 24. It calls no workspace. Run `npm install` in each package first. A failing fixture exits with code 3; `-v` also prints log lines for passing fixtures. See [Test tools](/tools/testing/).
+
+## Review the difference
+
+```sh
+caplo diff
+caplo diff agent/concierge -o json
+```
+
+Compares each package's files with its workspace draft, and each agent file and its eval cases with the agent's draft and eval suite. It prints a plan, one line per resource, and a unified diff for each changed agent. A new agent is shown against nothing. With `-o json` or `-o yaml`, it prints the plan as one document that a pipeline can post on a pull request; see [Scripting](/cli/scripting/#plans-as-json).
+
+## Push drafts
+
+```sh
+caplo push
+caplo push --dry-run
+```
+
+`caplo push` prints the plan, then:
+
+<Steps>
+1. Uploads each changed package as its workspace draft and builds it, streaming the build log.
+2. Saves each agent file as its agent's draft, children before parents, creating any agent the workspace does not have.
+3. Saves each agent's `evals` as its eval suite. An agent file without an `evals` key leaves the suite alone.
+</Steps>
+
+Nothing is published. `--dry-run` prints the plan and diffs and stops. If nothing changed, push says so and does nothing.
+
+<Aside type="caution">
+A push replaces the workspace draft with your file. Edits someone made to that draft in the console since your last push are overwritten. Pull them first with `caplo pull` if you want to keep them.
+</Aside>
+
+### Try it in a test chat
+
+```sh
+caplo agent chat "Shop Concierge"
+```
+
+This opens a private test conversation with the agent's draft in your terminal; you can also use the console's test chat. A test conversation runs linked sub-agents from their **releases**, not their drafts, so a sub-agent you have never published cannot answer yet. Push tells you when that is the case and names the `caplo publish agent/<key>` that releases it. See [Test an agent](/agents/testing/).
+
+## Evaluate
+
+```sh
+caplo eval
+caplo eval agent/concierge
+```
+
+Pushes the selection like `caplo push`, then runs each selected agent's eval cases against its saved draft in isolated test conversations and prints the result of every case. A grader model also judges each case's `desiredOutcome`; a failed case prints its rationale, and a case it could not grade counts as failed. If a passing run already exists for the same draft and eval cases, it is reused instead of run again.
+
+It exits with code 3 when any case fails or a selected agent has no eval cases. See [Evals](/agents/evals/) for how to write cases.
+
+## Publish
+
+```sh
+caplo publish
+caplo publish agent/orders --dry-run
+caplo publish --yes
+```
+
+`caplo publish` validates the project, works out what needs releasing, prints the plan with diffs, and asks `Publish to workspace <name>? [y/N]`. Then it publishes **bottom up**:
+
+<Steps>
+1. **Tool packages.** Each package that changed or has an unpublished build is pushed, built, tested with its fixtures in the workspace's test runner, and published as a new version.
+2. **Child agents.** Each sub-agent's draft is saved, pinned to the package versions just published, its eval cases run, and it is published as a release.
+3. **Parent agents.** Each parent's draft is saved pinned to its children's new releases, evaluated and published, until the top of the project.
+</Steps>
+
+Every agent it publishes needs at least one eval case, and every case must pass. If a step fails, publishing stops there; what was already published stays published.
+
+### What gets a new release
+
+An agent is published when any of these is true:
+
+- its file or eval cases differ from the workspace
+- its saved draft has never been published
+- a project package it uses publishes a new version, or its packages have newer versions than its release
+- a project sub-agent it links at `release: latest` publishes a new release
+
+An agent whose eval cases alone changed since its release is evaluated against the new cases and **keeps** its release, because a release does not include eval cases. Everything else is left unchanged and shown as `unchanged` in the plan.
+
+The plan shows each new version. A first release is 1.0.0. After that, changing the model or provider, changing sub-agent links, or removing a tool or knowledge base is a major bump; adding one is a minor bump; anything else is a patch. A new child release forces a major bump of its parents.
+
+### Confirming
+
+| Situation | What happens |
+| --- | --- |
+| A terminal, after the project's first publish to this workspace | The CLI asks; answer `y` to publish |
+| `--yes` (`-y`) | Publishes without asking |
+| No terminal, such as CI, without `--yes` | Stops with exit code 2 |
+| The project's first publish to a workspace, without `--yes` | Stops with exit code 2, even in a terminal, so you review the full plan first |
+
+`--dry-run` prints the plan and stops. Add `-o json` to get the plan as a document.
+
+### Clean up removed agents
+
+```sh
+caplo publish --prune
+```
+
+Agents are never deleted when you remove their file. `--prune` adds an `archive` step to the plan for each agent that an earlier publish of this project created and that the project no longer defines, and archives them after publishing. It works on the whole project only, so it takes no selectors. Archived agents can be restored in the console.
+
+## Pull console changes
+
+```sh
+caplo pull "agent/Shop Concierge"
+```
+
+Writes the agent's current draft, its sub-agents and their eval cases back into the project files, so you can commit changes made in the console. See [Pull an existing agent](/cli/projects/#pull-an-existing-agent).
+
+## Next
+
+- Publish to staging and production from the same files: [Environments](/cli/environments/).
+- Run this loop in a pipeline: [CI/CD](/cli/ci-cd/).
+- Every flag of these commands: [project command reference](/reference/cli/project/).

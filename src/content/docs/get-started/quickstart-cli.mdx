@@ -1,0 +1,146 @@
+---
+title: Build your first agent with the CLI
+description: Install the caplo CLI, scaffold a multi-agent project with tools, test it, and publish it from your terminal.
+sidebar:
+  order: 3
+  label: Quickstart with the CLI
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+import AgentPrompt from '~/components/AgentPrompt.astro';
+
+With the `caplo` CLI you keep agents and tool packages as files in your own repository and publish them from your terminal or CI. This quickstart scaffolds the **summit** example: an outdoor gear shop with a concierge agent that routes customers to three specialist agents, plus two tool packages with mock data.
+
+## Before you start
+
+- A Caplo account. If you have never signed in, sign in once at [app.caplo.si](https://app.caplo.si); Caplo creates a workspace for you.
+- The **Owner** or **Admin** role in the workspace. The project pushes tool packages and agents and publishes both, which no other role can do alone. See [Workspaces and roles](/concepts/workspaces-and-roles/).
+- Node.js 24 and npm, to install the tool packages' dependencies.
+- **Fast decisions** turned on for the workspace. The summit concierge uses fast routing to pick a specialist, and an agent with fast routing cannot publish without it. An Owner or Admin turns it on in the console under **Settings** > **AI providers** > **Fast decisions**. See [Fast decisions](/providers/fast-decisions/).
+
+<Aside>
+If you only want a single agent without tools or fast routing, run `caplo init my-assistant` instead. It uses the **blank** template: one agent file and one eval case. The rest of the steps are the same, without the tool dependencies.
+</Aside>
+
+## Create and publish the project
+
+<Steps>
+
+1. **Install the CLI.** On macOS or Linux:
+
+   ```sh
+   brew install getcaplo/tap/caplo
+   ```
+
+   Or install it to `~/.local/bin` without Homebrew:
+
+   ```sh
+   curl -fsSL https://cli.caplo.si/install.sh | sh
+   ```
+
+   See [Install the CLI](/cli/install/) for Windows, version pinning and verifying signatures.
+
+2. **Sign in.**
+
+   ```sh
+   caplo auth login
+   ```
+
+   Your browser opens to sign in; on a machine without a browser, use `caplo auth login --device`. If you belong to one workspace, the CLI selects it. Otherwise pick one:
+
+   ```sh
+   caplo workspace list
+   caplo workspace use "<WORKSPACE_NAME>"
+   ```
+
+   `caplo auth status` shows who you are signed in as and which workspace commands act on.
+
+3. **Scaffold the project.**
+
+   ```sh
+   caplo init shop --template summit
+   cd shop
+   ```
+
+   The project name comes from the directory and becomes part of each agent's name. You get:
+
+   | Path | Contents |
+   | --- | --- |
+   | `caplo.yaml` | The project file. It finds agents in `agents/*.yaml` and tool packages in `tools/*`. |
+   | `agents/concierge.yaml` | **Shop Concierge**, the entry agent. It routes to the three specialists with fast routing. |
+   | `agents/orders.yaml` | **Shop Orders**: looks up orders and shipments and starts returns. |
+   | `agents/gear.yaml` | **Shop Gear**: recommends products and checks store stock. |
+   | `agents/returns.yaml` | **Shop Returns**: answers return and warranty policy questions from its instructions. |
+   | `tools/order-desk/` | An MCP server package with mock data: `lookup_order`, `track_shipment`, `search_products` and `check_return_eligibility` (reads) and `create_return` (a write that the customer must confirm). |
+   | `tools/store-stock/` | A function package with one read tool, `check_store_stock`. |
+
+   Every agent file includes eval cases. The agents use an Anthropic model; if your workspace cannot use it, change `model.name` in each agent file. See [Instructions and model](/agents/instructions-and-model/).
+
+4. **Install the tool dependencies.** Each package needs its dependencies and a lockfile before Caplo can build it.
+
+   ```sh
+   (cd tools/order-desk && npm install)
+   (cd tools/store-stock && npm install)
+   ```
+
+5. **Validate the project.** This runs offline and checks the files against the schemas, every tool and sub-agent reference, and the sub-agent links.
+
+   ```sh
+   caplo validate
+   ```
+
+   You can also run the tool packages' test fixtures locally with `caplo test`.
+
+6. **Push the drafts.**
+
+   ```sh
+   caplo push
+   ```
+
+   The CLI uploads and builds both tool packages, then saves each agent as a draft, specialists before the concierge. Nothing is published yet and no customer can reach the agents. Agents and packages are matched by name, so pushing again updates them.
+
+7. **Chat with the draft.**
+
+   ```sh
+   caplo agent chat "Shop Concierge"
+   ```
+
+   Type one message per line, for example `Where is my order SO-1002?` or `Can you recommend a lightweight two-person tent?` Each reply shows the sub-agents and tools the turn used. When the agent proposes a write such as `create_return`, the CLI shows what it will do; type `/confirm` to approve it or `/cancel` to decline. Ordinary text never approves a write. End the chat with `/exit` or Ctrl-D.
+
+   This is a private test conversation, but tools run for real. The summit tools only use mock data.
+
+8. **Preview the publish.**
+
+   ```sh
+   caplo publish --dry-run
+   ```
+
+   The plan lists what will be published, in order: the tool packages, then the specialists, then the concierge, pinned to the specialists' new releases.
+
+9. **Publish.** A project's first publish to a workspace needs `--yes`, after you have reviewed the plan:
+
+   ```sh
+   caplo publish --yes
+   ```
+
+   For each agent the CLI pins the exact tool versions, runs its eval cases, and creates a release. Every eval case must pass unless your workspace has made evals advisory. If a case fails, the CLI prints why and stops with exit code 3; fix the agent file or the case and run `caplo publish` again. Later publishes show the plan and ask before going ahead.
+
+</Steps>
+
+Your agents now have releases in the workspace, and you can see them under **Agents** in the console.
+
+## Put it on your website
+
+Channels are created in the console. Follow [Add an agent to your website](/get-started/add-to-your-website/) and choose **Shop Concierge** as the channel's agent. After that, publish new releases with `caplo publish` and move the channel to them with `caplo channel deploy`; see [Agents and releases](/concepts/agents-and-releases/).
+
+## Let an AI assistant do it
+
+<AgentPrompt id="first-agent-cli" />
+
+## Next steps
+
+- How projects, selectors and environments work: [Projects](/cli/projects/) and [Environments](/cli/environments/).
+- The day-to-day loop of editing, pushing and publishing: [CLI workflow](/cli/workflow/).
+- Every field of an agent file: [Agent YAML](/agents/agent-yaml/) and the [agent YAML reference](/reference/agent-yaml/).
+- Writing your own tool package: [Write your first tool](/tools/first-tool/).
+- Commands used here: [`caplo init`](/reference/cli/project/#caplo-init), [`caplo push`](/reference/cli/project/#caplo-push), [`caplo publish`](/reference/cli/project/#caplo-publish), [`caplo agent chat`](/reference/cli/agent/#caplo-agent-chat).

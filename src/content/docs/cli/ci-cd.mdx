@@ -1,0 +1,191 @@
+---
+title: Publish from CI/CD
+description: Run caplo in GitHub Actions or GitLab CI with an API key to validate and test every change and publish from your main branch.
+sidebar:
+  order: 7
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+import AgentPrompt from '~/components/AgentPrompt.astro';
+
+Keep your [project](/cli/projects/) in Git and let a pipeline publish it: every pull request is validated and its tool fixtures run, and every merge to `main` is evaluated and published. Nobody publishes from a laptop, and the release history matches your commit history.
+
+In CI there is nobody to log in, so the CLI authenticates with an **API key** instead. See [API keys for automation](/cli/authentication/#api-keys-for-automation) for how keys and scopes work.
+
+## Set up the key
+
+<Steps>
+1. Log in as a workspace Owner or Admin, so you can grant agent scopes, and select the workspace you publish to.
+
+2. Create an API client with the scopes a publish needs, and send its key straight into your repository's secrets without printing it. With the [GitHub CLI](https://cli.github.com):
+
+   ```sh
+   caplo workspace api-client create github-deploy \
+     --scope agents:write,agents:publish,tools:write,tools:publish \
+     | gh secret set CAPLO_API_KEY
+   ```
+
+   Add `channels:write` if an [environment](/cli/environments/#deploy-channels) deploys channels. Leave out the `tools` scopes if the project has no tool packages.
+
+3. Store the workspace ID as `CAPLO_WORKSPACE`. It is not secret, but keeping it next to the key keeps them in step:
+
+   ```sh
+   caplo workspace get -o json
+   gh secret set CAPLO_WORKSPACE --body <WORKSPACE_ID>
+   ```
+</Steps>
+
+With an API key, the workspace must be given by ID, never by name.
+
+## GitHub Actions
+
+Save this as `.github/workflows/caplo.yml`. It pins the CLI version, so a new CLI release never changes your pipeline until you update the pin.
+
+```yaml
+name: Caplo
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  CAPLO_VERSION: v0.4.0
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install the Caplo CLI
+        run: |
+          curl -fsSL "https://raw.githubusercontent.com/getcaplo/homebrew-tap/$CAPLO_VERSION/install.sh" | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Install tool package dependencies
+        run: |
+          for dir in tools/*/; do
+            if [ -f "$dir/package.json" ]; then npm ci --prefix "$dir"; fi
+          done
+      - run: caplo validate
+      - run: caplo test
+
+  publish:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: check
+    runs-on: ubuntu-latest
+    concurrency: caplo-publish
+    env:
+      CAPLO_API_KEY: ${{ secrets.CAPLO_API_KEY }}
+      CAPLO_WORKSPACE: ${{ secrets.CAPLO_WORKSPACE }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install the Caplo CLI
+        run: |
+          curl -fsSL "https://raw.githubusercontent.com/getcaplo/homebrew-tap/$CAPLO_VERSION/install.sh" | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - run: caplo auth status
+      - run: caplo eval
+      - run: caplo publish --yes
+```
+
+What each part does:
+
+- **`check`** runs on every pull request and push. `caplo validate` and `caplo test` need no key and call no workspace, so they also run for pull requests from forks. `npm ci` needs each package's `package-lock.json` committed.
+- **`publish`** runs only on pushes to `main`. `caplo auth status` prints the API client and its scopes, which makes a wrong key easy to spot in the log. `caplo eval` pushes the drafts and runs every agent's eval cases, so a failing case stops the job before anything is published. `caplo publish --yes` then publishes bottom up, reusing a passing eval run wherever the draft has not changed since.
+- **`--yes`** is required: without a terminal, a publish that would ask for confirmation stops with exit code 2. It also covers the project's first publish to the workspace.
+- **`concurrency`** stops two publishes from running against the same workspace at once.
+
+The install script checks the archive's SHA-256 checksum before installing. To also gate publishing on a reviewer, put the `publish` job in a [GitHub environment](https://docs.github.com/actions/deployment/targeting-different-environments/using-environments-for-deployment) with required reviewers.
+
+<Aside type="caution">
+Do not run `caplo push`, `caplo eval` or `caplo publish` on pull requests against the workspace that serves customers. `push` and `eval` overwrite the workspace drafts with the pull request's files, and two open pull requests would overwrite each other. Use a separate staging workspace for that, or limit pull requests to `caplo validate`, `caplo test` and `caplo diff`.
+</Aside>
+
+### Show the plan on pull requests
+
+To see what a merge would change, add a step to `check` with a key that has only `agents:read` and `tools:read`:
+
+```yaml
+      - run: caplo diff
+        env:
+          CAPLO_API_KEY: ${{ secrets.CAPLO_READ_KEY }}
+          CAPLO_WORKSPACE: ${{ secrets.CAPLO_WORKSPACE }}
+```
+
+`caplo diff -o json` prints the same plan as one JSON document, to post as a comment or check with a policy; see [Plans as JSON](/cli/scripting/#plans-as-json).
+
+### Staging and production
+
+With [environments](/cli/environments/) in `caplo.yaml`, give each its own API client and secret, and select the environment per job:
+
+```yaml
+      - run: caplo publish --env staging --yes
+        env:
+          CAPLO_STAGING_KEY: ${{ secrets.CAPLO_STAGING_KEY }}
+```
+
+For production, run a separate job, for example on `workflow_dispatch` or a tag, that sets both keys. With `promoteFrom: staging`, the CLI reads staging with `CAPLO_STAGING_KEY` and refuses any agent staging has not released from the same source:
+
+```yaml
+      - run: caplo publish --env prod --yes
+        env:
+          CAPLO_PROD_KEY: ${{ secrets.CAPLO_PROD_KEY }}
+          CAPLO_STAGING_KEY: ${{ secrets.CAPLO_STAGING_KEY }}
+```
+
+Do not also set `CAPLO_WORKSPACE` in these jobs unless it matches the environment's `workspace` exactly; a different value stops the command with exit code 2.
+
+<AgentPrompt id="publish-from-github-actions" />
+
+## GitLab CI
+
+Add `CAPLO_API_KEY` and `CAPLO_WORKSPACE` under **Settings**, **CI/CD**, **Variables** in GitLab, masked and protected so only protected branches can read them. Then in `.gitlab-ci.yml`:
+
+```yaml
+stages: [check, publish]
+
+variables:
+  CAPLO_VERSION: v0.4.0
+
+default:
+  image: node:24
+  before_script:
+    - curl -fsSL "https://raw.githubusercontent.com/getcaplo/homebrew-tap/$CAPLO_VERSION/install.sh" | sh
+    - export PATH="$HOME/.local/bin:$PATH"
+
+check:
+  stage: check
+  script:
+    - for dir in tools/*/; do if [ -f "$dir/package.json" ]; then npm ci --prefix "$dir"; fi; done
+    - caplo validate
+    - caplo test
+
+publish:
+  stage: publish
+  resource_group: caplo-publish
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - caplo eval
+    - caplo publish --yes
+```
+
+## Exit codes
+
+Pipelines stop on any non-zero exit code. The code tells you where to look:
+
+| Code | Meaning in CI | Typical fix |
+| --- | --- | --- |
+| `0` | Success, including nothing to publish | |
+| `1` | An error, such as a refused API key, a missing scope, a network failure or a failed build | Read the error line; check scopes with `caplo auth status` |
+| `2` | A usage error: a missing `--yes`, a workspace given by name with an API key, `--workspace` disagreeing with `--env`, or `channels:write` missing for a channel deploy | Fix the command or the variables |
+| `3` | A failed gate: validation, tool fixtures, eval cases, or a promotion with no matching release | Fix the files, or publish to the `promoteFrom` environment first |
+| `130`, `143` | The job was cancelled | Rerun it |
+
+A publish that fails partway keeps what it already published, such as tool versions or child agent releases. Fix the cause and run it again; unchanged resources are skipped. See [Scripting](/cli/scripting/) for output formats and environment variables.

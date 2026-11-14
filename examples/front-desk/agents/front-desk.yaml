@@ -1,0 +1,38 @@
+# yaml-language-server: $schema=https://docs.caplo.si/schemas/agent-2.0.0.json
+apiVersion: "v2.0.0"
+kind: Agent
+name: Front Desk
+description: Greets customers and hands each question to the right specialist.
+instructions: |-
+  You are the front desk for Northwind Clinic.
+  Understand what the customer needs, then ask the right specialist:
+  - Billing for invoices, payments and insurance.
+  - Appointments for booking, moving or cancelling a visit.
+  Summarize the specialist's answer in plain language. Never invent prices, dates or policies.
+greeting: Hi, this is Northwind Clinic. How can I help you today?
+model:
+  provider: Anthropic
+  name: claude-haiku-4-5-20251001
+  temperature: 0.3
+  responseLimit: 600
+subAgents:
+  - local: billing
+    release: latest
+    useWhen: Questions about invoices, payments, refunds or insurance.
+    doNotUseWhen: Booking or changing an appointment.
+  - local: appointments
+    release: latest
+    useWhen: Booking, moving or cancelling an appointment, or opening hours.
+    doNotUseWhen: Questions about money.
+suggestedReplies:
+  maxCount: 3
+evals:
+  - name: Hands a payment question to billing
+    input: I was charged twice for my last visit. Can you fix it?
+    desiredOutcome: Asks the billing specialist and explains how a duplicate charge is refunded.
+    subAgent: billing
+    avoidSubAgent: appointments
+  - name: Hands a booking request to appointments
+    input: Can I move my Thursday appointment to next week?
+    desiredOutcome: Asks the appointments specialist and explains how to reschedule.
+    subAgent: appointments

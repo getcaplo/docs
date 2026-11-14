@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches-ignore: [gh-pages]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # last-updated dates come from git history
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Released CLI for example projects
+        run: echo "CAPLO_BIN=$(node scripts/fetch-cli.mjs "$RUNNER_TEMP/caplo")" >> "$GITHUB_ENV"
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - run: npm run check
+      - run: npm run build
+      - name: External links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --no-progress --root-dir "${{ github.workspace }}/dist" --exclude-path dist/_llms-txt --exclude '^https://(claude\.ai|chatgpt\.com)/' --exclude '^https://docs\.caplo\.si/' 'dist/**/*.html'
+          fail: true
