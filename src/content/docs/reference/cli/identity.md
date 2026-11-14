@@ -8,7 +8,7 @@ sidebar:
 ---
 
 :::note[Generated reference]
-Generated from `caplo` v0.4.0, the latest release. `caplo identity --help` prints the same text.
+Generated from `caplo` v0.4.1, the latest release. `caplo identity --help` prints the same text.
 :::
 
 Generate keys and sign or check host sign-in assertions locally.

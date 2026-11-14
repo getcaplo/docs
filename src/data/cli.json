@@ -1,5 +1,5 @@
 {
-  "version": "0.4.0",
+  "version": "0.4.1",
   "commands": [
     {
       "path": "caplo",
@@ -324,7 +324,7 @@
       "path": "caplo agent push",
       "use": "caplo agent push [flags]",
       "short": "Save an agent file as the agent's draft, creating the agent if needed, and its evals as the eval suite",
-      "long": "Saves the file as the draft of the workspace agent with its name, creating the agent when there is none. The\nfile's evals replace the agent's eval suite; without an evals key the suite is left alone. Inside a project, local\nreferences resolve, and the sub-agents and packages they name must exist in the workspace already. --dry-run prints\nthe draft diff without saving.",
+      "long": "Saves the file as the draft of the workspace agent with its name, creating the agent when there is none. The\nfile's evals replace the agent's eval suite; without an evals key the suite is left alone. Cases in the console's\nevals: {cases: [...]} form keep their IDs, and a plain list of cases matches the suite's cases by name. Inside a\nproject, local references resolve, and the sub-agents and packages they name must exist in the workspace already.\n--dry-run prints the draft diff without saving.",
       "example": "caplo agent push -f agent.yaml\n  caplo agent push -f agent.yaml --dry-run",
       "runnable": true,
       "flags": [
@@ -736,7 +736,7 @@
       "path": "caplo channel rollback",
       "use": "caplo channel rollback <channel>... [flags]",
       "short": "Point channels back at their agent's release before the one they serve",
-      "long": "Points each channel at the newest release of its agent, older than the one it serves, that is not revoked. The\nrelease is served as it was published; publish again to move forward. It asks for confirmation; --yes skips it.",
+      "long": "Points each channel at the newest release of its agent, older than the one it serves, that is not revoked. The\nrelease is served as it was published. Publishing never moves a channel; caplo channel deploy points it at a newer\nrelease. It asks for confirmation; --yes skips it.",
       "example": "caplo channel rollback Website --yes",
       "runnable": true,
       "flags": [

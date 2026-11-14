@@ -7,7 +7,7 @@ sidebar:
 ---
 
 :::note[Generated reference]
-Generated from the schema in `caplo` v0.4.0. Guide: [Agent YAML](/agents/agent-yaml/).
+Generated from the schema in `caplo` v0.4.1. Guide: [Agent YAML](/agents/agent-yaml/).
 :::
 
 For validation and completion in your editor, add this first line to the file (YAML language server, used by VS Code and others):
@@ -126,7 +126,7 @@ How the agent loop runs. Omitted fields take the platform defaults; an empty gui
 | `chatStyle` | string |  | Reply style for chat turns. At most 2000 characters. |
 | `voiceStyle` | string |  | Reply style for voice calls. At most 2000 characters. |
 | `history` | object |  |  See [`policy.history`](#policyhistory). |
-| `knowledgePassages` | integer |  | Passages one knowledge search returns. Default 6. From 1 to 16. |
+| `knowledgePassages` | integer |  | Passages one knowledge search returns. Default 6. From 1 to 8. |
 | `maxModelCalls` | integer |  | Model calls of the whole agent graph per turn. Default 16. From 1 to 48. |
 | `maxReads` | integer |  | Tool lookups per turn. Default 8. From 1 to 32. |
 | `maxSearches` | integer |  | Knowledge searches per turn. Default 4. From 1 to 16. |
@@ -162,7 +162,7 @@ Short next messages offered under the replies this agent writes itself, on chann
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| `maxCount` | integer |  | Most suggestions under one reply; 3 when omitted. WhatsApp and Messenger show at most 3. From 1 to 4. |
+| `maxCount` | integer |  | Most suggestions under one reply; 3 when omitted. WhatsApp, Messenger and Instagram show at most 3. From 1 to 4. |
 
 Other fields are refused.
 
@@ -285,7 +285,7 @@ How the agent loop runs. Omitted fields take the platform defaults; an empty gui
 | `chatStyle` | string |  | Reply style for chat turns. At most 2000 characters. |
 | `voiceStyle` | string |  | Reply style for voice calls. At most 2000 characters. |
 | `history` | object |  |  See [`agents.policy.history`](#agentspolicyhistory). |
-| `knowledgePassages` | integer |  | Passages one knowledge search returns. Default 6. From 1 to 16. |
+| `knowledgePassages` | integer |  | Passages one knowledge search returns. Default 6. From 1 to 8. |
 | `maxModelCalls` | integer |  | Model calls of the whole agent graph per turn. Default 16. From 1 to 48. |
 | `maxReads` | integer |  | Tool lookups per turn. Default 8. From 1 to 32. |
 | `maxSearches` | integer |  | Knowledge searches per turn. Default 4. From 1 to 16. |
@@ -321,7 +321,7 @@ Short next messages offered under the replies this agent writes itself, on chann
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
-| `maxCount` | integer |  | Most suggestions under one reply; 3 when omitted. WhatsApp and Messenger show at most 3. From 1 to 4. |
+| `maxCount` | integer |  | Most suggestions under one reply; 3 when omitted. WhatsApp, Messenger and Instagram show at most 3. From 1 to 4. |
 
 Other fields are refused.
 

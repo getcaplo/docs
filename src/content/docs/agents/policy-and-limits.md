@@ -40,8 +40,6 @@ When to change them:
 - Raise `knowledgePassages` when answers miss details that are in the documents; lower it when replies drift into unrelated passages. More passages mean more input tokens per search.
 - Raise `maxDepth` only when your agent tree needs another level; every level adds latency.
 
-The agent file schema accepts `knowledgePassages` up to 16, but Caplo refuses a draft above 8 when you push or save it.
-
 ## History
 
 | Field | Console label | Range | Default |
