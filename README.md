@@ -22,6 +22,7 @@ npm run check      # type check, plus CLI, schema and prompt drift checks
 | `src/content/prompts/` | AI task prompts shown by `<AgentPrompt id="..."/>`. The file name is the ID. |
 | `src/data/versions.json` | The production versions the generated reference and `requires` gates were built from. |
 | `src/data/cli.json` | The released CLI's command tree, from `caplo docs export`. |
+| `src/content/docs/reference/sdk/` | The `@caplo/tools` API, generated with TypeDoc from the package published on npm. |
 | `public/schemas/` | Published JSON Schemas (agent YAML, `caplo.yaml`, fixtures), for editors and AI tools. |
 | `examples/` | Complete example files that CI validates with the released CLI. |
 | `scripts/` | Sync, reference generators, drift checks and the Pages deploy. |
@@ -83,7 +84,7 @@ Every page also has a menu to copy it as Markdown or open it in Claude or ChatGP
 
 ## How the docs stay current
 
-`scripts/sync.mjs` reads what production runs: image versions pinned in `getcaplo/argocd-deployments` and the latest CLI release in `getcaplo/homebrew-tap`. It downloads that CLI, checks it against the release checksums, runs `caplo docs export`, and regenerates `src/content/docs/reference/`, `src/data/` and `public/schemas/`.
+`scripts/sync.mjs` reads what production runs: image versions pinned in `getcaplo/argocd-deployments`, the latest CLI release in `getcaplo/homebrew-tap`, and the latest `@caplo/tools` on npm. It downloads that CLI, checks it against the release checksums, runs `caplo docs export`, renders the SDK's type declarations with TypeDoc, and regenerates `src/content/docs/reference/`, `src/data/` and `public/schemas/`. The build also publishes `/slugs.json`, the list of page paths that the console checks its docs links against.
 
 The `Sync` workflow runs it when production versions change, when a CLI release is published, nightly, and on demand. On a change it commits to a `sync/` branch, builds and runs every check, then merges the branch into `main` and deploys. If a check fails, the branch stays and the workflow opens or updates a "Docs drift" issue; the live site keeps the last good build.
 

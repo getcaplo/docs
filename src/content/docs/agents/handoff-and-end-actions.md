@@ -26,7 +26,7 @@ An action needs permission in two places: on the agent, and on the channel entry
 
 2. **Publish** a release with the action. Adding an action suggests a minor version bump, removing one a major bump. See [Publish an agent](/agents/publishing/).
 
-3. **On the channel.** In the channel's entry point settings, under **Conversation actions**, allow the action. For a transfer, choose a **Transfer destination** compatible with the entry point: a Chatwoot handoff destination for chat, or a phone number or SIP address for calls. An action the published agent does not allow shows **Unavailable: enable this action in the agent and publish a version.** See [Channels](/channels/).
+3. **On the channel.** For a website widget, open the entry point's **Conversation** tab and allow the action under **Conversation actions**; for a transfer, choose a Chatwoot handoff destination as the **Transfer destination**. An action the published agent does not allow shows **Unavailable: enable this action in the agent and publish a version.** For a phone channel, set **Transfer calls to** (a phone number or SIP address) and **Transfer type** in the channel's **Conversation** step; see [Phone](/channels/phone/). For WhatsApp, Messenger and Instagram, see [Handoff to Chatwoot](/channels/handoff-to-chatwoot/).
 
 Tell the agent in its [instructions](/agents/instructions-and-model/) when to hand off, for example "Offer to connect the customer with a person when they ask for a refund over 100 euros, or when you cannot resolve the issue after two tries." Without guidance, the model decides on its own.
 

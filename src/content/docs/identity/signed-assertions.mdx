@@ -1,0 +1,208 @@
+---
+title: Host sign-in with signed assertions
+description: Sign visitors who are already signed in on your site in to the website widget, with a short-lived assertion your backend signs.
+sidebar:
+  order: 2
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+import AgentPrompt from '~/components/AgentPrompt.astro';
+
+With **Host sign-in**, your website vouches for its own signed-in user. When the widget needs to know who the visitor is, it asks your page for a token; your page asks your backend, which checks its own session and signs a short **assertion** naming the customer. Caplo checks the signature against the public key you registered and verifies the visitor. The visitor clicks nothing, and Caplo never sees your passwords, cookies or private keys.
+
+In order:
+
+1. The widget gets a one-time `nonce` from Caplo and calls your page's `getToken` with it.
+2. Your page posts the nonce to your backend.
+3. Your backend checks its own session and returns an assertion for the signed-in customer, signed with your private key and valid for about a minute.
+4. The widget sends the assertion to Caplo, which checks the signature, issuer, audience, nonce and times, and verifies the visitor as that customer.
+
+## Before you start
+
+- The Owner or Admin role, to manage **Customer identity**.
+- A website channel whose widget runs on pages where your customers are signed in. See [Install the website widget](/channels/website-widget/install/).
+- The [caplo CLI](/cli/install/), for generating keys and testing assertions. Nothing in `caplo identity` talks to your workspace.
+
+## Set it up
+
+<Steps>
+
+1. **Generate a signing key.** Run this where your backend's secrets live:
+
+   ```sh
+   caplo identity keygen --alg ES256 --kid 2026-11 --out ./caplo-keys
+   ```
+
+   It writes `2026-11.private.jwk.json` and `2026-11.private.pem` (readable only by you) and `2026-11.public.jwk.json`. The key ID defaults to the key's thumbprint when you leave out `--kid`. Other algorithms are `ES384`, `PS256`, `RS256` and `EdDSA`. Store the private key in your backend's secret store; it never goes to Caplo.
+
+2. **Create the connection.** In the console, go to **Settings**, **Customer identity**, and select **Add connection**:
+
+   | Field | What to enter |
+   | --- | --- |
+   | **Connection type** | **Host sign-in**. |
+   | **Connection name** | Up to 80 characters, shown in the console. |
+   | **Subject namespace** | Optional. Leave it empty to use the issuer. Connections that share a namespace identify the same customers. Fixed once created. |
+   | **Issuer (iss)** | The exact value your backend puts in `iss`, for example `https://www.example.com`. |
+   | **Public keys** | **JWKS URL (recommended for rotation)**: an HTTPS URL that serves your public keys as a JWK Set. Or **Paste public JWKs (up to 4)**: the contents of `2026-11.public.jwk.json`. Every key needs `kid` and `alg`. |
+   | **Allowed algorithms** | The algorithms your keys use. A key whose `alg` is not allowed is refused. |
+   | **Assurance mapping** | Each `acr` value you send and its level, and the level **When acr is absent**. See [Assurance levels](/identity/#assurance-levels). |
+   | **Claims and attributes** | The profile claims (`name`, `email`, `email_verified`, `locale`) and typed attributes you will send. Anything not listed is refused. |
+
+   Select **Create connection**, then open it again with **Configure** and copy the **Audience (aud)**. It looks like `urn:caplo:customer-identity:<CONNECTION_ID>` and never changes.
+
+3. **Add it to the policy.** In **Verification policy**, turn on **Verify customers in support conversations**, add the connection under **Connections, in order**, make sure **Allowed scopes** includes `identity:bind`, and select **Save policy**.
+
+4. **Add a token endpoint to your backend.** See [Write the token endpoint](#write-the-token-endpoint). The connection editor also shows ready-made Node.js, Python and Go examples filled in with your issuer and audience.
+
+5. **Register a token provider on your page** with the widget's JavaScript API:
+
+   ```js
+   window.CaploWidget.get('<WIDGET_ID>').identity.configure({
+     when: 'open',
+     getToken: async ({ nonce, requirement }) => {
+       const response = await fetch('/support/caplo-token', {
+         method: 'POST',
+         headers: { 'content-type': 'application/json', 'x-caplo-token-request': '1' },
+         body: JSON.stringify({ nonce, requirement }),
+       });
+       return response.status === 200 ? response.text() : null;
+     },
+   });
+   ```
+
+   Return `null` when nobody is signed in on your page. `when` decides when the widget asks; call `identity.refresh()` after your user signs in or switches account and `identity.signOut()` after they sign out. See [Sign visitors in from your page](/channels/website-widget/javascript-api/#sign-visitors-in-from-your-page).
+
+6. **Turn it on for the channel.** Open the website channel, select **Configure & install**, and go to the **Conversation** tab. Set **Customer verification** to **Visitors may verify who they are** or **Visitors must verify before chatting**, select **Choose sign-in methods and consent for this channel**, add the connection as a sign-in method, set **Consent mode** to **Show a notice after verification**, write the **Consent text** (16 to 4096 characters), and select **Save entry point**.
+
+</Steps>
+
+<Aside type="caution">
+Host sign-in runs only with the consent mode **Show a notice after verification**. With **Ask for agreement before the first verification**, or without channel sign-in settings at all, the widget never asks your page for a token, and a channel that requires verification leaves the visitor unable to chat.
+</Aside>
+
+## Write the token endpoint
+
+The endpoint is yours, on your own domain. It must:
+
+- Accept only `POST` requests from your own site, and check the `Origin` header.
+- Require a custom header, such as `x-caplo-token-request: 1`, so a form on another site cannot call it.
+- Identify the visitor from your own session cookie (`SameSite`), never from the request body.
+- Take the issuer and audience from server configuration, never from the request.
+- Sign only the `nonce` and `requirement` it is given.
+- Answer `Cache-Control: no-store`, and `401` when nobody is signed in.
+
+```js
+// npm install jose
+import { SignJWT, importPKCS8 } from "jose";
+
+const ISSUER = "https://www.example.com";                       // the connection's Issuer (iss)
+const AUDIENCE = "urn:caplo:customer-identity:<CONNECTION_ID>"; // the connection's Audience (aud)
+const SITE_ORIGIN = "https://www.example.com";
+const privateKey = await importPKCS8(process.env.CAPLO_SIGNING_KEY, "ES256"); // 2026-11.private.pem
+
+// Express: app.post("/support/caplo-token", express.json(), caploToken)
+export async function caploToken(req, res) {
+  res.set("Cache-Control", "no-store");
+  if (req.get("origin") !== SITE_ORIGIN || req.get("x-caplo-token-request") !== "1") return res.sendStatus(403);
+  const user = req.session?.user;
+  if (!user) return res.sendStatus(401);
+  const { nonce, requirement } = req.body ?? {};
+  if (typeof nonce !== "string") return res.sendStatus(400);
+  if (requirement && !meets(user, requirement)) return res.sendStatus(401);
+  const token = await new SignJWT({ nonce, acr: user.mfa ? "mfa" : "pwd", auth_time: user.authTime })
+    .setProtectedHeader({ alg: "ES256", kid: "2026-11", typ: "caplo-customer+jwt" })
+    .setIssuer(ISSUER)
+    .setAudience(AUDIENCE)
+    .setSubject(user.customerId) // stable and opaque, never an email or phone number
+    .setIssuedAt()
+    .setExpirationTime("60s")
+    .sign(privateKey);
+  res.type("text/plain").send(token);
+}
+
+// A step-up asks for a level, a recent sign-in, or both. Sign only when this session meets it.
+function meets(user, { level, maxAuthAgeSeconds }) {
+  if (level === "high" && !user.mfa) return false;
+  if (maxAuthAgeSeconds !== undefined && Date.now() / 1000 - user.authTime > maxAuthAgeSeconds) return false;
+  return true;
+}
+```
+
+This example assumes the connection maps `acr` `mfa` to **High** and `pwd` to **Standard**.
+
+### Assertion format
+
+The assertion is a compact JWS of at most 16 KiB. Its header has `typ` `caplo-customer+jwt`, an `alg` that matches the key's `alg` and is allowed on the connection, and a `kid` that names an unrevoked key. Headers `crit`, `jku`, `jwk`, `x5u`, `x5c` and `x5t` are refused.
+
+| Claim | Required | Rules |
+| --- | --- | --- |
+| `iss` | Yes | Exactly the connection's issuer. |
+| `aud` | Yes | Exactly the connection's audience, as a string or a one-value list. |
+| `sub` | Yes | Your stable, opaque customer ID, up to 255 characters. This is the ID tools receive. |
+| `nonce` | Yes | The `nonce` the widget passed to `getToken`, unchanged. Each nonce works once. |
+| `iat`, `exp` | Yes | `exp` at most 300 seconds after `iat`; 60 is recommended. Mint the assertion when asked: one issued before the widget's request is refused. Caplo allows 60 seconds of clock skew. |
+| `nbf` | No | Not before; must not be in the future. |
+| `acr` | No | Mapped to a level through **Assurance mapping**. An unmapped value is refused. |
+| `auth_time` | No | When the customer last authenticated, in seconds. Needed to meet a freshness requirement. Must not be after `iat`. |
+| `amr` | No | Authentication methods, such as `["pwd","otp"]`, up to 16. |
+| `sid` | No | A non-secret ID of the customer's session on your site, so a [back-channel logout](/identity/account-links-and-revocation/#back-channel-logout) can end it. |
+| `jti` | No | A unique ID, up to 255 characters. |
+| `name`, `email`, `email_verified`, `locale` | No | Only those allowed under **Accepted profile claims**. The widget shows `name` as "Signed in as". |
+| `attributes` | No | An object of declared attributes, such as `{"tier":"gold"}`, checked against each attribute's type. Up to 20. |
+| `act_for` | No | `{"sub": "<PRINCIPAL_ID>", "relationship": "caregiver"}` when a person acts for another customer. The relationship must be listed under **Delegation relationships**. Tools then act for the principal. |
+
+Any other claim is refused, so a mistake shows up as a failed verification in **Activity** instead of passing silently.
+
+## Renewal and step-up
+
+A host sign-in lasts 15 minutes and is renewed in the background: while the page is open, the widget calls `getToken` again about every 10 minutes, with a new nonce and `requirement` `null`. After a page reload, the widget hides the transcript until your page confirms the same person with a fresh token. If `getToken` returns `null`, the visitor is signed out. If it returns an assertion for a different `sub`, the conversation ends and the new person starts a fresh one.
+
+When an operation needs more than the current sign-in, the widget shows **Confirm it's you**. When the visitor selects it, `getToken` receives a `requirement` with `level`, optionally `maxAuthAgeSeconds`, and for a specific action an `action` with its `id`, `summary` and `digest`. Your page can run its own multi-factor prompt before calling your backend: the widget waits up to 5 minutes. Sign only when the session meets the requirement, with an `acr` that maps to the level and an `auth_time` within `maxAuthAgeSeconds`, and for the same `sub`.
+
+## Test it
+
+Before you put it on a live site, test your assertions with the CLI and in the console.
+
+<Steps>
+
+1. Sign an assertion locally, as your backend would:
+
+   ```sh
+   caplo identity sign-assertion --key ./caplo-keys/2026-11.private.pem --kid 2026-11 \
+     --iss https://www.example.com --aud urn:caplo:customer-identity:<CONNECTION_ID> \
+     --sub cus_1234 --nonce test-nonce-0123456789 --acr mfa --auth-time now --ttl 60
+   ```
+
+2. Check an assertion, from the CLI or from your own endpoint, against your public key:
+
+   ```sh
+   caplo identity verify-assertion - --jwks ./caplo-keys/2026-11.public.jwk.json \
+     --iss https://www.example.com --aud urn:caplo:customer-identity:<CONNECTION_ID> \
+     --nonce test-nonce-0123456789 < assertion.txt
+   ```
+
+   It prints each check as `PASS`, `FAIL` or `SKIP` and exits with status 3 when one fails. `--jwks` also takes your HTTPS JWKS URL. The connection's own rules (acr mapping, allowed claims, attributes) are skipped locally.
+
+3. In the console, select **Test assertion** on the connection and paste an assertion your servers signed. Every check runs, including the connection's rules, except the nonce, and nothing is created.
+
+4. Open the widget on a test channel while signed in to your site. Failed attempts appear under **Activity**, **Failures by reason**.
+
+</Steps>
+
+See the [`caplo identity` reference](/reference/cli/identity/) for every flag.
+
+## Rotate keys
+
+With a **JWKS URL**, Caplo caches your key set for its `Cache-Control` max-age, between 5 minutes and 24 hours, and fetches it again (at most once a minute) when an assertion names a key ID it does not know. To rotate:
+
+1. Generate a new key and publish its public JWK in your JWKS alongside the old one.
+2. Start signing with the new key.
+3. Remove the old key from your JWKS once nothing signs with it. Select **Flush keys** on the connection to make Caplo drop its cached copy at once.
+
+With pasted keys, add the new public JWK to the connection (up to 4), switch your backend to it, then remove the old one. Each edit is a trust change and may need a second approver.
+
+<Aside type="caution">
+If a private key may have leaked, select **Revoke key** on the connection. The key is refused from then on, whatever any cache holds, and every verification made with it is revoked. Then publish a new key.
+</Aside>
+
+<AgentPrompt id="host-sign-in-assertions" />

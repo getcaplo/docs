@@ -1,0 +1,144 @@
+---
+title: Connect a Telnyx number
+description: Connect your Telnyx account, route a number to Caplo with an FQDN SIP connection, set up transfers, test a call, and remove the number again.
+sidebar:
+  order: 2
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Caplo answers calls to your Telnyx numbers through a Telnyx FQDN SIP connection. You create the connection in the Telnyx portal and point it at Caplo; Caplo never buys numbers or changes your Telnyx configuration. For how phone channels work as a whole, see [Phone calls](/channels/phone/).
+
+## What you need
+
+| Value | Where to find it in Telnyx | What Caplo does with it |
+| --- | --- | --- |
+| **Telnyx API v2 key** | The portal's account settings, under **API Keys**. Create a key for Caplo. | Reads the account's phone numbers and SIP connections. |
+| **Ed25519 public key** | The portal's account settings, next to the API keys, as the account's public key. A Base64 value of 44 characters ending in `=`. | Required by the connect form and stored with the account. |
+
+Copy the **public** key. Never paste a private signing key.
+
+Caplo only reads through the API key. It stores the key encrypted and never shows it again. You also need a role that can manage integrations (Owner, Admin or Developer), and phone numbers enabled for your workspace. See [Before you start](/channels/phone/#before-you-start).
+
+## Connect the account
+
+<Steps>
+
+1. In the console, open **Integrations** then **Communication channels**, select the **Telnyx** tab, then **Add integration**.
+
+2. Enter an **Integration name**, the **Telnyx API v2 key** and the **Ed25519 public key**, then select **Verify and connect**. Caplo checks the key with Telnyx and lists the account's voice numbers.
+
+3. Select **Connection details** on the new account. The **SIP connection** panel shows what your Telnyx connection needs:
+
+   | Field | Use |
+   | --- | --- |
+   | **SIP host** | The address Telnyx sends calls to. |
+   | **Port and transport** | The port and protocol for that address, for example TLS. |
+   | **SIP URI** | The same address as a single SIP URI, for settings that ask for one. |
+   | **Username** and **Password** | Credentials Caplo created for this Telnyx account. Select **Reveal** to see the password. |
+
+   **Verification key** shows a fingerprint of the public key you entered, so you can tell which key is stored.
+
+</Steps>
+
+Connecting changes nothing in Telnyx. Your numbers keep their current routing until you assign them to the connection.
+
+## Route a number to Caplo
+
+<Steps>
+
+1. In the Telnyx portal, create a SIP connection of type **FQDN** that points to Caplo's **SIP host**, on the port and transport shown in **Connection details**. Copy the values rather than typing them.
+
+2. Use credential authentication with the **Username** and **Password** from **Connection details**.
+
+3. Enable SRTP media encryption and the PCMU (G.711 μ-law) codec on the connection.
+
+4. Assign the phone number to this connection.
+
+5. Back in Caplo, select **Refresh account and numbers** in **Connection details**. The number should now show **Eligible for binding**.
+
+6. Create a phone channel for the number. See [Set up a phone channel](/channels/phone/#set-up-a-phone-channel).
+
+</Steps>
+
+Saving the channel creates the number's route in Caplo. It shows **Provisioning** and then **Ready** under **Number routes**.
+
+<Aside type="caution">
+Assigning a number to the connection replaces how Telnyx handled its calls before, such as a Call Control application. Numbers on a Call Control application or any connection type other than FQDN cannot be connected to Caplo.
+</Aside>
+
+You can use one FQDN connection for every number you send to Caplo from the same Telnyx account. The username and password belong to the Telnyx account you connected in Caplo, not to a single number.
+
+## Transfers
+
+**Cold transfers** ask Telnyx to transfer the call (SIP REFER) to the target number or SIP URI.
+
+**Warm transfers** make a new call from your Telnyx account to the person, authenticated with the same username and password. Make sure the connection is allowed to place outbound calls to the target, which in Telnyx means an outbound voice profile assigned to the connection that permits the destination.
+
+The transferred call is billed to your Telnyx account.
+
+## Test a call
+
+<Steps>
+
+1. Check that the number shows **Ready** under **Number routes** in **Connection details**.
+2. Call the number from a phone. You should hear the agent's greeting.
+3. Talk to the agent, try interrupting it, and hang up.
+4. Open **Monitor** then **Conversations** and find the call on the channel to read the transcript.
+
+</Steps>
+
+Number discovery does not prove that audio works both ways, so make a real call after every change to the connection.
+
+## Keep the account current
+
+Caplo checks a Telnyx account's numbers and connections automatically about once an hour, and whenever you select **Refresh account and numbers**. After you change something in Telnyx, refresh to apply it straight away.
+
+If Caplo cannot check the account for 24 hours, for example because the API key was deleted in Telnyx, its numbers stop taking calls until a check succeeds. Rotate the credentials to fix it.
+
+To replace the API key or public key, select **Rotate credentials** on the account, enter the new values and select **Verify and rotate**. The SIP username and password stay the same, so you do not need to change the connection in Telnyx.
+
+## What not to change in Telnyx
+
+While a number serves a phone channel, leave these as they are:
+
+- The connection's host, port and transport. Without them, calls never reach Caplo.
+- The connection's username and password.
+- SRTP and the PCMU codec on the connection. Without them, callers may hear nothing.
+- The number's assignment to the connection, and the connection's enabled state. A disabled connection stops calls.
+
+If you change any of them, select **Refresh account and numbers** in Caplo and make a test call.
+
+## Remove a number
+
+<Steps>
+
+1. In Caplo, open the number's channel and select **Pause channel**. New calls are disconnected; calls in progress finish.
+2. In Telnyx, assign the number to another connection or application.
+3. In Caplo, select **Refresh account and numbers**, or wait for the next automatic check. The number shows **Needs setup** and its route **Disconnected**.
+
+</Steps>
+
+Phone channels cannot be deleted, and a number stays tied to the channel it was first connected to. To have another agent answer the number, change the channel's agent instead.
+
+To stop all numbers of a Telnyx account at once, select **Disable** on the account in **Integrations**. Its numbers stop taking calls until you select **Enable**.
+
+## Troubleshooting
+
+Blockers next to a number in **Connection details**:
+
+| Message | Fix |
+| --- | --- |
+| The number is no longer available in this account. | The number was released or moved. Check the account in Telnyx, then refresh. |
+| Enable this account connection. | The account is disabled in Caplo. Select **Enable**. |
+| Refresh the account and numbers. | The last check is more than 24 hours old. Select **Refresh account and numbers**. |
+| Enable the number's SIP connection in Telnyx. | The connection is disabled in Telnyx. Enable it, then refresh. |
+| Assign the number to an FQDN SIP connection configured with the SIP connection settings. | The number is on another connection type or none. Assign it to the FQDN connection, then refresh. |
+
+**No voice-capable numbers found.** Assign an owned number to an FQDN SIP connection in Telnyx, then refresh.
+
+**Verify and connect fails.** Check that the API key is active and that the public key is the 44-character Base64 value from your Telnyx account, not a private key.
+
+**The call connects but there is no audio.** Check that SRTP and the PCMU (G.711 μ-law) codec are enabled on the connection.
+
+**Calls are not answered.** Check the connection's host, port, transport and credentials against **Connection details**, that the route is **Ready**, and that the channel is not paused. See [Troubleshooting](/channels/phone/#troubleshooting) for more.

@@ -1,0 +1,176 @@
+---
+title: Connect WhatsApp
+description: Connect a WhatsApp Business number through Meta, serve an agent release on it, and send approved templates when the 24-hour customer service window has closed.
+sidebar:
+  order: 3
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+A WhatsApp channel answers messages sent to one of your WhatsApp Business numbers. Caplo uses Meta's WhatsApp Cloud API: you connect your WhatsApp Business account once under **Integrations**, then create a channel that serves a published agent release on one of its numbers.
+
+## Before you start
+
+- A Meta business portfolio and a WhatsApp Business account, or permission to create them during setup. You sign in to Meta with a Facebook account that can manage them.
+- A phone number for WhatsApp. It is either already on the WhatsApp Cloud API, or a new number that can receive a verification code by SMS or call.
+- A workspace role that can manage integrations (Owner, Admin or Developer) to connect the account, and one that can configure channels (Owner, Admin or Builder) to create the channel.
+- A published agent release. See [Publish an agent](/agents/publishing/).
+- A browser that allows popups from the console, because Meta's signup opens in a popup.
+
+<Aside type="caution">
+Numbers used in the WhatsApp Business app on a phone cannot be connected. Caplo does not support Business App coexistence. To use such a number, first move it off the app by following Meta's instructions, then connect it as a new number.
+</Aside>
+
+## Connect your WhatsApp Business account
+
+<Steps>
+
+1. In the console, open **Integrations** then **Communication channels**.
+
+2. Select **Add integration**, then **WhatsApp Business**.
+
+3. Enter an **Integration name**, for example "Customer service account".
+
+4. Under **How is this number set up?**, choose:
+   - **Already on the WhatsApp Cloud API** for a number that already sends messages through the Cloud API.
+   - **A new number for WhatsApp** for a number you are adding to WhatsApp now.
+
+5. Select **Prepare Meta connection**. A setup row appears on the **WhatsApp** tab with the status **Awaiting authorization**.
+
+6. Select **Continue with Meta**. In Meta's popup, sign in, choose or create the business portfolio and WhatsApp Business account, choose or add the phone number, and grant access. For a new number, Meta sends the verification code and asks for a display name.
+
+7. When the popup closes, the row shows **Saving authorization**, then **Checking account**. Caplo verifies the access Meta granted, the account and the number, and subscribes your account to Caplo's webhooks. When it finishes, the console shows "Your WhatsApp account is connected."
+
+</Steps>
+
+Meta must grant Caplo the `whatsapp_business_management` and `whatsapp_business_messaging` permissions. If you clear either one in the popup, setup ends with "Meta did not grant access to this WhatsApp account."
+
+For a new number, Caplo registers the number for messaging after setup. If the number already has a two-step verification PIN, registration waits for it: select **Check connection**, open **Numbers**, enter the six-digit PIN under **Two-step PIN** and select **Register number**. Caplo never guesses a PIN. A number shows **Ready for messages** once Meta has activated it.
+
+## Create the WhatsApp channel
+
+<Steps>
+
+1. Open **Channels** under **Deploy**, select **Create channel** and choose **WhatsApp Business**.
+
+2. Enter a **Channel name**, choose the **Agent** and **Agent release**, then select **Set up connection**.
+
+3. Choose the **WhatsApp Business account** you connected and a **Phone number**. Only numbers that are ready and not used by another channel can be selected; others show **unavailable**. Select **Continue**.
+
+4. Choose **Who answers**:
+   - **AI agent**: the agent answers every customer. Your team can still take over any conversation.
+   - **Your team**: the agent stays silent, also in open conversations. Messages wait in **Conversations** for your team to take over and reply.
+
+5. Set the **Conversation inactivity timeout (seconds)**, from 300 to 604800. The default, 86400, starts a new conversation when the customer writes again after a day of silence.
+
+6. Select **Create channel**, then send a message to the number from your own WhatsApp to test it.
+
+</Steps>
+
+A channel keeps its number. To use another number, create another channel. To serve a newer release, update the channel as described in [Channels](/channels/#deploy-a-new-release). You can pause a WhatsApp channel but not delete it.
+
+Customers on WhatsApp are not signed in, so tools that need a [verified customer](/tools/customer-aware-tools/) do not run there, and customer memory is off. A WhatsApp conversation lasts at most seven days, whatever the inactivity timeout.
+
+## The 24-hour customer service window
+
+WhatsApp lets a business reply freely for 24 hours after the customer's last message. Outside that window, only approved message templates can be sent.
+
+- The agent replies only inside the window. A message that reaches Caplo after its own window has passed, for example after a Meta outage, is recorded in the transcript without a reply.
+- Your team's replies from the console are also bound to the window. After it closes, the console refuses a typed reply and asks you to send an approved template.
+- An open conversation in **Conversations** shows **WhatsApp reply window closes in** with the time left, or **WhatsApp reply window closed. Only approved templates can be sent.**
+
+The agent never sends templates. Templates are sent by a person on your team, from a conversation they have taken over.
+
+## Message templates
+
+### Create or sync templates
+
+Templates you create in Meta's WhatsApp Manager are synced to Caplo automatically every few minutes. To sync now, select **Check connection** on the account, then **Check connection and templates**. The **Templates** tab lists every template with its status. Caplo can send a template when it is approved, its category is utility or marketing, and it has a text body with optional fixed text header and footer. Templates with media, buttons or variables outside the body are listed but cannot be sent.
+
+To create a template from Caplo:
+
+<Steps>
+
+1. On the **Templates** tab, select **New template**.
+
+2. Enter the **Template name** (lowercase letters, digits and underscores; other characters become underscores), the **Language** (for example `en_US`) and the **Purpose**: **Updates about an order, booking or account** (utility) or **Offers and promotions** (marketing).
+
+3. Write the **Message**, up to 1024 characters. Use `{{1}}`, `{{2}}` and so on for values you fill in when sending, numbered in order. A variable cannot start or end the message. Give an **Example** for each variable for Meta's review.
+
+4. Optionally add a **Header** and **Footer** of up to 60 characters each, without variables. A marketing template must tell people how to opt out, for example "Reply STOP to opt out".
+
+5. Select **Submit to Meta for review**. Meta usually decides within minutes to a day; the template becomes sendable once it shows as approved.
+
+</Steps>
+
+Authentication templates cannot be created or sent from Caplo.
+
+### Send a template from the inbox
+
+<Steps>
+
+1. In **Conversations**, open the customer's WhatsApp conversation and select **Take over**.
+
+2. Open **More actions** and select **Send approved template**.
+
+3. Choose the **Approved template** and fill in each **Body parameter**. The **Message preview** shows exactly what the customer will receive.
+
+4. Record the customer's opt-in for the template's category: under **Customer message with explicit opt-in**, pick the customer's message that gives permission, confirm the check box, and select **Record customer opt-in**. A booking request or an ordinary reply is not an opt-in.
+
+5. Choose the recorded opt-in under **Customer opt-in** and select **Queue template**. Follow its delivery in the transcript.
+
+</Steps>
+
+A template can be sent while the conversation is still open, inside or outside the window. Each body parameter is sent as one line of at most 512 characters: line breaks and repeated spaces are collapsed. An opt-in lasts until the conversation ends, and you can revoke it with **Revoke selected opt-in**. Meta charges your WhatsApp Business account for template messages under its own pricing.
+
+## What customers see
+
+- **Replies** arrive as text from your business number.
+- **Suggested replies** appear as up to three reply buttons of up to 20 characters, when the reply is short enough to carry buttons. Otherwise the reply is sent as text alone. See [Replies and feedback](/agents/replies-and-feedback/).
+- **Tool results**: cards with a reply action become a WhatsApp list; choices become reply buttons when three or fewer fit, otherwise a list; a detail with reply actions becomes reply buttons. Other results are sent as short numbered text. See [Present results](/tools/present-results/).
+- **Confirmations**: before a write tool runs, the customer gets a message with the details and "Confirm to approve these details, or Cancel.", with **Confirm** and **Cancel** buttons. Only a tap on that message's **Confirm** approves the request, and the buttons expire after 10 minutes or when the window closes. Fields cannot be edited on WhatsApp. A confirmation WhatsApp cannot show, such as one that needs editing or a stronger sign-in, is not sent; the customer is told the request has not been confirmed and to use your website or contact your team. See [Write tools](/tools/write-tools/).
+- **Handoff**: WhatsApp channels have no transfer destination, so the agent cannot hand off on its own. Your team takes over from **Conversations**, or from Chatwoot when you mirror WhatsApp conversations there. See [Hand off to Chatwoot](/channels/handoff-to-chatwoot/). WhatsApp customers get no message when your team takes over or hands back; your team's replies simply arrive from the same number.
+
+## Media and message limits
+
+- Caplo reads text messages and taps on its own buttons and lists. Photos, videos, voice notes, documents, stickers, locations and contacts are not passed to the agent, and the customer gets no reply to them.
+- Replies are text only; the agent cannot send files or images on WhatsApp.
+- A customer message longer than 4,000 characters reaches the agent cut to its first 3,980 characters, followed by "[message shortened]".
+
+## Check the connection
+
+Select **Check connection** on the account under **Integrations** to open its status:
+
+| Tab | What it shows |
+| --- | --- |
+| **Deliveries** | Each outgoing message with its status (queued, sent, delivered, read, failed or unknown) and Meta's reason for a failure. **Check delivery evidence** looks for Meta's receipt. **Retry delivery** is offered only when the earlier attempt is proven not to have been accepted. |
+| **Numbers** | Each number, its registration state, and Meta's account health: whether Meta allows the account to send, limits it, or blocks it. |
+| **Templates** | Synced templates, their status and why one cannot be sent. |
+
+Caplo never resends a message whose outcome is unknown, because the customer may already have it. Until its outcome is known, later replies to that customer wait. Use **Check delivery evidence** to settle it.
+
+## Troubleshooting
+
+| Problem | What to do |
+| --- | --- |
+| "WhatsApp signup isn't available for this workspace yet." | Embedded Signup is not enabled for your workspace. Contact [support](/resources/support/). |
+| "The Meta popup was blocked." or "Meta could not load." | Allow popups for `app.caplo.si`, turn off blockers for `facebook.com`, then select **Continue with Meta** again. |
+| "This WhatsApp account needs the Caplo app subscription before it can connect." | Meta refused Caplo's webhook subscription for the account. Check in Meta Business Settings that the account is shared with the Caplo app, then select **Reconnect**. |
+| "Meta did not return a Cloud API number for this account." | You chose **Already on the WhatsApp Cloud API** but the number is not on it. Start again and choose **A new number for WhatsApp**, or pick another number. |
+| A number shows **Needs the number's two-step PIN** | Enter the PIN on the **Numbers** tab and select **Register number**. If you do not know it, reset it in WhatsApp Manager first. |
+| A number is **unavailable** when creating a channel | It is not registered yet, it is already used by another channel, it is on the WhatsApp Business app, or the account needs to be reconnected. Check **Numbers** and the account status. |
+| Account shows **Reconnect required** or **Authorization expired** | Meta access was revoked or expired. Select **Reconnect** and finish the Meta popup. |
+| "Add a payment method in Meta Business Settings to continue." | Meta blocks the account until it has a payment method. Add one in Meta Business Settings, then select **Check connection and templates**. |
+| Delivery failed with `provider rejected 131047` | The customer service window had closed. Send an approved template instead. |
+| Delivery failed with `provider rejected 131026` | Meta could not deliver to that number, for example because it is not on WhatsApp. |
+| Delivery failed with `provider rejected 131049` | Meta chose not to deliver a marketing message to keep engagement healthy. Try later or rely on a customer-initiated conversation. |
+| The agent does not answer | Check that the channel is not paused, **Who answers** is **AI agent**, and the customer's message is text sent within the last 24 hours. |
+
+**Disconnect** on the account stops new messages and replies for every channel that uses it; existing conversations are kept. Select **Reconnect** to use it again.
+
+## Related
+
+- [Channels](/channels/)
+- [Messenger and Instagram](/channels/messenger-and-instagram/)
+- [Hand off to Chatwoot](/channels/handoff-to-chatwoot/)
+- [Conversations inbox](/operate/conversations-inbox/)
