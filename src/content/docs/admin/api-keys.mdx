@@ -57,7 +57,7 @@ A write or publish scope includes the read scope of the same resource: `agents:p
 | `endpoints:write` | **Manage endpoints** | Accepted, but no Caplo API uses it. |
 
 <Aside type="caution" title="agents:publish is broad">
-Despite the console's **Access boundaries** note, `agents:publish` does let a key publish agents. It can also delete agents and turn off the workspace's eval requirement. Give it only to pipelines that publish, and keep that key in a protected CI environment.
+`agents:publish` lets a key publish agents, and it can also delete agents and turn off the workspace's eval requirement. Give it only to pipelines that publish, and keep that key in a protected CI environment.
 </Aside>
 
 No scope covers members, roles, SSO, billing, workspace secrets, integrations or other API clients. Those always need a person. See [What works with an API key](/cli/authentication/#what-works-with-an-api-key) for the CLI commands each scope enables.

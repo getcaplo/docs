@@ -8,7 +8,7 @@ sidebar:
 ---
 
 :::note[Generated reference]
-Generated from `caplo` v0.4.0, the latest release. `caplo tool --help` prints the same text.
+Generated from `caplo` v0.4.1, the latest release. `caplo tool --help` prints the same text.
 :::
 
 Build, test, publish, and run tool packages.

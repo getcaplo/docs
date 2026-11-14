@@ -8,7 +8,7 @@ sidebar:
 ---
 
 :::note[Generated reference]
-Generated from `caplo` v0.4.0, the latest release. `caplo channel --help` prints the same text.
+Generated from `caplo` v0.4.1, the latest release. `caplo channel --help` prints the same text.
 :::
 
 List channels and deploy agent releases to them.
@@ -108,7 +108,7 @@ Point channels back at their agent's release before the one they serve.
 caplo channel rollback <channel>... [flags]
 ```
 
-Points each channel at the newest release of its agent, older than the one it serves, that is not revoked. The release is served as it was published; publish again to move forward. It asks for confirmation; --yes skips it.
+Points each channel at the newest release of its agent, older than the one it serves, that is not revoked. The release is served as it was published. Publishing never moves a channel; caplo channel deploy points it at a newer release. It asks for confirmation; --yes skips it.
 
 **Examples**
 

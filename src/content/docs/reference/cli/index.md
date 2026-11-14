@@ -8,7 +8,7 @@ sidebar:
 ---
 
 :::note[Generated reference]
-Generated from `caplo` v0.4.0, the latest release. `caplo --help` prints the same text.
+Generated from `caplo` v0.4.1, the latest release. `caplo --help` prints the same text.
 :::
 
 Install the CLI with the [installation guide](/cli/install/). Task guides are under [CLI](/cli/workflow/).

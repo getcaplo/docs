@@ -20,7 +20,7 @@ On a voice call, whether by phone or in the website widget, an agent needs to tu
 ## Providers
 
 - Speech recognition and voice models come from **Deepgram** and **ElevenLabs**, set under **Speech providers**.
-- Realtime models belong to a language model provider, such as OpenAI, and use its **Language models** key source.
+- Realtime models belong to a language model provider (OpenAI for OpenAI Realtime, Google for Gemini Live) and use its **Language models** key source.
 
 Both are in the console under **Integrations** then **Service providers**. Speech providers are **Caplo Managed** by default, so voice works without your own keys. See [Models and providers](/providers/).
 
