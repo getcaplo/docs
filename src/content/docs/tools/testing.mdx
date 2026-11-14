@@ -1,0 +1,110 @@
+---
+title: Test tools with fixtures
+description: Write JSON fixtures for your tools, run them locally with caplo tool test and on Caplo with --remote, and gate project publishes on them.
+sidebar:
+  order: 8
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import AgentPrompt from '~/components/AgentPrompt.astro';
+
+A fixture is one tool call and what you expect back. Fixtures live in your package as JSON files, run the same way on your machine and on Caplo, and stop a project publish when they fail.
+
+## Write a fixture
+
+Each file in `tests/` (or the glob `tests` sets in `caplo.yaml`) holds one fixture:
+
+```json
+{
+  "name": "looks up a shipped order",
+  "tool": "get_order",
+  "arguments": { "orderId": "SO-1002" },
+  "secrets": { "SHOP_API_KEY": "test-key" },
+  "expect": {
+    "isError": false,
+    "structuredContent": { "orderId": "SO-1002", "status": "shipped" },
+    "textIncludes": "shipped"
+  }
+}
+```
+
+| Field | Required | Notes |
+| --- | --- | --- |
+| `name` | No | A label for the output. |
+| `tool` | Yes | The tool name as the package lists it, such as `get_order`, not the model name. |
+| `arguments` | Yes | The call's arguments, an object. |
+| `secrets` | No | Test values for declared secrets, by name. |
+| `expect` | Yes | At least one of the checks below. |
+
+| Check | Passes when |
+| --- | --- |
+| `isError` | The result's error flag equals it. Use `true` to test a refusal, such as an unknown order. |
+| `structuredContent` | Every listed property equals the result's property of that name. Values are compared exactly, including nested objects and arrays; properties you do not list are ignored. |
+| `textIncludes` | The result's text content contains this string. |
+
+The full schema is in the [fixture reference](/reference/fixtures/).
+
+<Aside type="caution">
+Fixtures are source files you push and often commit. Put test credentials in `secrets`, never production ones. Live calls never use fixture secrets.
+</Aside>
+
+Tips:
+
+- Write one fixture per behaviour that matters: a normal result, an empty result, an invalid input your API rejects.
+- Keep expectations to the properties you care about, so harmless additions to the result do not break the test.
+- If a tool calls a live API, point fixtures at a test account or sandbox whose data does not change.
+
+## Run fixtures locally
+
+```sh
+caplo tool test
+```
+
+`caplo tool test` bundles the package with the builder's exact settings, loads it from an empty directory with no environment variables, checks `caplo.yaml` against the tools the code lists, and runs each fixture in Node 24 with the tool's timeout. Run `npm install` first.
+
+```txt
+bundle 8.1 KB (5be0c2d41a7e, esbuild 0.28.2)
+tool order_lookup__get_order (read, 5s)
+capabilities subject-context/1 effect-outcome/1 operation-status/1
+server advertises subject-context/1 effect-outcome/1
+ok   tests/get-order.json (looks up a shipped order)
+FAIL tests/unknown-order.json (refuses an unknown order)
+  expected isError true, got false
+1 passed, 1 failed
+```
+
+- Log lines are printed for failing fixtures; add `-v` to print them for passing ones too.
+- The command exits with code 3 when a fixture fails, so CI can gate on it.
+- Local tests use your machine's network and do not enforce the `egress` list.
+- Local tests run every fixture, **including write tools**, for real. Point write fixtures at a test environment, or leave writes to `--remote`, which skips them.
+- It needs Node 24 exactly, on macOS or Linux (on Windows, use WSL).
+
+## Run fixtures on Caplo
+
+```sh
+caplo tool test --remote
+```
+
+`--remote` pushes the folder as the package's workspace draft and builds it, like `caplo tool push`, then runs the fixtures on Caplo, which runs packages the same way as live calls:
+
+- The `egress` list is enforced. A refused host is printed under the fixture as `egress denied <host>: <reason>`.
+- Fixtures for write tools are skipped and reported as `skip ... (write_effect)`.
+- Each result shows its execution time, and `cold` when the package had to load first.
+- Fixture `secrets` are used; workspace secret values are not.
+
+Run `--remote` before you publish to catch a missing egress host or a dependency that behaves differently in the build. The build on Caplo is the one that gets published, and it installs strictly from your lockfile.
+
+In Tool Studio, **Run Fixture Tests** in the **Tools** view does the same for the latest build.
+
+## Fixtures in projects
+
+In a [project](/cli/projects/), `caplo test` runs the selected packages' fixtures locally, like `caplo tool test`. `caplo publish` goes further: for each package it publishes, it pushes, builds and runs the fixtures on Caplo, and stops the publish if any fixture fails. Agents that use the package are not published either.
+
+```sh
+caplo test tool/orders
+caplo publish tool/orders
+```
+
+## Let an AI agent write fixtures
+
+<AgentPrompt id="tool-fixtures" />

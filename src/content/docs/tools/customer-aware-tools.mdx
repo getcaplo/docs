@@ -1,0 +1,153 @@
+---
+title: Build customer-aware tools
+description: Let a tool act for the verified customer in the conversation, and verify Caplo's customer context token in your own API.
+sidebar:
+  order: 7
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Some tools must act for one specific customer: "show my orders", "change my delivery address". The customer's identity must not come from the model, because a model can be talked into passing someone else's account number. A customer-aware tool instead receives the **verified customer** from Caplo, which knows who the visitor is because they signed in through your [customer identity](/channels/website-widget/settings/) setup.
+
+## Before you start
+
+- A customer identity connection in **Settings**, **Customer identity**, so visitors can verify who they are (for example with your own sign-in).
+- A channel whose customer verification lets or requires visitors to verify. See [Website widget settings](/channels/website-widget/settings/).
+
+## Declare the subject
+
+Add `subject` to the tool's policy in `caplo.yaml`:
+
+```yaml
+tools:
+  - name: list_my_orders
+    effect: read
+    timeoutSeconds: 10
+    subject:
+      policy: verified_required
+      selector: account
+```
+
+- `policy: verified_required` means the tool runs only for a verified customer. Caplo passes that customer in the call context, never through arguments. Tools without `subject` never receive it.
+- `selector` is optional. It names a string input property that Caplo fills with the customer's resource reference on every call. The model cannot set it: a call where the model supplied it is refused. The property must be optional in the input schema (not listed in `required`), and it can never be shown in a [presentation](/tools/present-results/).
+
+For a function package, put `subject` at the top level beside `effect`.
+
+## Read the customer in code
+
+`ctx.subject` holds the verified customer. Call `ctx.requireSubject()` to get it or fail: it throws when the call has none, so the tool can never run unscoped.
+
+```ts
+import { defineTool } from "@caplo/tools";
+
+export default defineTool({
+  name: "list_my_orders",
+  description: "List the signed-in customer's recent orders.",
+  inputSchema: { type: "object", properties: {}, additionalProperties: false },
+  async handler(_args, ctx) {
+    const customer = ctx.requireSubject();
+    const response = await fetch(`https://api.shop.example/customers/${encodeURIComponent(customer.externalSubject)}/orders`, {
+      headers: { authorization: `Bearer ${ctx.secrets.get("SHOP_API_KEY")}` },
+      signal: ctx.signal,
+    });
+    if (!response.ok) throw new Error(`order list failed with ${response.status}`);
+    return { orders: (await response.json()).orders.slice(0, 10) };
+  },
+});
+```
+
+| Property | What it is |
+| --- | --- |
+| `externalSubject` | The customer's ID in your system, as your sign-in asserted it (its `sub`). |
+| `subjectNamespace`, `subjectNamespaceRef` | The identity namespace the customer verified in. |
+| `resourceRef` | `subjectNamespaceRef:externalSubject`, a stable key to map to your customer account. |
+| `level` | How strongly the customer verified: `low`, `standard` or `high`. |
+| `subjectId`, `bindingId` | Caplo's IDs for the customer and their sign-in. |
+| `customerToken` | A customer context token, when the channel is set to send one. See below. |
+
+Function packages announce support for the subject automatically. An MCP package must add the capability when it creates the server, or Caplo refuses to send it subject calls:
+
+```ts
+import { SUBJECT_CONTEXT_CAPABILITY } from "@caplo/tools";
+
+const server = new McpServer(
+  { name: "accounts", version: "1.0.0" },
+  { capabilities: { logging: {}, experimental: { ...SUBJECT_CONTEXT_CAPABILITY } } },
+);
+```
+
+## Customer context tokens
+
+Passing the customer ID to your API with a shared API key means your API trusts the tool completely. A **customer context token** lets your API check for itself that Caplo verified this customer for this call. It is a signed JWT that:
+
+- lasts 60 seconds and is meant for a single call;
+- names your API as its audience and your workspace's Caplo issuer;
+- carries the customer's ID in `sub`, the agent in `act`, the verification level in `acr`, and for a write, the confirmed action in `caplo.action` and `caplo.actionDigest`.
+
+### Set it up
+
+<Steps>
+
+1. In **Settings**, **Customer identity**, edit the connection your customers use and list your API under **API audiences**: one HTTPS URL per line, up to 8. Tools can only get tokens for these audiences.
+
+2. On the same page, under **Customer context tokens**, copy the **Issuer** (and the **JWKS URL**, if your API needs it). Give them to whoever runs the API.
+
+3. In the website channel's settings, under **Customer verification**, find the tool's operation in **Verified tool operations** and choose your API in its **customer token audience**.
+
+4. In the tool, send the token as a bearer token. It is not an enumerable property, so spreading or logging the subject does not leak it, but never log it yourself:
+
+   ```ts
+   const customer = ctx.requireSubject();
+   if (!customer.customerToken) throw new Error("no customer context token is configured for this tool");
+   const response = await fetch("https://api.shop.example/me/orders", {
+     headers: { authorization: `Bearer ${customer.customerToken}` },
+     signal: ctx.signal,
+   });
+   ```
+
+</Steps>
+
+### Verify the token in your API
+
+Install `@caplo/tools` in your API and use `verifyCustomerContext` from `@caplo/tools/verify`. It has no runtime dependencies; it uses `fetch` and WebCrypto.
+
+```ts
+import { CustomerContextError, MemoryReplayStore, verifyCustomerContext } from "@caplo/tools/verify";
+
+const replayStore = new MemoryReplayStore();
+
+export async function customerFrom(request: Request) {
+  const token = request.headers.get("authorization")?.replace(/^Bearer /, "") ?? "";
+  try {
+    const claims = await verifyCustomerContext(token, {
+      issuer: process.env.CAPLO_ISSUER!,          // the Issuer from Settings, Customer identity
+      audience: "https://api.shop.example",       // one of the connection's API audiences
+      replayStore,                                // refuse a token used twice
+    });
+    return { customerId: claims.sub, level: claims.acr };
+  } catch (error) {
+    if (error instanceof CustomerContextError) return null; // answer 401
+    throw error;
+  }
+}
+```
+
+`verifyCustomerContext(token, options)` refuses a token unless its type is `at+jwt`, it is signed with ES256 by a key from `<issuer>/.well-known/jwks.json`, its issuer and audience match exactly, it is valid now and lives at most 60 seconds, and, with a replay store, its `jti` has not been used. It returns the claims or throws `CustomerContextError` with a `reason` such as `issuer`, `audience`, `expired`, `signature` or `replayed`.
+
+| Option | Notes |
+| --- | --- |
+| `issuer` | Required. The exact issuer from the console. |
+| `audience` | Required. This API's audience, as listed on the connection. |
+| `replayStore` | Recommended for write APIs. `MemoryReplayStore` suits a single instance; with several instances, implement `use(jti, expiresAt)` on a shared store, returning `false` for a used ID. |
+| `requiredScope` | A scope the token must carry. |
+| `clockToleranceSeconds` | Allowed clock skew, default 0. |
+
+Key sets are cached for their `Cache-Control` max-age, and an unknown key ID triggers a refetch at most every 30 seconds, so key rotation needs no change on your side.
+
+<Aside type="caution">
+Look the customer up by `claims.sub`, never by an ID in the request body. That is the point of the token: a model or a tampered request cannot change whose data your API returns.
+</Aside>
+
+### Ask for a stronger sign-in
+
+When an operation needs a higher level or a more recent sign-in than the token shows, your API can answer `401` with an RFC 9470 challenge, for example `WWW-Authenticate: Bearer error="insufficient_user_authentication", acr_values="high", max_age="300"`. The tool passes it on with `stepUpFromChallenge`, and Caplo asks the customer to verify again. See [Ask the customer to verify again](/tools/write-tools/#ask-the-customer-to-verify-again).

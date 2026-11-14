@@ -1,0 +1,156 @@
+---
+title: Website widget JavaScript API
+description: Control the website widget from your page with window.CaploWidget, sign visitors in from your own site, and listen to widget events.
+sidebar:
+  order: 4
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import AgentPrompt from '~/components/AgentPrompt.astro';
+
+The widget loader adds a small API to your page so your own code can open the widget, pass hints about the visitor, sign the visitor in, and react to widget events. Everything here runs in the visitor's browser; nothing on this page needs a Caplo credential.
+
+## Get the widget control
+
+```js
+const chat = window.CaploWidget.get('<WIDGET_ID>');
+```
+
+`window.CaploWidget` exists once the loader script has run. `get(id)` returns the control for that widget ID, or `undefined` if no widget with that ID is loaded on the page. `window.CaploWidget.protocolVersion` is `2`.
+
+The control is available as soon as the loader runs, before the widget has finished loading. Calls you make early are kept and applied when the widget mounts, so you do not need to wait for `caplo:mounted` to call `open()` or `setVisitorHints()`.
+
+Because the loader script is `async`, run your code after it loads:
+
+```js
+function withCaplo(widgetId, callback) {
+  const chat = window.CaploWidget?.get(widgetId);
+  if (chat) return callback(chat);
+  const script = document.querySelector(`script[data-widget-id="${widgetId}"]`);
+  script?.addEventListener('load', () => callback(window.CaploWidget.get(widgetId)), { once: true });
+}
+```
+
+## Methods
+
+| Method | What it does |
+| --- | --- |
+| `open()` | Opens the popup widget. If the widget is still loading, it opens when it mounts. |
+| `close()` | Closes the popup widget. |
+| `setVisitorHints(hints)` | Passes unverified hints about the visitor to the conversation. Pass `null` to clear them. |
+| `unmount()` | Removes the widget from the page and closes its connection. To show it again, add the loader script again. |
+| `identity.configure({ getToken, when })` | Registers your page as a sign-in provider. See [Sign visitors in from your page](#sign-visitors-in-from-your-page). |
+| `identity.refresh()` | Tells the widget your page's signed-in user changed. Returns a promise. |
+| `identity.signOut()` | Tells the widget your page signed its user out. Returns a promise. |
+| `addEventListener(type, listener)` and `removeEventListener(type, listener)` | Listen to `caplo:identity` and `caplo:identity-signout-requested`. |
+
+### Open the widget from your own button
+
+```js
+withCaplo('<WIDGET_ID>', (chat) => {
+  document.querySelector('#help-button').addEventListener('click', () => chat.open());
+});
+```
+
+### Visitor hints
+
+Hints give the agent context it would otherwise have to ask for. They are never treated as identity: a visitor's name in a hint does not let tools act on that person's account.
+
+```js
+chat.setVisitorHints({
+  name: 'Ada',
+  locale: 'en-GB',
+  page: window.location.href,
+});
+```
+
+| Field | Rules |
+| --- | --- |
+| `name` | 1 to 80 characters, no control characters. |
+| `locale` | A BCP 47 language tag, such as `en-GB` or `fr`, up to 35 characters. |
+| `page` | An `http` or `https` URL without a user name or password, up to 512 characters. |
+
+Other fields are ignored. A value that breaks these rules throws a `TypeError`; if you set it before the widget has loaded, the widget fails to load and shows **Chat unavailable · Try again**. Check values before you pass them, and leave a field out rather than sending an empty string. Each call replaces the previous hints. Hints travel with the visitor's messages, so call `setVisitorHints` again when the page changes in a single page app.
+
+## Sign visitors in from your page
+
+If visitors are already signed in to your site, your page can sign them in to the widget too. This uses a **Host sign-in** connection that you set up under **Settings** then **Customer identity**, with these settings on the website entry point:
+
+- **Customer verification** allows verified visitors, and the host sign-in connection is one of the **Sign-in methods**.
+- **Consent mode** is **Show a notice after verification**. With the agreement mode, host sign-in does not run automatically.
+
+Your backend signs a short-lived assertion for the signed-in user; the browser never holds your signing key. See [Website widget settings](/channels/website-widget/settings/#customer-verification).
+
+```js
+chat.identity.configure({
+  when: 'open',
+  getToken: async ({ nonce, requirement }) => {
+    const response = await fetch('/support/caplo-token', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ nonce, requirement }),
+    });
+    return response.status === 200 ? response.text() : null;
+  },
+});
+```
+
+`getToken` receives:
+
+| Field | Meaning |
+| --- | --- |
+| `nonce` | A one-time value your backend must put in the assertion. |
+| `requirement` | `null`, or the level the conversation needs: `level` (`low`, `standard` or `high`), optionally `maxAuthAgeSeconds`, and for a confirmation of a specific action, `action` with an `id`, `summary` and `digest`. |
+
+Return the signed assertion as a string, or `null` when nobody is signed in on your page. The widget waits up to 30 seconds for an ordinary sign-in and up to 5 minutes when a specific action needs confirmation.
+
+`when` decides when the widget asks for a token:
+
+| `when` | The widget signs the visitor in |
+| --- | --- |
+| `open` (default) | When the widget opens, or when the visitor sends a message. |
+| `first-message` | When the visitor sends their first message. |
+| `required` | Only when the channel or an action requires verification. |
+
+Call `identity.refresh()` after your user signs in or switches account, and `identity.signOut()` after they sign out. Both return promises.
+
+<Aside type="caution">
+Never put assertions in URLs, logs or browser storage. Treat them like passwords: each one proves who the visitor is.
+</Aside>
+
+## Events
+
+The loader dispatches two events on its `<script>` element. They bubble, so you can listen on `document`:
+
+| Event | When | `event.detail` |
+| --- | --- | --- |
+| `caplo:mounted` | The widget has loaded and rendered. | `{ installationId, bundleId, designId, revision }`: the widget ID, the widget release, and the design and revision shown. |
+| `caplo:error` | The widget could not load, so the page shows a **Chat unavailable · Try again** button instead. | `{ installationId, code }`, with `code` `"presentation-unavailable"`. |
+
+Listen to identity events on the control:
+
+| Event | When | `event.detail` |
+| --- | --- | --- |
+| `caplo:identity` | The visitor's verification state changed. | `{ state, level?, reason? }` |
+| `caplo:identity-signout-requested` | A visitor signed in through your page chose to sign out in the widget. | `{}` |
+
+`state` is `anonymous`, `verified`, `reauthenticate` (the visitor must verify again) or `ended` (the verified conversation ended). `level` is present when `state` is `verified`. `reason` explains the change when there is one, for example `signed_in`, `stepped_up`, `signed_out` or `host_signed_out`.
+
+```js
+document.addEventListener('caplo:error', (event) => {
+  console.warn('Caplo widget unavailable', event.detail);
+});
+
+chat.addEventListener('caplo:identity', (event) => {
+  console.log('Visitor is now', event.detail.state);
+});
+
+chat.addEventListener('caplo:identity-signout-requested', async () => {
+  await signOutOfMySite();
+  await chat.identity.signOut();
+});
+```
+
+The widget also dispatches `caplo:open` and `caplo:close` (no detail) on its own element when a visitor opens or closes the popup. They bubble to `document`.
+
+<AgentPrompt id="widget-js-api" />

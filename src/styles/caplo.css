@@ -1,0 +1,66 @@
+@import '@fontsource-variable/geist';
+@import '@fontsource-variable/geist-mono';
+@import '@fontsource-variable/bricolage-grotesque';
+
+/* Dark theme (Starlight's default). Colors follow caplo.si: harbor teal, signal coral, deep ink. */
+:root {
+	--sl-font: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+	--sl-font-mono: 'Geist Mono Variable', ui-monospace, monospace;
+	--caplo-font-head: 'Bricolage Grotesque Variable', var(--sl-font);
+
+	--sl-color-accent-low: #0e3335;
+	--sl-color-accent: #3fb3a7;
+	--sl-color-accent-high: #bfe6e0;
+	--sl-color-white: #ffffff;
+	--sl-color-gray-1: #e8f0ee;
+	--sl-color-gray-2: #c3d2cf;
+	--sl-color-gray-3: #8fa6a3;
+	--sl-color-gray-4: #5b7371;
+	--sl-color-gray-5: #2c4446;
+	--sl-color-gray-6: #142d2f;
+	--sl-color-black: #082426;
+
+	--caplo-signal: #ff6a3d;
+	--caplo-signal-ink: #ff8257;
+	--caplo-prompt-bg: #0b2b2d;
+}
+
+:root[data-theme='light'] {
+	--sl-color-accent-low: #e2eeea;
+	--sl-color-accent: #0e5a57;
+	--sl-color-accent-high: #0a4644;
+	--sl-color-white: #0c1a1d;
+	--sl-color-gray-1: #1d2d30;
+	--sl-color-gray-2: #384a4d;
+	--sl-color-gray-3: #5a6a6c;
+	--sl-color-gray-4: #8a9696;
+	--sl-color-gray-5: #c8cbc1;
+	--sl-color-gray-6: #eeede6;
+	--sl-color-gray-7: #f3f2ec;
+	--sl-color-black: #fbfaf6;
+
+	--caplo-signal: #e8542a;
+	--caplo-signal-ink: #8a2f12;
+	--caplo-prompt-bg: #fff6f1;
+}
+
+:root[data-theme='light'] .page,
+:root[data-theme='light'] body {
+	background-color: var(--sl-color-black);
+}
+
+.sl-markdown-content :is(h1, h2, h3, h4),
+h1#_top,
+.hero h1 {
+	font-family: var(--caplo-font-head);
+	letter-spacing: -0.01em;
+}
+
+.sl-markdown-content code:not(pre code) {
+	overflow-wrap: anywhere;
+}
+
+/* Generated reference: keep long command signatures readable on small screens. */
+.caplo-usage {
+	overflow-x: auto;
+}

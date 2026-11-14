@@ -1,0 +1,157 @@
+---
+import Default from '@astrojs/starlight/components/PageTitle.astro';
+import { chatgptUrl, claudeUrl, markdownPath, site } from '../lib/markdown-url';
+
+const { entry } = Astro.locals.starlightRoute;
+const md = `${site}${markdownPath(Astro.url.pathname)}`;
+const ask = `Read the Caplo documentation page "${entry.data.title}" at ${md} and then help me apply it to what I am building on Caplo. Ask me what I am working on if you need to.`;
+---
+
+<div class="caplo-title-row">
+	<Default />
+	<div class="caplo-page-actions" data-page-actions data-markdown={markdownPath(Astro.url.pathname)}>
+		<button type="button" class="caplo-action-main" data-copy-page>
+			<svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M8 3h9a2 2 0 0 1 2 2v12h-2V5H8V3Zm-3 4h9a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Zm0 2v11h9V9H5Z"/></svg>
+			<span data-label>Copy page</span>
+		</button>
+		<details class="caplo-action-menu">
+			<summary aria-label="More ways to use this page with AI">
+				<svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="m7 10 5 5 5-5H7Z"/></svg>
+			</summary>
+			<ul role="list">
+				<li>
+					<button type="button" data-copy-page>
+						<strong>Copy page</strong><span>As Markdown, for any AI tool</span>
+					</button>
+				</li>
+				<li>
+					<a href={markdownPath(Astro.url.pathname)} target="_blank" rel="noopener">
+						<strong>View as Markdown</strong><span>Plain text of this page</span>
+					</a>
+				</li>
+				<li>
+					<a href={claudeUrl(ask)} target="_blank" rel="noopener">
+						<strong>Open in Claude</strong><span>Ask about this page</span>
+					</a>
+				</li>
+				<li>
+					<a href={chatgptUrl(ask)} target="_blank" rel="noopener">
+						<strong>Open in ChatGPT</strong><span>Ask about this page</span>
+					</a>
+				</li>
+			</ul>
+		</details>
+	</div>
+</div>
+
+<script>
+	import { copyText, flash } from '../lib/clipboard';
+
+	for (const actions of document.querySelectorAll<HTMLElement>('[data-page-actions]')) {
+		const label = actions.querySelector<HTMLElement>('[data-label]')!;
+		const menu = actions.querySelector('details')!;
+		for (const button of actions.querySelectorAll('[data-copy-page]')) {
+			button.addEventListener('click', async () => {
+				menu.open = false;
+				const ok = await copyText(fetch(actions.dataset.markdown!).then((r) => {
+					if (!r.ok) throw new Error(`HTTP ${r.status}`);
+					return r.text();
+				}));
+				flash(label, ok ? 'Copied' : 'Copy failed', 'Copy page');
+			});
+		}
+		document.addEventListener('click', (event) => {
+			if (!menu.contains(event.target as Node)) menu.open = false;
+		});
+		menu.addEventListener('keydown', (event) => {
+			if (event.key === 'Escape') {
+				menu.open = false;
+				menu.querySelector('summary')!.focus();
+			}
+		});
+	}
+</script>
+
+<style>
+	.caplo-title-row {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 0.75rem 1rem;
+	}
+	.caplo-title-row :global(h1) {
+		flex: 1 1 18rem;
+		min-width: 0;
+	}
+	.caplo-page-actions {
+		position: relative;
+		display: inline-flex;
+		margin-top: 1.1rem;
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 0.5rem;
+		background: var(--sl-color-bg);
+		font-size: var(--sl-text-sm);
+	}
+	.caplo-action-main,
+	.caplo-action-menu summary {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		padding: 0.35rem 0.7rem;
+		color: var(--sl-color-white);
+		background: none;
+		border: 0;
+		cursor: pointer;
+		font: inherit;
+		list-style: none;
+	}
+	.caplo-action-menu summary {
+		padding-inline: 0.45rem;
+		border-left: 1px solid var(--sl-color-gray-5);
+	}
+	.caplo-action-menu summary::-webkit-details-marker {
+		display: none;
+	}
+	.caplo-action-main:hover,
+	.caplo-action-menu summary:hover {
+		background: var(--sl-color-gray-6);
+	}
+	.caplo-action-menu ul {
+		position: absolute;
+		right: 0;
+		top: calc(100% + 0.35rem);
+		z-index: 20;
+		width: 16rem;
+		margin: 0;
+		padding: 0.35rem;
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 0.6rem;
+		background: var(--sl-color-bg-nav);
+		box-shadow: var(--sl-shadow-md);
+	}
+	.caplo-action-menu li {
+		margin: 0;
+	}
+	.caplo-action-menu li > * {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		padding: 0.45rem 0.6rem;
+		border: 0;
+		border-radius: 0.4rem;
+		background: none;
+		color: var(--sl-color-white);
+		text-align: left;
+		text-decoration: none;
+		font: inherit;
+		cursor: pointer;
+	}
+	.caplo-action-menu li > *:hover {
+		background: var(--sl-color-gray-6);
+	}
+	.caplo-action-menu li span {
+		color: var(--sl-color-gray-3);
+		font-size: var(--sl-text-xs);
+	}
+</style>

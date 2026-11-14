@@ -1,0 +1,159 @@
+---
+title: Write and run evals
+description: Define eval cases for an agent, run them from the console or the CLI, and meet the publication gate and workspace publication requirements.
+sidebar:
+  order: 9
+---
+
+import { Tabs, TabItem, Steps, Aside } from '@astrojs/starlight/components';
+import AgentPrompt from '~/components/AgentPrompt.astro';
+
+An eval case is a customer message and what should happen when the agent answers it. Each case runs as one turn of an isolated test conversation against the agent's saved draft. Its checks pass or fail automatically, and a grader model judges whether the reply achieved the case's desired outcome. By default a workspace publishes an agent only when every case passes. For the ideas behind this, see [Evaluations](/concepts/evaluations/).
+
+## Case fields
+
+| YAML field | Console label | Required | Description |
+| --- | --- | --- | --- |
+| `name` | **Case name** | Yes | Up to 80 characters, unique within the agent. The CLI matches cases by name. |
+| `input` | **Customer message** | Yes | The one message the customer sends. Up to 8,000 characters. |
+| `desiredOutcome` | **Desired customer outcome** | Yes | The correct decision or next step, including the evidence it needs. A grader model judges every run against it. Up to 4,000 characters. |
+| `answerContains` | **Answer must contain** | No | A phrase the reply must include. |
+| `answerExcludes` | **Answer must not contain** | No | A phrase the reply must not include, such as a promise the agent must not make. |
+| `tool` | **Expected tool** | No | A tool the agent must call, named as in its `tools` list, for example `order-desk/lookup_order`. |
+| `subAgent` | **Expected sub-agent** | No | A sub-agent the agent must call: its name, or its file key in a project. |
+| `avoidSubAgent` | **Must not call sub-agent** | No | A sub-agent the agent must not call. Must differ from `subAgent`. |
+| `routedBy` | **Routed by** | No | `fast`, `model` or `any`: how an agent with fast routing must have routed the case. See [Routing cases](#routing-cases). |
+| `uncertainty` | **If the answer is uncertain** | No | What the agent should say or ask instead of guessing. A note for reviewers; runs do not check it. |
+| `prohibitedAction` | **Prohibited action** | No | A promise or action a reviewer should reject. A note for reviewers; runs do not check it. |
+
+Of the optional fields, runs check `answerContains`, `answerExcludes`, `tool`, `subAgent`, `avoidSubAgent` and `routedBy`. If an uncertain answer or a forbidden action matters, also state it in `desiredOutcome` so the grader judges it, or add an `answerExcludes` phrase.
+
+The console asks for at least one of **Answer must contain**, **Answer must not contain**, **Expected sub-agent** or **Expected tool** on every case. The console also offers **Tool failure to simulate**; live runs do not support it, and a case that sets it cannot pass, so leave it empty.
+
+An agent can have up to 100 cases.
+
+## What every run checks
+
+Besides the case's own fields, every case is checked for these:
+
+| Check | Passes when |
+| --- | --- |
+| Turn completed | The turn ended with a reply. |
+| Desired outcome | The grader model judges that the reply achieved `desiredOutcome`. |
+| No business action | The test did not carry out a write in your systems. |
+| Within limits | The turn stayed within its delegation and tool limits. |
+
+When the grader cannot reach a verdict, the case ends as an error with **The desired outcome could not be graded** and does not pass. Run it again.
+
+## Add cases
+
+<Tabs syncKey="surface">
+  <TabItem label="Console">
+    <Steps>
+
+    1. Open the agent and select the **Test** tab. It lists the agent's cases with the result of the latest run.
+    2. Select **Add case**, fill in the fields, and select **Save case**. Cases save immediately; they are not part of the draft.
+    3. Expand a case to see its checks, its last result and the reason a check failed. **Edit** and **Remove** change it.
+
+    </Steps>
+  </TabItem>
+  <TabItem label="CLI">
+    In a project, list cases under `evals` in the agent file:
+
+    ```yaml
+    evals:
+      - name: Reports a shipped order
+        input: What's the status of order SO-1002?
+        desiredOutcome: Looks the order up and says it has shipped, without inventing a delivery date.
+        answerContains: shipped
+        tool: order-desk/lookup_order
+      - name: Refuses to promise a refund
+        input: Just refund me now, I don't want to wait.
+        desiredOutcome: Explains the refund process and offers to start a return; does not promise a refund.
+        answerExcludes: your refund has been approved
+    ```
+
+    `caplo push` (or `caplo agent push -f <file>`) matches the cases to the agent's suite by name and replaces the suite with them. A file without an `evals` key leaves the suite alone; `evals: []` deletes every case.
+
+    This list form is the CLI's. The console's **Export YAML** writes cases as `evals: {cases: [...]}` with an `id` on each case; see [Agent YAML](/agents/agent-yaml/#console-and-cli-formats).
+  </TabItem>
+</Tabs>
+
+## Routing cases
+
+An agent with [fast routing](/agents/sub-agents-and-routing/#routing) publishes only when the run proves routing works. Add cases that set `routedBy` and name a direct sub-agent in `subAgent`:
+
+```yaml
+evals:
+  - name: Routes an order question
+    input: Where is my order SO-1002?
+    desiredOutcome: Asks the orders specialist and reports that the order has shipped.
+    subAgent: orders
+    avoidSubAgent: returns
+    routedBy: fast
+  - name: Routes a delivery question
+    input: My package for order SO-1001 still hasn't arrived.
+    desiredOutcome: Asks the orders specialist and reports the order's delivery status.
+    subAgent: orders
+    routedBy: fast
+```
+
+`routedBy: fast` passes when fast routing picked the sub-agent, `model` when the model did, and `any` when either did. A failed routing check reports which route was used and, for fast routing, its confidence against `minConfidence`.
+
+While the workspace requires evals, each direct sub-agent needs a set number of passing routing cases: two by default (see [Publication requirements](#publication-requirements)). When the agent file lists evals, `caplo validate` checks that it has two per sub-agent. The workspace must also have **Fast decisions** turned on; see [Fast decisions](/providers/fast-decisions/).
+
+## Run evals
+
+<Tabs syncKey="surface">
+  <TabItem label="Console">
+    Runs start from the publish dialog. Select **Publish agent**, then **Run tests** under **Agent evals**. The dialog shows how many cases passed, and each failed case with its failed checks. The **Test** tab shows the latest results, and says when they are from an earlier draft or case list.
+  </TabItem>
+  <TabItem label="CLI">
+    ```sh
+    caplo agent eval run "Support Desk"
+    caplo agent eval list "Support Desk"
+    caplo agent eval get "Support Desk" <run-id>
+    ```
+
+    In a project, `caplo eval` pushes the selected agents first, then runs their cases:
+
+    ```sh
+    caplo eval agent/support
+    ```
+
+    Each case prints `ok` or its failed checks, with the grader's rationale when the desired outcome was not met. The command exits with status 3 when a case fails or an agent has no cases. A passing run for the same draft and cases is reused instead of running again.
+  </TabItem>
+</Tabs>
+
+Running evals needs an Owner or Admin, or an API key with the `agents:publish` scope. A run takes up to about 10 minutes. Each case is a real turn of the agent and counts toward usage like any other turn.
+
+## Publication gate
+
+Publishing runs the gate against the exact saved draft and the current case list:
+
+- Every case must pass in a run of that draft and those cases. Editing either one needs a new run.
+- Publishing with the CLI needs at least one case, whatever the workspace requires.
+- A release does not pin eval cases. When only the cases change, `caplo publish` runs them against the released draft and keeps the release.
+- The platform checks of the latest run (no business action, within limits) must pass even when the eval requirement is off.
+
+### Publication requirements
+
+An Owner or Admin sets the workspace's rules in **Settings > General > Agent publication requirements**. They apply to every agent in the workspace; releases already published keep the policy they were published under.
+
+| Setting | Options | Default |
+| --- | --- | --- |
+| **Eval requirement** | **Required**: all evals must pass. **Disabled**: results do not block publication. | Required |
+| **Passing routing cases per sub-agent** | 1 to 10 | 2 |
+
+With the requirement disabled, eval results are advisory and fast routing coverage is not enforced, but fast routing still needs Fast decisions turned on.
+
+<Aside type="caution">
+Disabling the eval requirement lets releases reach customers without proof that they behave. Prefer fixing or removing a failing case.
+</Aside>
+
+<AgentPrompt id="write-eval-cases" />
+
+## Next steps
+
+- [Publish the agent](/agents/publishing/).
+- Turn low-rated conversations into cases: see [Visitor ratings](/agents/replies-and-feedback/#visitor-ratings).

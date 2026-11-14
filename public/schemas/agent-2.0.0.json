@@ -1,0 +1,485 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.caplo.example/agents/2.0.0/manifest.json",
+  "title": "Caplo agent manifest",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/agentDocument"
+    },
+    {
+      "$ref": "#/$defs/bundleDocument"
+    }
+  ],
+  "$defs": {
+    "model": {
+      "type": "object",
+      "description": "Language model and response limits for this agent.",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "name"
+      ],
+      "properties": {
+        "provider": {
+          "type": "string",
+          "description": "Provider configured in this workspace. Example: OpenAI."
+        },
+        "name": {
+          "type": "string",
+          "description": "Model ID or display name from this workspace's catalog."
+        },
+        "temperature": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.4,
+          "description": "Lower values produce more consistent responses."
+        },
+        "responseLimit": {
+          "type": "integer",
+          "minimum": 64,
+          "maximum": 128000,
+          "default": 1024,
+          "description": "Maximum response tokens; the model's tested maximum output bounds it when the agent is tested or published."
+        }
+      }
+    },
+    "subAgent": {
+      "type": "object",
+      "description": "A reusable agent this agent may call. Use agentId for an existing agent or local for another agent in this bundle. The linked agent runs with its release's own tools and knowledge.",
+      "additionalProperties": false,
+      "required": [
+        "useWhen"
+      ],
+      "oneOf": [
+        {
+          "required": [
+            "agentId"
+          ],
+          "not": {
+            "required": [
+              "local"
+            ]
+          }
+        },
+        {
+          "required": [
+            "local"
+          ],
+          "not": {
+            "required": [
+              "agentId"
+            ]
+          }
+        }
+      ],
+      "properties": {
+        "agentId": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Stable ID of an existing workspace agent."
+        },
+        "local": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Key of an agent defined in this bundle."
+        },
+        "release": {
+          "type": "string",
+          "default": "latest",
+          "description": "'latest' resolves to a fixed child release when the parent publishes; or choose a fixed semantic version now.",
+          "anyOf": [
+            {
+              "const": "latest"
+            },
+            {
+              "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+            }
+          ]
+        },
+        "useWhen": {
+          "type": "string",
+          "minLength": 1,
+          "description": "When the parent should call this agent."
+        },
+        "doNotUseWhen": {
+          "type": "string",
+          "description": "Requests that should stay with the parent or another agent."
+        },
+        "mode": {
+          "enum": [
+            "task_tool",
+            "active_conversation"
+          ],
+          "default": "task_tool",
+          "description": "task_tool: this agent asks it in plain words and hears back. active_conversation: it takes over the conversation."
+        }
+      }
+    },
+    "routing": {
+      "type": "object",
+      "description": "How this agent picks a sub-agent. Omitted means model.",
+      "additionalProperties": false,
+      "required": [
+        "mode"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "model",
+            "fast"
+          ],
+          "description": "model: the agent's model decides. fast: a decision service picks a sub-agent in about 0.3 s and the model decides when unsure. fast needs doNotUseWhen on every sub-agent."
+        },
+        "minConfidence": {
+          "type": "number",
+          "minimum": 0.6,
+          "maximum": 0.99,
+          "multipleOf": 0.01,
+          "default": 0.85,
+          "description": "Lowest decision confidence fast routing accepts before the model decides."
+        }
+      }
+    },
+    "agentFields": {
+      "type": "object",
+      "required": [
+        "name",
+        "instructions",
+        "greeting",
+        "model"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "Agent name shown throughout the workspace."
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 240,
+          "description": "Short explanation of what the agent helps with."
+        },
+        "instructions": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Reusable behavior, tone, and boundaries. No voice or channel settings."
+        },
+        "greeting": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Opening message when this agent serves a channel."
+        },
+        "model": {
+          "$ref": "#/$defs/model"
+        },
+        "tools": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "description": "Stable IDs of workspace tools."
+        },
+        "knowledgeBases": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "description": "IDs of ready workspace knowledge bases referenced by this agent."
+        },
+        "actions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "transfer",
+              "end"
+            ]
+          },
+          "description": "Agent-level conversation actions. Channel-specific workflows stay on the entry point."
+        },
+        "subAgents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/subAgent"
+          },
+          "description": "Links to reusable agents. A linked agent may have sub-agents of its own."
+        },
+        "routing": {
+          "$ref": "#/$defs/routing"
+        },
+        "evals": {
+          "$ref": "#/$defs/evals"
+        },
+        "policy": {
+          "$ref": "#/$defs/policy"
+        },
+        "suggestedReplies": {
+          "$ref": "#/$defs/suggestedReplies"
+        },
+        "visitorFeedback": {
+          "type": "boolean",
+          "description": "Let website visitors rate this agent's replies with a thumbs up or down and an optional reason; operators see the ratings in Conversations and the agent never does. Omit to turn it off."
+        }
+      }
+    },
+    "agentDocument": {
+      "type": "object",
+      "description": "Edit or create one agent.",
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "pattern": "^v2(?:\\.0(?:\\.0)?)?$"
+        },
+        "kind": {
+          "const": "Agent"
+        },
+        "evals": {
+          "$ref": "#/$defs/evals"
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/agentFields"
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "bundleAgent": {
+      "type": "object",
+      "required": [
+        "key"
+      ],
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "Local key used by other agents in this bundle."
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/agentFields"
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "bundleDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "apiVersion",
+        "kind",
+        "agents"
+      ],
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "pattern": "^v2(?:\\.0(?:\\.0)?)?$"
+        },
+        "kind": {
+          "const": "AgentBundle"
+        },
+        "agents": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/bundleAgent"
+          },
+          "description": "Agents to create together. Sub-agent links may refer to their local keys."
+        }
+      }
+    },
+    "evalCase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "input",
+        "desiredOutcome"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "input": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8000
+        },
+        "desiredOutcome": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "uncertainty": {
+          "type": "string"
+        },
+        "prohibitedAction": {
+          "type": "string"
+        },
+        "toolFailure": {
+          "type": "string"
+        },
+        "answerContains": {
+          "type": "string"
+        },
+        "answerExcludes": {
+          "type": "string"
+        },
+        "subAgent": {
+          "type": "string"
+        },
+        "avoidSubAgent": {
+          "type": "string"
+        },
+        "tool": {
+          "type": "string"
+        },
+        "routedBy": {
+          "enum": [
+            "fast",
+            "model",
+            "any"
+          ]
+        }
+      }
+    },
+    "evals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cases"
+      ],
+      "properties": {
+        "cases": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "$ref": "#/$defs/evalCase"
+          }
+        }
+      }
+    },
+    "suggestedReplies": {
+      "type": "object",
+      "description": "Short next messages offered under the replies this agent writes itself, on channels that can show them. Omit to turn them off.",
+      "additionalProperties": false,
+      "properties": {
+        "maxCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4,
+          "description": "Most suggestions under one reply; 3 when omitted. WhatsApp and Messenger show at most 3."
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "description": "How the agent loop runs. Omitted fields take the platform defaults; an empty guidance or style turns that block off.",
+      "additionalProperties": false,
+      "properties": {
+        "guidance": {
+          "type": "string",
+          "maxLength": 4000,
+          "description": "Platform guidance that follows the instructions."
+        },
+        "chatStyle": {
+          "type": "string",
+          "maxLength": 2000,
+          "description": "Reply style for chat turns."
+        },
+        "voiceStyle": {
+          "type": "string",
+          "maxLength": 2000,
+          "description": "Reply style for voice calls."
+        },
+        "history": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "maxTokens"
+          ],
+          "properties": {
+            "maxTokens": {
+              "type": "integer",
+              "minimum": 2000,
+              "maximum": 400000,
+              "description": "Tokens of earlier conversation each turn reads."
+            }
+          }
+        },
+        "knowledgePassages": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16,
+          "description": "Passages one knowledge search returns. Default 6."
+        },
+        "maxModelCalls": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 48,
+          "description": "Model calls of the whole agent graph per turn. Default 16."
+        },
+        "maxReads": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32,
+          "description": "Tool lookups per turn. Default 8."
+        },
+        "maxSearches": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16,
+          "description": "Knowledge searches per turn. Default 4."
+        },
+        "maxDepth": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4,
+          "description": "Linked agent depth. Default 3."
+        },
+        "maxParallelReads": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8,
+          "description": "Lookups run at once. Default 4."
+        },
+        "reasoning": {
+          "type": "object",
+          "additionalProperties": false,
+          "minProperties": 1,
+          "properties": {
+            "effort": {
+              "enum": [
+                "low",
+                "medium",
+                "high"
+              ]
+            },
+            "thinkingBudgetTokens": {
+              "type": "integer",
+              "minimum": 1024,
+              "maximum": 32000,
+              "description": "Extended thinking tokens; smaller than the response limit."
+            }
+          }
+        }
+      }
+    }
+  }
+}

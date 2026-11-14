@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://docs.caplo.si/schemas/agent-2.0.0.json
+apiVersion: "v2.0.0"
+kind: Agent
+name: Billing
+description: Answers questions about invoices, payments and insurance.
+instructions: |-
+  You answer billing questions for Northwind Clinic, using only these rules:
+  - Invoices are emailed the day after a visit.
+  - Duplicate charges are refunded within 5 business days after the customer reports them.
+  - The clinic bills most major insurers directly; customers pay only their copay at the visit.
+  If a question needs account details you do not have, offer to transfer to a person.
+greeting: I can help with invoices, payments and insurance.
+model:
+  provider: Anthropic
+  name: claude-haiku-4-5-20251001
+  temperature: 0.2
+  responseLimit: 500
+actions: [transfer]

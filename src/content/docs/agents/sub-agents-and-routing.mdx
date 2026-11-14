@@ -1,0 +1,113 @@
+---
+title: Add sub-agents and routing
+description: Link other agents as sub-agents, choose how each one works with the parent, pin their releases, and choose model or fast routing.
+sidebar:
+  order: 4
+---
+
+import { Tabs, TabItem, Steps, Aside } from '@astrojs/starlight/components';
+
+An agent can call other agents in the workspace. Each sub-agent is an ordinary agent with its own instructions, tools and knowledge, so you can build focused specialists (orders, returns, billing) once and reuse them under several parents. For when to split an agent and how calls flow, see [Multi-agent](/concepts/multi-agent/).
+
+## Add a sub-agent
+
+<Tabs syncKey="surface">
+  <TabItem label="Console">
+    <Steps>
+
+    1. Open the parent agent and select the **Sub-agents** tab.
+    2. Select **Add existing agent** and choose a **Workspace agent**, or select **Create agent** to create a new draft agent and link it in one step.
+    3. Choose the **Release to use**. The child needs a published release before the parent can publish.
+    4. Fill in **Use when** and, optionally, **Do not use when**.
+    5. Choose how the sub-agent **Works as** (see [Modes](#modes)), then select **Add agent**.
+    6. Select **Save draft**.
+
+    </Steps>
+
+    A link shows **Needs release** while its child has no release. When the child publishes a newer release, the link shows it and offers a **Use** button with that version **in draft**; the parent keeps its fixed release until you adopt the new one and publish the parent. **View agent graph** shows the whole tree.
+  </TabItem>
+  <TabItem label="CLI">
+    Add `subAgents` to the parent's agent file. In a project, link another project agent by its file key with `local`; link any workspace agent by ID with `agentId`:
+
+    ```yaml
+    subAgents:
+      - local: orders
+        release: latest
+        useWhen: The customer asks about an existing order, its shipment or delivery.
+        doNotUseWhen: General product or policy questions with no order involved.
+        mode: task_tool
+      - agentId: 6f0c2a8e-4b1d-4e7a-9c3f-2d5b8a1e7f40
+        release: 2.1.0
+        useWhen: The customer asks how returns or refunds work in general.
+        doNotUseWhen: Starting a return for a specific order.
+    ```
+
+    `caplo publish` publishes children before parents. A single agent published with `caplo agent publish` needs its sub-agents to have releases already.
+  </TabItem>
+</Tabs>
+
+## Link fields
+
+| Console label | YAML field | Required | Description |
+| --- | --- | --- | --- |
+| **Workspace agent** | `agentId` or `local` | One of them | The child agent. `local` is a file key in the same project. |
+| **Release to use** | `release` | No | `latest` (default) or a fixed version such as `2.1.0`. See [Release pinning](#release-pinning). |
+| **Use when** | `useWhen` | Yes | When the parent should call this agent. Up to 2,000 characters. |
+| **Do not use when** | `doNotUseWhen` | For fast routing | Requests that belong to the parent or another agent. |
+| **Works as** | `mode` | No | `task_tool` (default) or `active_conversation`. |
+
+Write `useWhen` and `doNotUseWhen` as plain descriptions of customer requests. The parent's model reads them to decide, and fast routing relies on them entirely.
+
+## Modes
+
+| Mode | Console label | What happens |
+| --- | --- | --- |
+| `task_tool` | **Answers and returns to this agent** | The parent asks the sub-agent in plain words, the sub-agent works with its own tools and knowledge, and the parent writes the reply. The sub-agent remembers earlier requests in the same conversation. |
+| `active_conversation` | **Takes over the conversation** | The sub-agent becomes the agent the customer talks to for the rest of the conversation, or until it hands back. |
+
+A sub-agent always runs with its own release's tools, knowledge and settings, not the parent's. Writes a sub-agent proposes are confirmed by the customer the same way as the parent's.
+
+## Release pinning
+
+Every published parent release pins an exact release of each child, so a child's change never alters a published parent on its own.
+
+- A fixed version (`release: 2.1.0`, or the console's **Release to use**) keeps that child release until you change the link and publish the parent again.
+- `release: latest` resolves to the child's newest release that is not revoked when you push or publish the parent. With `caplo publish`, a child that publishes a new release also republishes the project agents that link it at `latest`.
+
+When you link an existing agent in the console, the link pins the release you choose. Exported YAML writes `latest` only for a link without a fixed release, and `caplo pull` writes the release the draft pins.
+
+<Aside type="caution">
+Revoking a child release stops every parent release that pins it from running that child. Publish the parents with a usable child release first. See [Publish an agent](/agents/publishing/#revoke-a-release).
+</Aside>
+
+## Depth limit
+
+Sub-agents can have sub-agents of their own. `policy.maxDepth` (**Linked agent depth** in the console) caps how many sub-agent links may sit below an agent: 1 to 4, default 3. Links cannot form a cycle. `caplo validate` checks both offline.
+
+## Routing
+
+Routing decides how a parent picks a sub-agent for each customer message.
+
+| Mode | Console label | Behavior |
+| --- | --- | --- |
+| `model` (default) | **The model decides** | The parent's model reads the conversation and calls a sub-agent or answers itself. Takes about 2 seconds. |
+| `fast` | **Fast routing** | A separate decision call picks a sub-agent in about 0.3 seconds. When its confidence is below `minConfidence`, the model decides instead. |
+
+```yaml
+routing:
+  mode: fast
+  minConfidence: 0.85
+```
+
+`minConfidence` (**Minimum confidence**, under **Advanced** in the console) is 0.60 to 0.99, default 0.85. Raise it if fast routing picks the wrong agent; lower it if too many turns fall back to the model. Omit the `routing` block for model routing.
+
+Fast routing needs:
+
+- At least one sub-agent, and `doNotUseWhen` on every link. A draft that lacks one cannot be saved.
+- **Fast decisions** turned on for the workspace. An Owner or Admin enables it in **Settings > AI providers** and accepts the provider's data processing terms, because the visitor's recent messages and your sub-agent descriptions are sent to the decision provider. See [Fast decisions](/providers/fast-decisions/). If Fast decisions are turned off later, agents set to fast routing fall back to the model on their next turn.
+- Routing eval cases to publish. While the workspace requires evals, each direct sub-agent needs passing cases that set `routedBy` and name it in `subAgent`: two per sub-agent by default, set by **Passing routing cases per sub-agent** in **Settings > General**. See [Routing cases](/agents/evals/#routing-cases).
+
+## Next steps
+
+- [Write routing eval cases](/agents/evals/#routing-cases).
+- [Publish the children, then the parent](/agents/publishing/).

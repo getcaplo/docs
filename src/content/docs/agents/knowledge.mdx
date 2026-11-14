@@ -1,0 +1,123 @@
+---
+title: Add knowledge
+description: Create a knowledge base, upload and review documents, publish a version, and attach it to an agent from the console or with caplo knowledge.
+sidebar:
+  order: 2
+---
+
+import { Tabs, TabItem, Steps, Aside } from '@astrojs/starlight/components';
+import AgentPrompt from '~/components/AgentPrompt.astro';
+
+A knowledge base holds documents an agent answers from: policies, FAQs, product guides. You manage it once in the workspace and attach it to any agent that needs it. Each upload is extracted to text and waits for review; publishing snapshots the approved documents into a version, and an agent release pins the version that was ready when it published. For how retrieval works, see [Knowledge](/concepts/knowledge/).
+
+## Supported files
+
+| Type | Extensions |
+| --- | --- |
+| Text and Markdown | `.txt`, `.md`, `.markdown` |
+| Web pages | `.html` |
+| Documents | `.pdf`, `.docx` |
+| Images (text is read with OCR) | `.png`, `.jpg`, `.jpeg`, `.webp` |
+
+Each file can be up to 25 MiB. A knowledge base names documents by file name, so two documents in one base cannot share a name.
+
+## Create a knowledge base and add documents
+
+<Tabs syncKey="surface">
+  <TabItem label="Console">
+    <Steps>
+
+    1. Open **Build > Knowledge** and select **Create knowledge base**.
+    2. Enter a **Name** and an **Owner** (the team responsible for the content), and optionally a **Description**. Choose the **Audience** (see [Audience](#audience)), then select **Create draft**.
+    3. Under **Files**, select **Choose files**, pick up to 20 files, and select **Add to draft**. Each file shows **Extracting** while Caplo reads it.
+    4. When a file shows **In review**, select it and check **Document review**: the **Extracted text** tab shows what was read, and **Chunks** shows the passages an agent can retrieve. Look for missing pages, tables, image text and anything sensitive.
+    5. Select **Approve** on each file that is correct. A file that shows **Failed** could not be extracted; upload a corrected copy.
+    6. Under **Approval & availability**, select **Publish version**. Caplo indexes the approved files; the base shows **Ready** when the version can be used.
+
+    </Steps>
+
+    Owners, Admins and Builders can create bases and upload files. Approving files and publishing versions need an Owner or Admin.
+  </TabItem>
+  <TabItem label="CLI">
+    ```sh
+    caplo knowledge create "Returns policy" --owner "Support operations" --description "Returns, exchanges and refunds"
+    caplo knowledge sync "Returns policy" ./docs/returns --dry-run
+    caplo knowledge sync "Returns policy" ./docs/returns
+    caplo knowledge get "Returns policy"
+    ```
+
+    `caplo knowledge get` lists each document with its extraction and review state. Review the extracted text in the console, then approve and publish:
+
+    ```sh
+    caplo knowledge approve "Returns policy"
+    caplo knowledge publish "Returns policy"
+    ```
+
+    `caplo knowledge approve` waits for extraction to finish and approves every document awaiting review, or only the documents you name. It fails if a document cannot be extracted. `caplo knowledge publish` publishes a version from the approved documents and waits until it is indexed. Both wait up to 15 minutes by default; change it with `--timeout`.
+
+    Approving with the CLI skips reading the extracted text. Do it when you trust the source files, for example Markdown your team maintains.
+  </TabItem>
+</Tabs>
+
+## Keep a knowledge base in sync with a folder
+
+`caplo knowledge sync` makes a knowledge base's documents match a directory tree, so you can keep the source files in a repository and publish from CI:
+
+```sh
+caplo knowledge sync "Returns policy" ./docs/returns --approve --publish --yes
+```
+
+What it does:
+
+- Uploads new files and files whose content changed. Files are matched by name and content, so an unchanged file is not uploaded again.
+- Removes documents whose file is gone from the directory. It asks first; `--yes` skips the question.
+- Replaces a changed file's older copy only after the new copy is approved, so a published version never lacks the document.
+- Skips hidden files and directories and unsupported file types, and fails if two files in the tree share a name.
+
+With `--approve` it waits for extraction and approves the directory's documents. With `--publish` it then publishes a version and waits for it to index. `--dry-run` prints the changes without making them. Approving and publishing need an Owner or Admin, or an API key with the `agents:publish` scope.
+
+<Aside type="caution">
+Removing a document takes it out of the next version. Versions already published keep it, and agent releases that pin those versions keep answering from it until you publish a new agent release.
+</Aside>
+
+<AgentPrompt id="sync-knowledge-folder" />
+
+## Attach a knowledge base to an agent
+
+<Tabs syncKey="surface">
+  <TabItem label="Console">
+    Open the agent, select the **Knowledge** tab, check each knowledge base the agent should use, and select **Save draft**. Only bases that show **Ready** can be selected.
+  </TabItem>
+  <TabItem label="CLI">
+    List knowledge bases by name or ID under `knowledgeBases` in the agent file, then push it:
+
+    ```yaml
+    knowledgeBases:
+      - Returns policy
+    ```
+
+    A name resolves in the workspace the command acts on, so the same file works in every [environment](/cli/environments/). Use the ID if two bases share a name.
+  </TabItem>
+</Tabs>
+
+The agent searches attached knowledge with a built-in search tool. How many searches it may run per turn and how many passages each returns are set in its [policy](/agents/policy-and-limits/) (`maxSearches` and `knowledgePassages`).
+
+## Versions and agent releases
+
+Publishing an agent pins the knowledge version that is ready at that moment. Publishing a newer knowledge version does not change agents already published, so live answers never change without a release. To use the new version, publish a new release of the agent. A release is made from a new draft revision, so save a change to the agent first; see [Publish an agent](/agents/publishing/).
+
+## Audience
+
+The audience decides who may receive a knowledge base's content:
+
+| Audience | Console label | Who gets it |
+| --- | --- | --- |
+| `public` (default) | **Public** | Any visitor. |
+| `verified_customer` | **Verified customers only** | Only a customer who has signed in on a channel that allows sign-in. |
+
+Set it when you create the base (`--audience verified_customer` on `caplo knowledge create`). Each published version keeps the audience it was published with. Signing customers in is covered in [Customer-aware tools](/tools/customer-aware-tools/).
+
+## Next steps
+
+- [Test the agent](/agents/testing/) with questions the documents answer.
+- Add [eval cases](/agents/evals/) that check answers from the knowledge base.

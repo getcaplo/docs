@@ -1,0 +1,40 @@
+---
+title: Caplo documentation
+description: Build, test and publish AI agents with Caplo, then put them on your website, messaging channels and phone lines.
+template: splash
+hero:
+  title: Caplo documentation
+  tagline: Build AI agents that answer from your knowledge, act through your tools, and talk to customers on your website, in messaging apps and on the phone.
+  actions:
+    - text: Quickstart in the console
+      link: /get-started/quickstart-console/
+      icon: right-arrow
+      variant: primary
+    - text: Quickstart with the CLI
+      link: /get-started/quickstart-cli/
+      variant: minimal
+---
+
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+## Find your way
+
+<CardGrid>
+	<LinkCard title="Get started" description="What Caplo is, and your first agent in the console or with the CLI." href="/get-started/what-is-caplo/" />
+	<LinkCard title="Concepts" description="Workspaces, agents and releases, tools, knowledge, channels, conversations and evals." href="/concepts/workspaces-and-roles/" />
+	<LinkCard title="Build agents" description="Instructions, models, knowledge, tools, sub-agents, testing, evals and publishing." href="/agents/instructions-and-model/" />
+	<LinkCard title="Tools" description="Write tool packages, connect remote MCP servers, and let agents read and write safely." href="/tools/" />
+	<LinkCard title="Website widget" description="Install the chat widget on your site, design it, and control it from JavaScript." href="/channels/website-widget/install/" />
+	<LinkCard title="Models and providers" description="Choose models, bring your own provider keys, and set up voice." href="/providers/" />
+	<LinkCard title="Usage and billing" description="Understand usage, read statements, and set spend budgets." href="/usage/" />
+	<LinkCard title="CLI" description="Install the caplo CLI and manage projects, environments and CI/CD." href="/cli/install/" />
+	<LinkCard title="Reference" description="Every CLI command, the agent YAML schema, caplo.yaml and tool fixtures." href="/reference/cli/" />
+</CardGrid>
+
+## Use the docs with AI
+
+The docs are written to be read by coding agents and chat assistants as well as people.
+
+- Every page has a Markdown version. Replace the trailing slash of a page URL with `.md`: `/agents/publishing/` is `/agents/publishing.md`, and the home page is `/index.md`.
+- `https://docs.caplo.si/llms.txt` lists every page with a short description, and `https://docs.caplo.si/llms-full.txt` is the whole site as one Markdown file.
+- Task pages include an **AI prompt** you can copy, or open in Claude or ChatGPT, to have an assistant do the task in your own repository.

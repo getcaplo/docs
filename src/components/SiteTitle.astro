@@ -1,0 +1,27 @@
+---
+import Default from '@astrojs/starlight/components/SiteTitle.astro';
+---
+
+<div class="caplo-site-title">
+	<Default />
+	<a class="caplo-docs-label" href="/">Docs</a>
+</div>
+
+<style>
+	.caplo-site-title {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		min-width: 0;
+	}
+	.caplo-docs-label {
+		font-family: var(--caplo-font-head);
+		font-size: 1.05rem;
+		font-weight: 600;
+		color: var(--sl-color-gray-2);
+		text-decoration: none;
+		padding-left: 0.6rem;
+		border-left: 1px solid var(--sl-color-gray-5);
+		line-height: 1.4;
+	}
+</style>

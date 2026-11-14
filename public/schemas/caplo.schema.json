@@ -1,0 +1,938 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:caplo:tools:caplo:v1",
+  "title": "Caplo tool package (caplo.yaml)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "apiVersion",
+    "kind",
+    "name",
+    "type",
+    "entry",
+    "runtime"
+  ],
+  "properties": {
+    "apiVersion": {
+      "type": "string",
+      "pattern": "^v1(\\.0(\\.0)?)?$",
+      "description": "v1, v1.0, and v1.0.0 resolve to the latest matching schema."
+    },
+    "kind": {
+      "const": "ToolPackage"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,39}$",
+      "description": "Unique per workspace."
+    },
+    "type": {
+      "enum": [
+        "function",
+        "mcp"
+      ]
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "entry": {
+      "type": "string",
+      "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$))[A-Za-z0-9._/-]+\\.(ts|mts|js|mjs)$",
+      "description": "Module that exports createServer() (mcp) or a default defineTool() (function)."
+    },
+    "runtime": {
+      "const": "node24"
+    },
+    "tools": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "description": "Effect and timeout for every tool the server lists (mcp only).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "effect",
+          "timeoutSeconds"
+        ],
+        "properties": {
+          "name": {
+            "$ref": "#/$defs/toolName"
+          },
+          "effect": {
+            "$ref": "#/$defs/effect"
+          },
+          "timeoutSeconds": {
+            "$ref": "#/$defs/timeoutSeconds"
+          },
+          "confirmation": {
+            "$ref": "#/$defs/confirmation"
+          },
+          "subject": {
+            "$ref": "#/$defs/subject"
+          },
+          "presentation": {
+            "$ref": "#/$defs/presentation"
+          },
+          "progress": {
+            "$ref": "#/$defs/progress"
+          },
+          "elicitation": {
+            "$ref": "#/$defs/elicitation"
+          }
+        }
+      }
+    },
+    "effect": {
+      "$ref": "#/$defs/effect",
+      "description": "Function packages only."
+    },
+    "timeoutSeconds": {
+      "$ref": "#/$defs/timeoutSeconds",
+      "description": "Function packages only."
+    },
+    "confirmation": {
+      "$ref": "#/$defs/confirmation",
+      "description": "Function packages only."
+    },
+    "egress": {
+      "type": "array",
+      "maxItems": 50,
+      "uniqueItems": true,
+      "description": "Exact hosts or *.suffix wildcards. Empty or absent means no network.",
+      "items": {
+        "type": "string",
+        "pattern": "^(\\*\\.)?([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$"
+      }
+    },
+    "secrets": {
+      "type": "array",
+      "maxItems": 50,
+      "uniqueItems": true,
+      "description": "Secret names; values are configured per workspace and passed per call.",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z][A-Z0-9_]{0,63}$"
+      }
+    },
+    "tests": {
+      "type": "string",
+      "default": "tests/*.json",
+      "description": "Glob of fixture files relative to the package root."
+    },
+    "subject": {
+      "$ref": "#/$defs/subject",
+      "description": "Function packages only."
+    },
+    "presentation": {
+      "$ref": "#/$defs/presentation",
+      "description": "Function packages only."
+    },
+    "progress": {
+      "$ref": "#/$defs/progress",
+      "description": "Function packages only."
+    },
+    "elicitation": {
+      "$ref": "#/$defs/elicitation",
+      "description": "Function packages only."
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "function"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "required": [
+          "effect",
+          "timeoutSeconds"
+        ],
+        "properties": {
+          "tools": false
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "mcp"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "required": [
+          "tools"
+        ],
+        "properties": {
+          "effect": false,
+          "timeoutSeconds": false,
+          "confirmation": false,
+          "subject": false,
+          "presentation": false,
+          "progress": false,
+          "elicitation": false
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "toolName": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{0,47}$"
+    },
+    "effect": {
+      "enum": [
+        "read",
+        "write"
+      ]
+    },
+    "timeoutSeconds": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 30
+    },
+    "confirmation": {
+      "enum": [
+        "required",
+        "none"
+      ],
+      "description": "Write tools only. required (the default) runs the tool only after the customer confirms the call in a later turn."
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policy"
+      ],
+      "description": "The tool acts for a verified customer. The runner passes the owner-verified subject in the call context, never through arguments; selector names an optional input property the runner fills with the subject's resource reference and refuses from the model.",
+      "properties": {
+        "policy": {
+          "const": "verified_required"
+        },
+        "selector": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,63}$"
+        }
+      }
+    },
+    "progress": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "label"
+      ],
+      "description": "Static customer-facing status while the tool runs. Frozen with the release and never interpolated.",
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "Widget status line, for example Checking available times: 3 to 40 characters, no trailing punctuation.",
+          "pattern": "^(?![\\s\\S]*(?:https?:|www\\.))[^\\s<>{}\\u0000-\\u001f\\u007f][^<>{}\\u0000-\\u001f\\u007f]{1,38}[^\\s.!?:;,\\u2026<>{}\\u0000-\\u001f\\u007f]$"
+        },
+        "spoken": {
+          "type": "string",
+          "description": "Voice acknowledgement, one sentence of 3 to 90 characters ending with a full stop.",
+          "pattern": "^(?![\\s\\S]*(?:https?:|www\\.))[^\\s<>{}\\u0000-\\u001f\\u007f][^<>{}\\u0000-\\u001f\\u007f]{1,87}\\.$"
+        }
+      }
+    },
+    "presentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "title",
+        "fields"
+      ],
+      "description": "Public form and receipt metadata. Only listed fields are ever shown; it grants no execution and exposes no other argument. The build checks every path against the tool's schemas.",
+      "properties": {
+        "schemaVersion": {
+          "const": 1
+        },
+        "title": {
+          "$ref": "#/$defs/presentationText"
+        },
+        "fields": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": {
+            "$ref": "#/$defs/presentationField"
+          }
+        },
+        "receipt": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "fields"
+          ],
+          "description": "Display fields selected from structuredContent; never decides whether the operation succeeded.",
+          "properties": {
+            "fields": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 12,
+              "items": {
+                "$ref": "#/$defs/presentationReceiptField"
+              }
+            }
+          }
+        },
+        "result": {
+          "$ref": "#/$defs/presentationResult"
+        },
+        "files": {
+          "$ref": "#/$defs/presentationFiles"
+        }
+      }
+    },
+    "presentationResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "layout",
+        "title",
+        "columns"
+      ],
+      "description": "Items of structuredContent shown with the reply: up to 20 of one array property as a list, table or cards, up to 10 as choices, up to 4 side by side as a comparison, up to 12 as timeline steps, up to 20 as places on a map, or one object as a detail (the output itself, or the direct object property path names), or as a page: a link the visitor opens over the chat (read tools only). Columns are direct primitive properties of an item; nothing else of the result is shown. Column roles and item actions depend on the layout.",
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/presentationPath",
+          "description": "The array property of the items; for a detail or a page, a direct object property, or omitted for the output itself."
+        },
+        "layout": {
+          "enum": [
+            "list",
+            "table",
+            "cards",
+            "choices",
+            "detail",
+            "comparison",
+            "timeline",
+            "page",
+            "map"
+          ]
+        },
+        "title": {
+          "$ref": "#/$defs/presentationText"
+        },
+        "columns": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": {
+            "$ref": "#/$defs/presentationResultColumn"
+          },
+          "description": "At most 6, or 12 for a detail, comparison or map."
+        },
+        "actions": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "description": "Item controls: up to two on cards, a detail, a comparison or a map, and exactly one reply on choices. A reply sends a visitor message; a link opens a page. Neither calls a tool.",
+          "items": {
+            "$ref": "#/$defs/presentationResultAction"
+          }
+        },
+        "page": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "label",
+            "display",
+            "origins"
+          ],
+          "description": "Layout page only. How the link opens: label is its button; display panel opens it in a sandboxed panel over the chat, tab in a new browser tab (use tab for pages that refuse to be framed). The link, and any message the page posts, must come from one of origins. The page never decides an outcome: confirm it with a read tool.",
+          "properties": {
+            "label": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 20,
+              "pattern": "^[^\\r\\n<>]+$"
+            },
+            "display": {
+              "enum": [
+                "panel",
+                "tab"
+              ]
+            },
+            "origins": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 5,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^https://(\\*\\.)?([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}(:[0-9]{1,5})?$"
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "layout": {
+                "enum": [
+                  "detail",
+                  "page"
+                ]
+              }
+            }
+          },
+          "else": {
+            "required": [
+              "path"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "layout": {
+                "enum": [
+                  "detail",
+                  "comparison",
+                  "map"
+                ]
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "columns": {
+                "type": "array",
+                "maxItems": 6
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "layout": {
+                "enum": [
+                  "list",
+                  "table"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "actions": false,
+              "columns": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "role": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "layout": {
+                "const": "timeline"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "actions": false,
+              "columns": {
+                "type": "array",
+                "maxItems": 4
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "layout": {
+                "const": "choices"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "actions"
+            ],
+            "properties": {
+              "actions": {
+                "type": "array",
+                "maxItems": 1,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "const": "reply"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "layout": {
+                "const": "page"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "page"
+            ],
+            "properties": {
+              "actions": false,
+              "columns": {
+                "type": "array",
+                "maxItems": 3
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "page": false
+            }
+          }
+        }
+      ]
+    },
+    "presentationResultColumn": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "label",
+        "display"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/presentationPath"
+        },
+        "label": {
+          "$ref": "#/$defs/presentationText"
+        },
+        "display": {
+          "$ref": "#/$defs/presentationDisplay"
+        },
+        "role": {
+          "enum": [
+            "image",
+            "title",
+            "subtitle",
+            "description",
+            "money",
+            "badge",
+            "link",
+            "time",
+            "status",
+            "latitude",
+            "longitude",
+            "address"
+          ],
+          "description": "How the layout shows the column. image and link need https URLs, money a currency, time a date or date-time string, status a string enum mapped by statuses, and latitude and longitude (map) numbers in degrees."
+        },
+        "currency": {
+          "$ref": "#/$defs/presentationCurrency"
+        },
+        "statuses": {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 20,
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "additionalProperties": {
+            "enum": [
+              "done",
+              "current",
+              "upcoming"
+            ]
+          },
+          "description": "The timeline state of every enum value of a status column."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "role"
+            ],
+            "properties": {
+              "role": {
+                "const": "money"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "currency"
+            ]
+          },
+          "else": {
+            "properties": {
+              "currency": false
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "role"
+            ],
+            "properties": {
+              "role": {
+                "const": "status"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "statuses"
+            ]
+          },
+          "else": {
+            "properties": {
+              "statuses": false
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "role"
+            ]
+          },
+          "then": {
+            "properties": {
+              "display": {
+                "const": "plain"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "presentationCurrency": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "maxProperties": 1,
+      "description": "The ISO 4217 currency of a money column: a sibling string property of the item, or a fixed code.",
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/presentationPath"
+        },
+        "code": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        }
+      }
+    },
+    "presentationResultAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "label"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "reply",
+            "link"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20,
+          "pattern": "^[^\\s<>\\u0000-\\u001F\\u007F](?:[^<>\\u0000-\\u001F\\u007F]*[^\\s<>\\u0000-\\u001F\\u007F])?$"
+        },
+        "template": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "^[^\\s<>\\u0000-\\u001F\\u007F](?:[^<>\\u0000-\\u001F\\u007F]*[^\\s<>\\u0000-\\u001F\\u007F])?$",
+          "description": "The visitor message; {name} inserts the item's value of the listed column name."
+        },
+        "path": {
+          "$ref": "#/$defs/presentationPath"
+        }
+      },
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "reply"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "template"
+        ],
+        "properties": {
+          "path": false
+        }
+      },
+      "else": {
+        "required": [
+          "path"
+        ],
+        "properties": {
+          "template": false
+        }
+      }
+    },
+    "presentationText": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "pattern": "^[^\\s<>\\u0000-\\u001F\\u007F](?:[^<>\\u0000-\\u001F\\u007F]*[^\\s<>\\u0000-\\u001F\\u007F])?$",
+      "description": "Plain text rendered escaped: no markup, control characters, or surrounding whitespace."
+    },
+    "presentationPath": {
+      "type": "string",
+      "pattern": "^/[A-Za-z_][A-Za-z0-9_]{0,63}$",
+      "description": "JSON pointer to one direct property of the tool's schema."
+    },
+    "presentationDisplay": {
+      "enum": [
+        "plain",
+        "last4"
+      ],
+      "description": "last4 shows only the final four characters."
+    },
+    "presentationField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "label",
+        "display"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/presentationPath"
+        },
+        "label": {
+          "$ref": "#/$defs/presentationText"
+        },
+        "display": {
+          "$ref": "#/$defs/presentationDisplay"
+        },
+        "editable": {
+          "type": "boolean",
+          "description": "The customer may change this string input before review."
+        },
+        "input": {
+          "enum": [
+            "text",
+            "select"
+          ]
+        },
+        "options": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "value",
+              "label"
+            ],
+            "properties": {
+              "value": {
+                "type": "string",
+                "maxLength": 1000
+              },
+              "label": {
+                "$ref": "#/$defs/presentationText"
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "editable"
+            ],
+            "properties": {
+              "editable": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "input"
+            ]
+          },
+          "else": {
+            "properties": {
+              "input": false,
+              "options": false
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "input"
+            ],
+            "properties": {
+              "input": {
+                "const": "select"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "options"
+            ]
+          },
+          "else": {
+            "properties": {
+              "options": false
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "display"
+            ],
+            "properties": {
+              "display": {
+                "const": "last4"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "editable": {
+                "const": false
+              }
+            }
+          }
+        }
+      ]
+    },
+    "presentationReceiptField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "label",
+        "display"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/presentationPath"
+        },
+        "label": {
+          "$ref": "#/$defs/presentationText"
+        },
+        "display": {
+          "$ref": "#/$defs/presentationDisplay"
+        }
+      }
+    },
+    "elicitation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fields"
+      ],
+      "description": "Read tools only. While it runs, the tool may ask the visitor for missing details with MCP form elicitation (elicitation/create). A request may name only these fields; Caplo refuses one that asks for a credential, and offers elicitation only where the visitor can answer, so the tool must handle a client without the capability.",
+      "properties": {
+        "style": {
+          "type": "string",
+          "enum": [
+            "form",
+            "questions"
+          ],
+          "description": "form (default) shows each request as a form on the website widget. questions asks one tapped question per request, on the website and in WhatsApp, Messenger and Instagram: each request names one field as a required single choice of 2 to 9 options with labels of at most 20 characters, and the tool may ask as many questions per call as it declares fields, up to 8."
+        },
+        "fields": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$",
+                "description": "A property name the tool's requestedSchema may use."
+              }
+            }
+          }
+        }
+      }
+    },
+    "presentationFiles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "accept",
+        "maxBytes"
+      ],
+      "description": "Read tools only. The tool may return files for the visitor as MCP embedded resources with a blob (resource.uri names the file, resource.mimeType its type). Caplo takes them out of the result so the model never sees the bytes, proves the type from the content, scans them and shows them with the agent's reply as a download where the channel can; elsewhere the model is told they were not delivered. At most 3 files per result.",
+      "properties": {
+        "accept": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "image/jpeg",
+              "image/png",
+              "image/gif",
+              "image/webp",
+              "application/pdf"
+            ]
+          }
+        },
+        "maxBytes": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 10485760
+        }
+      }
+    }
+  }
+}

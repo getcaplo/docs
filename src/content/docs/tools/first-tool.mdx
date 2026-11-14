@@ -1,0 +1,154 @@
+---
+title: Build your first tool
+description: Create a function package, run it locally, test it, then push and publish it with the CLI or in Tool Studio.
+sidebar:
+  order: 2
+---
+
+import { Tabs, TabItem, Steps, Aside } from '@astrojs/starlight/components';
+import AgentPrompt from '~/components/AgentPrompt.astro';
+
+This page takes a one-tool function package from nothing to a published version an agent can use. The starter tool, `double_value`, doubles a number; replace its body with your own logic once the loop works.
+
+## Before you start
+
+- The **Owner**, **Admin** or **Developer** role in the workspace. These roles can create, build and publish tools.
+- For the CLI path: the `caplo` CLI ([install it](/cli/install/)), signed in with `caplo auth login` and with a workspace selected with `caplo workspace use`. See [Sign in from the CLI](/cli/authentication/).
+- For the CLI path: **Node.js 24** and npm. Tool packages run on Node 24, and `caplo tool test` refuses any other major version. Local tests run on macOS and Linux; on Windows, use WSL.
+
+## Create, test and publish
+
+<Tabs syncKey="surface">
+  <TabItem label="CLI">
+    <Steps>
+
+    1. **Create the package.** `caplo tool init` writes a package from the SDK template into a new or empty directory and names it after the directory:
+
+       ```sh
+       caplo tool init double-value --type function
+       cd double-value
+       ```
+
+       You get `caplo.yaml`, `package.json`, `tsconfig.json`, `src/tool.ts` (the tool), `src/stdio.ts` (runs it for local MCP clients) and `tests/double-value.json` (a fixture). Use `--type mcp` for an MCP package with several tools; see [Define tools and use the call context](/tools/define-tool-and-context/).
+
+    2. **Install dependencies.**
+
+       ```sh
+       npm install
+       ```
+
+       This also writes `package-lock.json`. Keep it and commit it: Caplo installs exactly what the lockfile lists, and a push without a lockfile fails to build. `yarn.lock` and `pnpm-lock.yaml` also work.
+
+    3. **Look at the tool.** `src/tool.ts` exports one `defineTool`:
+
+       ```ts
+       import { defineTool } from "@caplo/tools";
+
+       export default defineTool<{ value: number }, { result: number }>({
+         name: "double_value",
+         description: "Doubles a number",
+         inputSchema: { type: "object", properties: { value: { type: "number" } }, required: ["value"] },
+         outputSchema: { type: "object", properties: { result: { type: "number" } }, required: ["result"] },
+         async handler({ value }, { log }) {
+           log.info("doubling", { value });
+           return { result: value * 2 };
+         },
+       });
+       ```
+
+       `caplo.yaml` names the package and sets the tool's policy: `effect: read` and `timeoutSeconds: 5`.
+
+    4. **Call it by hand.** `caplo tool dev` opens MCP Inspector (started with `npx`) connected to your package, so you can list and call the tool:
+
+       ```sh
+       caplo tool dev
+       ```
+
+       Secrets your `caplo.yaml` declares are read from environment variables of the same name. To use the package from another local MCP client instead, run `caplo tool dev --no-inspector`, which speaks MCP on standard input and output.
+
+    5. **Run the fixtures.** `caplo tool test` bundles the package the way Caplo's builder does, checks `caplo.yaml` against the tools the code lists, and runs every fixture in `tests/`:
+
+       ```sh
+       caplo tool test
+       ```
+
+       ```txt
+       bundle 7.5 KB (d64251e71094, esbuild 0.28.2)
+       tool double_value__double_value (read, 5s)
+       capabilities subject-context/1 effect-outcome/1 operation-status/1
+       server advertises subject-context/1 effect-outcome/1
+       ok   tests/double-value.json (doubles 21)
+       1 passed, 0 failed
+       ```
+
+       `double_value__double_value` is the name the model sees. See [Test tools with fixtures](/tools/testing/).
+
+    6. **Push and build.** `caplo tool push` uploads the folder as the package's workspace draft (creating the package on the first push), builds it, and streams the build log. `node_modules`, `.git` and anything your `.gitignore` files ignore are left out.
+
+       ```sh
+       caplo tool push
+       ```
+
+       The build installs from your lockfile, bundles the code, runs safety checks and lists the tools with no network access. It ends with `Build <id> succeeded` and the tools it found, or with an error code such as `lockfile_required` or `tool_policy_missing`.
+
+    7. **Publish.** `caplo tool publish` turns the latest succeeded build into the next version:
+
+       ```sh
+       caplo tool publish
+       ```
+
+       ```txt
+       Published double-value version 1 from build <BUILD_ID>
+         double_value__double_value (read, 5s)
+       ```
+
+    </Steps>
+  </TabItem>
+  <TabItem label="Tool Studio">
+    Tool Studio is a browser editor at [studio.caplo.si](https://studio.caplo.si) for writing, building, testing and publishing tool packages without installing anything.
+
+    <Steps>
+
+    1. In the console, open **Tools**, select **Add tools**, then **Create package**. Studio opens on this workspace in a new tab; sign in if it asks.
+
+    2. In the **Packages** view, select **Create Package**. Choose **Function** (one tool written as a function) or **MCP server** (several tools in one server), then enter a package name such as `double-value`: a lowercase letter, then lowercase letters, digits or dashes.
+
+    3. Studio creates the package from the same template as the CLI. Edit `src/tool.ts` and `caplo.yaml`. Your edits are saved to the package's workspace draft. When you save `package.json`, Studio resolves the dependencies and updates the lockfile for you.
+
+    4. In the **Tools** view, select **Build**. When the build succeeds, Studio offers **Run Tests** and **Publish**. To call a tool by hand, select **Call Tool** on it, fill in the arguments and select **Send Call**.
+
+    5. Select **Run Fixture Tests** to run the files in `tests/`.
+
+    6. In the **Versions** view, select **Publish** and confirm. Studio builds the draft first if it changed since the last build.
+
+    </Steps>
+
+    You can return to a package from the console: **Tools** lists each package with **Open in Studio**.
+  </TabItem>
+</Tabs>
+
+## Give the tool to an agent
+
+A published tool appears on every agent's **Tools & actions** tab, grouped under its package. Select it there, or list it in agent YAML by package and tool name:
+
+```yaml
+tools:
+  - double-value/double_value
+```
+
+Then publish the agent. Its release pins version 1 of `double-value`; later versions reach the agent when you publish the agent again. See [Give an agent tools](/agents/tools/).
+
+<Aside type="tip">
+Each new push replaces the workspace draft and starts a new build. Publishing is a separate step, so you can push as often as you like without affecting agents.
+</Aside>
+
+## Next steps
+
+- Replace the starter with real logic that calls your API: [Define tools and use the call context](/tools/define-tool-and-context/) and [Secrets and network access](/tools/secrets-and-egress/).
+- For tools that change data, read [Write tools safely](/tools/write-tools/) before you publish.
+
+## Let an AI agent do it
+
+If you already have a REST API, a coding agent can wrap it as a tool package with read and write tools, declared secrets and an egress list.
+
+<AgentPrompt id="rest-api-to-tool" />
