@@ -76,4 +76,4 @@ To remove a budget, open it with **Edit** and select **Remove budget**. Its aler
 
 Note
 
-**Settings** then **Billing & limits** has an older **Budget & limits** panel that does not enforce anything. Use **Spend controls** for budgets.
+**Settings** then **Billing & limits** links to **Spend controls**, where budgets are set.

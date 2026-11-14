@@ -66,7 +66,7 @@ evals:
 
 `caplo push` (or `caplo agent push -f <file>`) matches the cases to the agent’s suite by name and replaces the suite with them. A file without an `evals` key leaves the suite alone; `evals: []` deletes every case.
 
-This list form is the CLI’s. The console’s **Export YAML** writes cases as `evals: {cases: [...]}` with an `id` on each case; see [Agent YAML](/agents/agent-yaml/#console-and-cli-formats).
+This list form is the project convention. The console’s **Export YAML** writes cases as `evals: {cases: [...]}` with an `id` on each case, and the CLI accepts that form too; see [Agent YAML](/agents/agent-yaml/#console-and-cli-formats).
 
 ## Routing cases
 

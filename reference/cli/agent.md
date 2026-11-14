@@ -4,7 +4,7 @@
 
 Generated reference
 
-Generated from `caplo` v0.4.0, the latest release. `caplo agent --help` prints the same text.
+Generated from `caplo` v0.4.1, the latest release. `caplo agent --help` prints the same text.
 
 Build, test, evaluate, and publish one agent.
 
@@ -273,7 +273,7 @@ Save an agent file as the agent’s draft, creating the agent if needed, and its
 caplo agent push [flags]
 ```
 
-Saves the file as the draft of the workspace agent with its name, creating the agent when there is none. The file’s evals replace the agent’s eval suite; without an evals key the suite is left alone. Inside a project, local references resolve, and the sub-agents and packages they name must exist in the workspace already. –dry-run prints the draft diff without saving.
+Saves the file as the draft of the workspace agent with its name, creating the agent when there is none. The file’s evals replace the agent’s eval suite; without an evals key the suite is left alone. Cases in the console’s evals: {cases: \[…]} form keep their IDs, and a plain list of cases matches the suite’s cases by name. Inside a project, local references resolve, and the sub-agents and packages they name must exist in the workspace already. –dry-run prints the draft diff without saving.
 
 **Examples**
 

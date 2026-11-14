@@ -4,7 +4,7 @@
 
 Generated reference
 
-Generated from `caplo` v0.4.0, the latest release. `caplo auth --help` prints the same text.
+Generated from `caplo` v0.4.1, the latest release. `caplo auth --help` prints the same text.
 
 Log in, log out, and show the session.
 

@@ -4,7 +4,7 @@
 
 Generated reference
 
-Generated from `caplo` v0.4.0, the latest release. `caplo <command> --help` prints the same text.
+Generated from `caplo` v0.4.1, the latest release. `caplo <command> --help` prints the same text.
 
 These commands work on the project around the current directory, or the one `-C` names. See [Projects](/cli/projects/).
 

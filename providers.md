@@ -13,7 +13,7 @@ Agents call two kinds of providers: language model providers, which write replie
 | Speech          | Deepgram   | Speech recognition on voice calls.                                                                   |
 | Speech          | ElevenLabs | Voices that speak the agent’s replies.                                                               |
 
-The **Language models** list also shows Google. Caplo does not route agent chat to Google models yet, so agents cannot use Google models even when Google is on. Leave it **Off**.
+The **Language models** list also shows Google, labelled **Realtime voice (Gemini Live) only**. Caplo does not route agent chat to Google models, so turn Google on only if an agent uses Gemini Live for realtime voice. See [Voice and speech](/providers/voice-and-speech/).
 
 The models you can pick for an agent depend on which providers are on. See [Instructions and model](/agents/instructions-and-model/) and [Voice and speech](/providers/voice-and-speech/).
 

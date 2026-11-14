@@ -652,7 +652,7 @@ caplo agent pull "Shop Concierge" -f concierge.yaml
 ```sh
 caplo agent push [flags]
 ```
- Saves the file as the draft of the workspace agent with its name, creating the agent when there is none. The file’s evals replace the agent’s eval suite; without an evals key the suite is left alone. Inside a project, local references resolve, and the sub-agents and packages they name must exist in the workspace already. –dry-run prints the draft diff without saving. **Examples** 
+ Saves the file as the draft of the workspace agent with its name, creating the agent when there is none. The file’s evals replace the agent’s eval suite; without an evals key the suite is left alone. Cases in the console’s evals: {cases: \[…]} form keep their IDs, and a plain list of cases matches the suite’s cases by name. Inside a project, local references resolve, and the sub-agents and packages they name must exist in the workspace already. –dry-run prints the draft diff without saving. **Examples** 
 ```sh
 caplo agent push -f agent.yaml
 caplo agent push -f agent.yaml --dry-run
@@ -813,7 +813,7 @@ caplo channel list --agent "Shop Concierge" -o json
 ```sh
 caplo channel rollback <channel>... [flags]
 ```
- Points each channel at the newest release of its agent, older than the one it serves, that is not revoked. The release is served as it was published; publish again to move forward. It asks for confirmation; –yes skips it. **Examples** 
+ Points each channel at the newest release of its agent, older than the one it serves, that is not revoked. The release is served as it was published. Publishing never moves a channel; caplo channel deploy points it at a newer release. It asks for confirmation; –yes skips it. **Examples** 
 ```sh
 caplo channel rollback Website --yes
 ```

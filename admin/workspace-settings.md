@@ -47,7 +47,7 @@ With **Eval requirement** set to **Disabled**, a release can reach customers wit
 
 **Settings** > **Workspace controls** (under **Advanced**) holds the emergency switch. Only the Owner can see it.
 
-1. Select **Pause new sessions**.
+1. Select **Pause member and API access**.
 2. Confirm **Pause workspace**. The badge changes from **Running** to **Paused**.
 
 While the workspace is paused:

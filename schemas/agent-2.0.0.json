@@ -384,7 +384,7 @@
           "type": "integer",
           "minimum": 1,
           "maximum": 4,
-          "description": "Most suggestions under one reply; 3 when omitted. WhatsApp and Messenger show at most 3."
+          "description": "Most suggestions under one reply; 3 when omitted. WhatsApp, Messenger and Instagram show at most 3."
         }
       }
     },
@@ -426,7 +426,7 @@
         "knowledgePassages": {
           "type": "integer",
           "minimum": 1,
-          "maximum": 16,
+          "maximum": 8,
           "description": "Passages one knowledge search returns. Default 6."
         },
         "maxModelCalls": {

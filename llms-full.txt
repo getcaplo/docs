@@ -931,7 +931,7 @@ A write or publish scope includes the read scope of the same resource: `agents:p
 
 agents:publish is broad
 
-Despite the console’s **Access boundaries** note, `agents:publish` does let a key publish agents. It can also delete agents and turn off the workspace’s eval requirement. Give it only to pipelines that publish, and keep that key in a protected CI environment.
+`agents:publish` lets a key publish agents, and it can also delete agents and turn off the workspace’s eval requirement. Give it only to pipelines that publish, and keep that key in a protected CI environment.
 
 No scope covers members, roles, SSO, billing, workspace secrets, integrations or other API clients. Those always need a person. See [What works with an API key](/cli/authentication/#what-works-with-an-api-key) for the CLI commands each scope enables.
 
@@ -1368,7 +1368,7 @@ With **Eval requirement** set to **Disabled**, a release can reach customers wit
 
 **Settings** > **Workspace controls** (under **Advanced**) holds the emergency switch. Only the Owner can see it.
 
-1. Select **Pause new sessions**.
+1. Select **Pause member and API access**.
 2. Confirm **Pause workspace**. The badge changes from **Running** to **Paused**.
 
 While the workspace is paused:
@@ -1510,7 +1510,7 @@ The two surfaces write some fields differently. A project file is portable acros
 | `knowledgeBases` | IDs                                                  | Names or IDs                                                                         |
 | `evals`          | `evals: {cases: [...]}`, each case with an `id`      | A list of cases matched by `name`                                                    |
 
-The CLI refuses the console’s `evals: {cases: ...}` form. To use a console export with the CLI, remove its `evals` block, or use `caplo pull` as described below, which converts everything.
+The CLI accepts both forms. A console export keeps its case IDs when you push it with `caplo agent push`; in a project, the list form matched by name is the convention, and `caplo pull` writes it.
 
 ## Move a console agent into a CLI project
 
@@ -1650,7 +1650,7 @@ When the grader cannot reach a verdict, the case ends as an error with **The des
 
   `caplo push` (or `caplo agent push -f <file>`) matches the cases to the agent’s suite by name and replaces the suite with them. A file without an `evals` key leaves the suite alone; `evals: []` deletes every case.
 
-  This list form is the CLI’s. The console’s **Export YAML** writes cases as `evals: {cases: [...]}` with an `id` on each case; see [Agent YAML](/agents/agent-yaml/#console-and-cli-formats).
+  This list form is the project convention. The console’s **Export YAML** writes cases as `evals: {cases: [...]}` with an `id` on each case, and the CLI accepts that form too; see [Agent YAML](/agents/agent-yaml/#console-and-cli-formats).
 
 ## Routing cases
 
@@ -2162,8 +2162,6 @@ When to change them:
 * Raise `maxParallelReads` when an agent often looks up several independent things at once.
 * Raise `knowledgePassages` when answers miss details that are in the documents; lower it when replies drift into unrelated passages. More passages mean more input tokens per search.
 * Raise `maxDepth` only when your agent tree needs another level; every level adds latency.
-
-The agent file schema accepts `knowledgePassages` up to 16, but Caplo refuses a draft above 8 when you push or save it.
 
 ## History
 
@@ -7377,7 +7375,7 @@ Agents call two kinds of providers: language model providers, which write replie
 | Speech          | Deepgram   | Speech recognition on voice calls.                                                                   |
 | Speech          | ElevenLabs | Voices that speak the agent’s replies.                                                               |
 
-The **Language models** list also shows Google. Caplo does not route agent chat to Google models yet, so agents cannot use Google models even when Google is on. Leave it **Off**.
+The **Language models** list also shows Google, labelled **Realtime voice (Gemini Live) only**. Caplo does not route agent chat to Google models, so turn Google on only if an agent uses Gemini Live for realtime voice. See [Voice and speech](/providers/voice-and-speech/).
 
 The models you can pick for an agent depend on which providers are on. See [Instructions and model](/agents/instructions-and-model/) and [Voice and speech](/providers/voice-and-speech/).
 
@@ -7601,7 +7599,7 @@ On a voice call, whether by phone or in the website widget, an agent needs to tu
 [Section titled “Providers”](#providers)
 
 * Speech recognition and voice models come from **Deepgram** and **ElevenLabs**, set under **Speech providers**.
-* Realtime models belong to a language model provider, such as OpenAI, and use its **Language models** key source.
+* Realtime models belong to a language model provider (OpenAI for OpenAI Realtime, Google for Gemini Live) and use its **Language models** key source.
 
 Both are in the console under **Integrations** then **Service providers**. Speech providers are **Caplo Managed** by default, so voice works without your own keys. See [Models and providers](/providers/).
 
@@ -9845,7 +9843,7 @@ To remove a budget, open it with **Edit** and select **Remove budget**. Its aler
 
 Note
 
-**Settings** then **Billing & limits** has an older **Budget & limits** panel that does not enforce anything. Use **Spend controls** for budgets.
+**Settings** then **Billing & limits** links to **Spend controls**, where budgets are set.
 
 # Usage and statements
 
@@ -9946,7 +9944,7 @@ Each page reads all its charts and tables from one snapshot, shown at the bottom
 
 Generated reference
 
-Generated from the schema in `caplo` v0.4.0. Guide: [Agent YAML](/agents/agent-yaml/).
+Generated from the schema in `caplo` v0.4.1. Guide: [Agent YAML](/agents/agent-yaml/).
 
 For validation and completion in your editor, add this first line to the file (YAML language server, used by VS Code and others):
 
@@ -10072,7 +10070,7 @@ How the agent loop runs. Omitted fields take the platform defaults; an empty gui
 | `chatStyle`         | string  |          | Reply style for chat turns. At most 2000 characters.                      |
 | `voiceStyle`        | string  |          | Reply style for voice calls. At most 2000 characters.                     |
 | `history`           | object  |          | See [`policy.history`](#policyhistory).                                   |
-| `knowledgePassages` | integer |          | Passages one knowledge search returns. Default 6. From 1 to 16.           |
+| `knowledgePassages` | integer |          | Passages one knowledge search returns. Default 6. From 1 to 8.            |
 | `maxModelCalls`     | integer |          | Model calls of the whole agent graph per turn. Default 16. From 1 to 48.  |
 | `maxReads`          | integer |          | Tool lookups per turn. Default 8. From 1 to 32.                           |
 | `maxSearches`       | integer |          | Knowledge searches per turn. Default 4. From 1 to 16.                     |
@@ -10109,9 +10107,9 @@ Other fields are refused.
 
 Short next messages offered under the replies this agent writes itself, on channels that can show them. Omit to turn them off.
 
-| Field      | Type    | Required | Description                                                                                           |
-| ---------- | ------- | -------- | ----------------------------------------------------------------------------------------------------- |
-| `maxCount` | integer |          | Most suggestions under one reply; 3 when omitted. WhatsApp and Messenger show at most 3. From 1 to 4. |
+| Field      | Type    | Required | Description                                                                                                      |
+| ---------- | ------- | -------- | ---------------------------------------------------------------------------------------------------------------- |
+| `maxCount` | integer |          | Most suggestions under one reply; 3 when omitted. WhatsApp, Messenger and Instagram show at most 3. From 1 to 4. |
 
 Other fields are refused.
 
@@ -10242,7 +10240,7 @@ How the agent loop runs. Omitted fields take the platform defaults; an empty gui
 | `chatStyle`         | string  |          | Reply style for chat turns. At most 2000 characters.                      |
 | `voiceStyle`        | string  |          | Reply style for voice calls. At most 2000 characters.                     |
 | `history`           | object  |          | See [`agents.policy.history`](#agentspolicyhistory).                      |
-| `knowledgePassages` | integer |          | Passages one knowledge search returns. Default 6. From 1 to 16.           |
+| `knowledgePassages` | integer |          | Passages one knowledge search returns. Default 6. From 1 to 8.            |
 | `maxModelCalls`     | integer |          | Model calls of the whole agent graph per turn. Default 16. From 1 to 48.  |
 | `maxReads`          | integer |          | Tool lookups per turn. Default 8. From 1 to 32.                           |
 | `maxSearches`       | integer |          | Knowledge searches per turn. Default 4. From 1 to 16.                     |
@@ -10279,9 +10277,9 @@ Other fields are refused.
 
 Short next messages offered under the replies this agent writes itself, on channels that can show them. Omit to turn them off.
 
-| Field      | Type    | Required | Description                                                                                           |
-| ---------- | ------- | -------- | ----------------------------------------------------------------------------------------------------- |
-| `maxCount` | integer |          | Most suggestions under one reply; 3 when omitted. WhatsApp and Messenger show at most 3. From 1 to 4. |
+| Field      | Type    | Required | Description                                                                                                      |
+| ---------- | ------- | -------- | ---------------------------------------------------------------------------------------------------------------- |
+| `maxCount` | integer |          | Most suggestions under one reply; 3 when omitted. WhatsApp, Messenger and Instagram show at most 3. From 1 to 4. |
 
 Other fields are refused.
 
@@ -10291,7 +10289,7 @@ Other fields are refused.
 
 Generated reference
 
-Generated from the schema in `caplo` v0.4.0. Guides: [Tools](/tools/).
+Generated from the schema in `caplo` v0.4.1. Guides: [Tools](/tools/).
 
 For validation and completion in your editor, add this first line to the file (YAML language server, used by VS Code and others):
 
@@ -10753,7 +10751,7 @@ Other fields are refused.
 
 Generated reference
 
-Generated from `caplo` v0.4.0, the latest release. `caplo --help` prints the same text.
+Generated from `caplo` v0.4.1, the latest release. `caplo --help` prints the same text.
 
 Install the CLI with the [installation guide](/cli/install/). Task guides are under [CLI](/cli/workflow/).
 
@@ -11054,7 +11052,7 @@ caplo version -o json
 
 Generated reference
 
-Generated from `caplo` v0.4.0, the latest release. `caplo agent --help` prints the same text.
+Generated from `caplo` v0.4.1, the latest release. `caplo agent --help` prints the same text.
 
 Build, test, evaluate, and publish one agent.
 
@@ -11345,7 +11343,7 @@ Save an agent file as the agent’s draft, creating the agent if needed, and its
 caplo agent push [flags]
 ```
 
-Saves the file as the draft of the workspace agent with its name, creating the agent when there is none. The file’s evals replace the agent’s eval suite; without an evals key the suite is left alone. Inside a project, local references resolve, and the sub-agents and packages they name must exist in the workspace already. –dry-run prints the draft diff without saving.
+Saves the file as the draft of the workspace agent with its name, creating the agent when there is none. The file’s evals replace the agent’s eval suite; without an evals key the suite is left alone. Cases in the console’s evals: {cases: \[…]} form keep their IDs, and a plain list of cases matches the suite’s cases by name. Inside a project, local references resolve, and the sub-agents and packages they name must exist in the workspace already. –dry-run prints the draft diff without saving.
 
 **Examples**
 
@@ -11543,7 +11541,7 @@ caplo agent validate -f agents/orders.yaml
 
 Generated reference
 
-Generated from `caplo` v0.4.0, the latest release. `caplo auth --help` prints the same text.
+Generated from `caplo` v0.4.1, the latest release. `caplo auth --help` prints the same text.
 
 Log in, log out, and show the session.
 
@@ -11647,7 +11645,7 @@ caplo auth status -o json
 
 Generated reference
 
-Generated from `caplo` v0.4.0, the latest release. `caplo channel --help` prints the same text.
+Generated from `caplo` v0.4.1, the latest release. `caplo channel --help` prints the same text.
 
 List channels and deploy agent releases to them.
 
@@ -11754,7 +11752,7 @@ Point channels back at their agent’s release before the one they serve.
 caplo channel rollback <channel>... [flags]
 ```
 
-Points each channel at the newest release of its agent, older than the one it serves, that is not revoked. The release is served as it was published; publish again to move forward. It asks for confirmation; –yes skips it.
+Points each channel at the newest release of its agent, older than the one it serves, that is not revoked. The release is served as it was published. Publishing never moves a channel; caplo channel deploy points it at a newer release. It asks for confirmation; –yes skips it.
 
 **Examples**
 
@@ -11774,7 +11772,7 @@ caplo channel rollback Website --yes
 
 Generated reference
 
-Generated from `caplo` v0.4.0, the latest release. `caplo config --help` prints the same text.
+Generated from `caplo` v0.4.1, the latest release. `caplo config --help` prints the same text.
 
 Show and change CLI settings.
 
@@ -11863,7 +11861,7 @@ caplo config set api-url https://api.staging.example.com
 
 Generated reference
 
-Generated from `caplo` v0.4.0, the latest release. `caplo identity --help` prints the same text.
+Generated from `caplo` v0.4.1, the latest release. `caplo identity --help` prints the same text.
 
 Generate keys and sign or check host sign-in assertions locally.
 
@@ -11996,7 +11994,7 @@ caplo identity sign-assertion ... | caplo identity verify-assertion --jwks https
 
 Generated reference
 
-Generated from `caplo` v0.4.0, the latest release. `caplo knowledge --help` prints the same text.
+Generated from `caplo` v0.4.1, the latest release. `caplo knowledge --help` prints the same text.
 
 Manage knowledge bases and sync their documents from a directory.
 
@@ -12184,7 +12182,7 @@ caplo knowledge sync "Returns policy" ./docs/returns --approve --publish --yes
 
 Generated reference
 
-Generated from `caplo` v0.4.0, the latest release. `caplo mcp --help` prints the same text.
+Generated from `caplo` v0.4.1, the latest release. `caplo mcp --help` prints the same text.
 
 Connect remote MCP servers and publish their reviewed tools.
 
@@ -12516,7 +12514,7 @@ printf %s "$NEW_TOKEN" | caplo mcp update erp --secret-stdin
 
 Generated reference
 
-Generated from `caplo` v0.4.0, the latest release. `caplo <command> --help` prints the same text.
+Generated from `caplo` v0.4.1, the latest release. `caplo <command> --help` prints the same text.
 
 These commands work on the project around the current directory, or the one `-C` names. See [Projects](/cli/projects/).
 
@@ -12827,7 +12825,7 @@ caplo validate -C ~/src/shop
 
 Generated reference
 
-Generated from `caplo` v0.4.0, the latest release. `caplo secret --help` prints the same text.
+Generated from `caplo` v0.4.1, the latest release. `caplo secret --help` prints the same text.
 
 Manage workspace secrets that package secrets bind to.
 
@@ -12950,7 +12948,7 @@ caplo secret usage orders-api-key
 
 Generated reference
 
-Generated from `caplo` v0.4.0, the latest release. `caplo tool --help` prints the same text.
+Generated from `caplo` v0.4.1, the latest release. `caplo tool --help` prints the same text.
 
 Build, test, publish, and run tool packages.
 
@@ -13676,7 +13674,7 @@ caplo tool version revoke orders@3 --reason "leaks order notes"
 
 Generated reference
 
-Generated from `caplo` v0.4.0, the latest release. `caplo workspace --help` prints the same text.
+Generated from `caplo` v0.4.1, the latest release. `caplo workspace --help` prints the same text.
 
 List, show, create, and select workspaces.
 
@@ -13921,7 +13919,7 @@ caplo workspace use "Shop staging"
 
 Generated reference
 
-Generated from the schema in `caplo` v0.4.0. Guide: [Test tools](/tools/testing/).
+Generated from the schema in `caplo` v0.4.1. Guide: [Test tools](/tools/testing/).
 
 For validation and completion in your editor, add this first line to the file (YAML language server, used by VS Code and others):
 

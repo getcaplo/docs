@@ -107,7 +107,7 @@ The two surfaces write some fields differently. A project file is portable acros
 | `knowledgeBases` | IDs                                                  | Names or IDs                                                                         |
 | `evals`          | `evals: {cases: [...]}`, each case with an `id`      | A list of cases matched by `name`                                                    |
 
-The CLI refuses the console’s `evals: {cases: ...}` form. To use a console export with the CLI, remove its `evals` block, or use `caplo pull` as described below, which converts everything.
+The CLI accepts both forms. A console export keeps its case IDs when you push it with `caplo agent push`; in a project, the list form matched by name is the convention, and `caplo pull` writes it.
 
 ## Move a console agent into a CLI project
 
