@@ -1,0 +1,1602 @@
+<SYSTEM>CLI: installing and using the caplo CLI, with the full command reference</SYSTEM>
+
+# Log in and use API keys
+
+> Log in to the caplo CLI as yourself, see where the session is kept, change CLI settings, and create API keys for CI and automation.
+
+The CLI authenticates in one of two ways: * **As you**, after `caplo auth login`. Commands act with your workspace role, the same as in the console. * **As an API client**, when `CAPLO_API_KEY` holds an API key. Commands act with the key’s scopes. Use this in CI and other automation where nobody can log in. ## Log in [Section titled “Log in”](#log-in) 
+```sh
+caplo auth login
+```
+ 1. The CLI opens your browser at the Caplo sign-in page. If it does not open, copy the URL the CLI prints. 2. Sign in as you do in the console. The browser then shows that you are logged in to the Caplo CLI, and you can close it. 3. The CLI prints your name and email. If you belong to exactly one workspace, it selects that workspace. If you belong to several, run `caplo workspace use <name>` to choose one; see [Workspaces](/cli/workspaces/). The browser returns to a short-lived listener on `127.0.0.1` on your machine, so the browser and the CLI must run on the same computer. The sign-in must finish within five minutes. ### On a machine without a browser [Section titled “On a machine without a browser”](#on-a-machine-without-a-browser) On a remote server, in a container, or over SSH, use the device flow: 
+```sh
+caplo auth login --device
+```
+ The CLI prints a URL and a code. Open the URL on any device, sign in, and confirm the code; the CLI finishes as soon as you do. `--no-browser` only stops the CLI from opening a browser itself. It still needs a browser on the same machine to finish, so prefer `--device` when there is none. ### Check and end the session [Section titled “Check and end the session”](#check-and-end-the-session) 
+```sh
+caplo auth status
+caplo auth logout
+```
+ `caplo auth status` shows who you are logged in as, the API and sign-in server, where the session is stored, and the selected workspace. With `CAPLO_API_KEY` set, it shows the API client, its workspace and its scopes instead. `caplo auth logout` deletes the stored session from your machine and then ends it on the server. If ending it on the server fails, the CLI says so; the local copy is already gone. ## Where the session is stored [Section titled “Where the session is stored”](#where-the-session-is-stored) Logging in creates a long-lived session. The CLI keeps it as a refresh token and gets short-lived access tokens from it as needed; access tokens stay in memory and are never written to disk. Several `caplo` commands can run at once safely. | Storage | Where | When | | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | | `keychain` (default) | The operating system’s credential store: macOS Keychain, Windows Credential Manager, or the Secret Service (such as GNOME Keyring) on Linux, under the service name `caplo` | Desktops and laptops | | `file` | `credentials.json` in the configuration directory, readable only by your user (mode 0600) | Machines without a credential store, such as a minimal Linux server | To use file storage, log in with `--insecure-storage`, or set it first with `caplo config set credential-storage file`. The choice is saved and applies to later logins too. Caution Anyone who can read `credentials.json` can act as you in Caplo until you log out. Use file storage only on a machine and account you control, and prefer an [API key](#api-keys-for-automation) for unattended jobs. The configuration directory is `CAPLO_CONFIG_DIR` if set, otherwise `$XDG_CONFIG_HOME/caplo` or `~/.config/caplo` on macOS and Linux, and `%AppData%\caplo` on Windows. It holds `config.yaml` with your settings and selected workspace, and `credentials.json` when you use file storage. ## CLI settings [Section titled “CLI settings”](#cli-settings) `caplo config` shows and changes the settings in `config.yaml`: 
+```sh
+caplo config list
+caplo config get api-url
+caplo config set credential-storage file
+```
+ | Key | Default | What it is | | -------------------- | ------------------------------------ | ------------------------------------------------ | | `api-url` | `https://api.caplo.si` | The Caplo API the CLI calls. | | `issuer` | `https://auth.caplo.si/realms/caplo` | The sign-in server. | | `client-id` | `caplo-cli` | The sign-in client the CLI identifies as. | | `credential-storage` | `keychain` | Where the session is kept: `keychain` or `file`. | `caplo config list` also shows the selected workspace. You only need to change `api-url`, `issuer` or `client-id` if Caplo support gives you different values. Changing `api-url` clears the selected workspace. After changing a setting, run `caplo auth login` again. When you log in, the API and sign-in server come from, in order: the `--api-url` and `--issuer` flags, the `CAPLO_API_URL` and `CAPLO_ISSUER` environment variables, the saved settings, then the defaults above. A successful login saves them. To keep two separate logins on one machine, give each its own `CAPLO_CONFIG_DIR`. ## API keys for automation [Section titled “API keys for automation”](#api-keys-for-automation) An API client is a workspace identity for CI and scripts. It is not a member: it has no role, cannot use the console, and can only do what its scopes allow in its own workspace. Each client can have several keys, so you can rotate a key without downtime. Keys start with `caplo_sk_`. ### Who can create one [Section titled “Who can create one”](#who-can-create-one) Workspace Owners, Admins and Developers can manage API clients. You can only give a client scopes whose actions your own role holds: for example, a Developer can create a client with tool scopes but not with `agents:write` or `agents:publish`. See [Workspaces and roles](/concepts/workspaces-and-roles/). ### Create a client [Section titled “Create a client”](#create-a-client) * Console 1. Open **Settings**, then **API access**. 2. Click **Create client**, enter a **Client name**, and turn on the permissions it needs. 3. Click **Create key** and copy the key from **Copy your API key**. It is shown only once. * CLI Log in as yourself, select the workspace, then: 
+  ```sh
+  caplo workspace api-client create github-deploy \
+    --scope agents:write,agents:publish,tools:write,tools:publish
+  ```
+ The key is printed once on standard output, so you can pipe it straight into your CI’s secret store. Repeat `--scope` or separate scopes with commas. Store the key as a secret in your CI system right away. Caplo keeps only a hash of it and cannot show it again. ### Scopes [Section titled “Scopes”](#scopes) A write or publish scope includes the read scope of the same resource. | Scope | Console label | Allows | | ---------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------ | | `agents:read` | Read agents | Read agents, releases, eval suites and runs, and knowledge bases | | `agents:write` | Edit agents and knowledge | Create agents, save drafts and eval suites, create knowledge bases and upload documents | | `agents:publish` | Publish agents and knowledge | Run evals, publish and revoke agent releases, archive agents, approve documents and publish knowledge versions | | `tools:read` | Read tools | Read tool packages, builds, versions, logs, remote MCP servers and secret names | | `tools:write` | Edit tools | Create and upload packages, build them, run remote fixtures, archive and delete packages, review remote MCP server tools | | `tools:publish` | Publish tools | Publish and revoke package versions, publish remote MCP server tools, set a package’s own secret values | | `channels:read` | Read channels | Read channels and the release each serves | | `channels:write` | Deploy to channels | Point channels at a release and roll them back | The workspace also accepts `conversations:read`, `usage:read`, `endpoints:read` and `endpoints:write`, but no `caplo` command uses them. ### Use the key [Section titled “Use the key”](#use-the-key) Set two environment variables. The CLI then authenticates as the client for every command, instead of any login on the machine: 
+```sh
+export CAPLO_API_KEY=<API_KEY>
+export CAPLO_WORKSPACE=<WORKSPACE_ID>
+caplo auth status
+```
+ `CAPLO_WORKSPACE` (or `--workspace`, or a project [environment](/cli/environments/)) must name the client’s workspace by ID, not by name, because a key cannot list workspaces. The CLI checks that the key belongs to that workspace before it does anything else. `caplo workspace get` while logged in, or the console, shows the ID. The key calls `CAPLO_API_URL` if set, then the saved `api-url`, then `https://api.caplo.si`. ### What works with an API key [Section titled “What works with an API key”](#what-works-with-an-api-key) | Commands | Scopes needed | | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | | `caplo validate`, `caplo test`, `caplo identity` | None: they do not call the Caplo API | | `caplo diff`, `caplo pull`, `caplo agent list`, `get` and `pull` | `agents:read`, plus `tools:read` when packages are involved | | `caplo push`, `caplo agent push` | `agents:write`, plus `tools:write` when the project has packages | | `caplo eval`, `caplo agent eval run` | `agents:write` and `agents:publish`, plus `tools:write` with packages | | `caplo publish`, `caplo agent publish` | `agents:write` and `agents:publish`, plus `tools:write` and `tools:publish` with packages, plus `channels:write` when the environment deploys channels | | `caplo tool` list, push, build, publish and version commands, `caplo tool secret set` and `unset` | `tools:read`, `tools:write` or `tools:publish` | | `caplo mcp list`, `get`, `tools`, `review` and `publish` | `tools:read`, `tools:write` or `tools:publish` | | `caplo secret list` and `usage`, `caplo tool secret list` | `tools:read` | | `caplo knowledge` | `agents:read`; `agents:write` to create and sync; `agents:publish` to approve and publish | | `caplo channel list` and `get` | `channels:read` and `agents:read` | | `caplo channel deploy` and `rollback` | `channels:write` and `agents:read` | These need a person’s login and do not work with an API key: * `caplo workspace` commands, including `caplo workspace api-client`: an API client cannot manage workspaces or other clients. * `caplo secret set` and `delete`, and `caplo tool secret bind` and `unbind`: managing workspace secrets needs a member with the secrets permission. * `caplo mcp add`, `update`, `remove`, `check`, `connect` and `refresh`: connecting remote MCP servers needs a member who can manage integrations. * `caplo agent chat` and `caplo agent test`: test conversations belong to a person. If the API refuses a key, the CLI says that an API key cannot do this or that it was revoked. Check the scopes with `caplo auth status`. ### Rotate a key [Section titled “Rotate a key”](#rotate-a-key) Add a new key, switch your CI secret to it, then revoke the old ones: 
+```sh
+caplo workspace api-client rotate github-deploy
+caplo workspace api-client revoke github-deploy --except <NEW_KEY_ID_OR_PREFIX>
+```
+ `rotate` prints the new key once and leaves the old keys active, so nothing breaks while you update the secret. `caplo workspace api-client list` shows each client’s scopes and the prefixes of its active keys. In the console, use **Add rotation key** on the client. ### Revoke keys [Section titled “Revoke keys”](#revoke-keys) 
+```sh
+caplo workspace api-client revoke github-deploy
+caplo workspace api-client revoke github-deploy --key <KEY_ID_OR_PREFIX>
+```
+ Without `--key`, every active key of the client is revoked. The command asks first; pass `--yes` in scripts. Anything still using a revoked key stops working at once. A client’s scopes cannot be changed; to change them, create a new client and revoke the old one’s keys.
+
+# Publish from CI/CD
+
+> Run caplo in GitHub Actions or GitLab CI with an API key to validate and test every change and publish from your main branch.
+
+Keep your [project](/cli/projects/) in Git and let a pipeline publish it: every pull request is validated and its tool fixtures run, and every merge to `main` is evaluated and published. Nobody publishes from a laptop, and the release history matches your commit history. In CI there is nobody to log in, so the CLI authenticates with an **API key** instead. See [API keys for automation](/cli/authentication/#api-keys-for-automation) for how keys and scopes work. ## Set up the key [Section titled “Set up the key”](#set-up-the-key) 1. Log in as a workspace Owner or Admin, so you can grant agent scopes, and select the workspace you publish to. 2. Create an API client with the scopes a publish needs, and send its key straight into your repository’s secrets without printing it. With the [GitHub CLI](https://cli.github.com): 
+   ```sh
+   caplo workspace api-client create github-deploy \
+     --scope agents:write,agents:publish,tools:write,tools:publish \
+     | gh secret set CAPLO_API_KEY
+   ```
+ Add `channels:write` if an [environment](/cli/environments/#deploy-channels) deploys channels. Leave out the `tools` scopes if the project has no tool packages. 3. Store the workspace ID as `CAPLO_WORKSPACE`. It is not secret, but keeping it next to the key keeps them in step: 
+   ```sh
+   caplo workspace get -o json
+   gh secret set CAPLO_WORKSPACE --body <WORKSPACE_ID>
+   ```
+ With an API key, the workspace must be given by ID, never by name. ## GitHub Actions [Section titled “GitHub Actions”](#github-actions) Save this as `.github/workflows/caplo.yml`. It pins the CLI version, so a new CLI release never changes your pipeline until you update the pin. 
+```yaml
+name: Caplo
+
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+
+permissions:
+  contents: read
+
+
+env:
+  CAPLO_VERSION: v0.4.0
+
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install the Caplo CLI
+        run: |
+          curl -fsSL "https://raw.githubusercontent.com/getcaplo/homebrew-tap/$CAPLO_VERSION/install.sh" | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Install tool package dependencies
+        run: |
+          for dir in tools/*/; do
+            if [ -f "$dir/package.json" ]; then npm ci --prefix "$dir"; fi
+          done
+      - run: caplo validate
+      - run: caplo test
+
+
+  publish:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: check
+    runs-on: ubuntu-latest
+    concurrency: caplo-publish
+    env:
+      CAPLO_API_KEY: ${{ secrets.CAPLO_API_KEY }}
+      CAPLO_WORKSPACE: ${{ secrets.CAPLO_WORKSPACE }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install the Caplo CLI
+        run: |
+          curl -fsSL "https://raw.githubusercontent.com/getcaplo/homebrew-tap/$CAPLO_VERSION/install.sh" | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - run: caplo auth status
+      - run: caplo eval
+      - run: caplo publish --yes
+```
+ What each part does: * **`check`** runs on every pull request and push. `caplo validate` and `caplo test` need no key and call no workspace, so they also run for pull requests from forks. `npm ci` needs each package’s `package-lock.json` committed. * **`publish`** runs only on pushes to `main`. `caplo auth status` prints the API client and its scopes, which makes a wrong key easy to spot in the log. `caplo eval` pushes the drafts and runs every agent’s eval cases, so a failing case stops the job before anything is published. `caplo publish --yes` then publishes bottom up, reusing a passing eval run wherever the draft has not changed since. * **`--yes`** is required: without a terminal, a publish that would ask for confirmation stops with exit code 2. It also covers the project’s first publish to the workspace. * **`concurrency`** stops two publishes from running against the same workspace at once. The install script checks the archive’s SHA-256 checksum before installing. To also gate publishing on a reviewer, put the `publish` job in a [GitHub environment](https://docs.github.com/actions/deployment/targeting-different-environments/using-environments-for-deployment) with required reviewers. Caution Do not run `caplo push`, `caplo eval` or `caplo publish` on pull requests against the workspace that serves customers. `push` and `eval` overwrite the workspace drafts with the pull request’s files, and two open pull requests would overwrite each other. Use a separate staging workspace for that, or limit pull requests to `caplo validate`, `caplo test` and `caplo diff`. ### Show the plan on pull requests [Section titled “Show the plan on pull requests”](#show-the-plan-on-pull-requests) To see what a merge would change, add a step to `check` with a key that has only `agents:read` and `tools:read`: 
+```yaml
+      - run: caplo diff
+        env:
+          CAPLO_API_KEY: ${{ secrets.CAPLO_READ_KEY }}
+          CAPLO_WORKSPACE: ${{ secrets.CAPLO_WORKSPACE }}
+```
+ `caplo diff -o json` prints the same plan as one JSON document, to post as a comment or check with a policy; see [Plans as JSON](/cli/scripting/#plans-as-json). ### Staging and production [Section titled “Staging and production”](#staging-and-production) With [environments](/cli/environments/) in `caplo.yaml`, give each its own API client and secret, and select the environment per job: 
+```yaml
+      - run: caplo publish --env staging --yes
+        env:
+          CAPLO_STAGING_KEY: ${{ secrets.CAPLO_STAGING_KEY }}
+```
+ For production, run a separate job, for example on `workflow_dispatch` or a tag, that sets both keys. With `promoteFrom: staging`, the CLI reads staging with `CAPLO_STAGING_KEY` and refuses any agent staging has not released from the same source: 
+```yaml
+      - run: caplo publish --env prod --yes
+        env:
+          CAPLO_PROD_KEY: ${{ secrets.CAPLO_PROD_KEY }}
+          CAPLO_STAGING_KEY: ${{ secrets.CAPLO_STAGING_KEY }}
+```
+ Do not also set `CAPLO_WORKSPACE` in these jobs unless it matches the environment’s `workspace` exactly; a different value stops the command with exit code 2. AI prompt Publish my Caplo project from GitHub Actions Adds a GitHub Actions workflow that validates and tests every change and publishes the Caplo project from main with an API key. Copy prompt[Open in Claude](https://claude.ai/new?q=Goal%3A%20add%20a%20GitHub%20Actions%20workflow%20to%20this%20repository%20that%20runs%20%60caplo%20validate%60%20and%20%60caplo%20test%60%20on%20every%20pull%20request%20and%20push%2C%20and%20runs%20%60caplo%20eval%60%20and%20%60caplo%20publish%20--yes%60%20on%20pushes%20to%20%60main%60%2C%20authenticated%20with%20a%20Caplo%20API%20key.%0A%0ARead%20these%20pages%20first%3A%0A-%20https%3A%2F%2Fdocs.caplo.si%2Fcli%2Fci-cd.md%0A-%20https%3A%2F%2Fdocs.caplo.si%2Fcli%2Fauthentication.md%0A-%20https%3A%2F%2Fdocs.caplo.si%2Fcli%2Fprojects.md%0A-%20https%3A%2F%2Fdocs.caplo.si%2Fcli%2Fscripting.md%0A%0ASteps%3A%0A1.%20Find%20the%20Caplo%20project%3A%20the%20%60caplo.yaml%60%20with%20%60kind%3A%20Project%60.%20If%20it%20is%20not%20at%20the%20repository%20root%2C%20run%20every%20%60caplo%60%20command%20in%20the%20workflow%20with%20%60-C%20%3CPROJECT_DIR%3E%60%20and%20adjust%20the%20%60tools%2F*%2F%60%20path.%20Read%20its%20%60tools%60%20glob%20and%20%60environments%60%2C%20if%20any.%0A2.%20Run%20%60caplo%20validate%60%20locally%20and%20fix%20any%20problem%20it%20reports%20before%20you%20write%20the%20workflow.%20Do%20not%20change%20agent%20behavior%20to%20make%20it%20pass%20without%20asking%20me.%0A3.%20Check%20that%20every%20tool%20package%20directory%20has%20a%20committed%20%60package-lock.json%60.%20If%20one%20is%20missing%2C%20run%20%60npm%20install%60%20in%20that%20package%20and%20include%20the%20lock%20file%20in%20your%20change.%0A4.%20Create%20%60.github%2Fworkflows%2Fcaplo.yml%60%20from%20the%20GitHub%20Actions%20example%20on%20the%20CI%2FCD%20page%3A%0A%20%20%20-%20pin%20the%20CLI%20with%20%60CAPLO_VERSION%3A%20%3CCLI_VERSION%3E%60%20and%20install%20it%20with%20the%20install%20script%20from%20that%20version's%20tag%3B%0A%20%20%20-%20a%20%60check%60%20job%20with%20Node.js%2024%20that%20installs%20package%20dependencies%20with%20%60npm%20ci%60%20and%20runs%20%60caplo%20validate%60%20and%20%60caplo%20test%60%3B%0A%20%20%20-%20a%20%60publish%60%20job%20that%20runs%20only%20on%20pushes%20to%20%60main%60%2C%20needs%20%60check%60%2C%20uses%20%60concurrency%3A%20caplo-publish%60%2C%20sets%20%60CAPLO_API_KEY%60%20and%20%60CAPLO_WORKSPACE%60%20from%20repository%20secrets%2C%20and%20runs%20%60caplo%20auth%20status%60%2C%20%60caplo%20eval%60%20and%20%60caplo%20publish%20--yes%60.%0A%20%20%20If%20%60caplo.yaml%60%20defines%20environments%2C%20use%20%60caplo%20publish%20--env%20%3CENVIRONMENT%3E%20--yes%60%20and%20that%20environment's%20%60apiKeyEnv%60%20secret%20instead%2C%20as%20the%20page%20describes.%0A5.%20Do%20not%20run%20%60caplo%20push%60%2C%20%60caplo%20eval%60%20or%20%60caplo%20publish%60%20on%20pull%20requests.%0A6.%20Tell%20me%20the%20commands%20to%20create%20the%20API%20client%20and%20store%20the%20secrets%20myself%2C%20with%20the%20scopes%20the%20project%20needs%20\(%60agents%3Awrite%60%2C%20%60agents%3Apublish%60%2C%20plus%20%60tools%3Awrite%60%20and%20%60tools%3Apublish%60%20if%20it%20has%20tool%20packages%2C%20plus%20%60channels%3Awrite%60%20if%20an%20environment%20lists%20channels\)%3A%0A%20%20%20%60caplo%20workspace%20api-client%20create%20%3CCLIENT_NAME%3E%20--scope%20%3CSCOPES%3E%20%7C%20gh%20secret%20set%20CAPLO_API_KEY%60%0A%20%20%20and%20%60gh%20secret%20set%20CAPLO_WORKSPACE%20--body%20%3CWORKSPACE_ID%3E%60.%0A%0AVerify%3A%0A-%20%60caplo%20validate%60%20and%20%60caplo%20test%60%20pass%20locally.%0A-%20The%20workflow%20file%20is%20valid%20YAML%20and%20every%20%60caplo%60%20command%20and%20flag%20in%20it%20appears%20in%20https%3A%2F%2Fdocs.caplo.si%2Freference%2Fcli%2Fproject.md.%0A-%20Open%20a%20pull%20request%20so%20the%20%60check%60%20job%20runs%2C%20and%20report%20its%20result.%0A%0ARules%3A%0A-%20Never%20create%2C%20print%2C%20paste%20or%20commit%20an%20API%20key%2C%20and%20never%20put%20one%20in%20the%20workflow%20file.%20Keys%20go%20only%20into%20GitHub%20secrets%2C%20and%20I%20create%20them.%0A-%20Do%20not%20run%20%60caplo%20push%60%2C%20%60caplo%20eval%60%20or%20%60caplo%20publish%60%20yourself%2C%20and%20do%20not%20merge%20to%20%60main%60%2C%20without%20asking%20me%20first%3A%20on%20%60main%60%20the%20workflow%20publishes%20to%20the%20workspace%20customers%20use.%0A-%20Do%20not%20edit%20agent%20files%20or%20tool%20code%20beyond%20what%20validation%20requires%2C%20and%20ask%20before%20any%20such%20change.)[Open in ChatGPT](https://chatgpt.com/?q=Goal%3A%20add%20a%20GitHub%20Actions%20workflow%20to%20this%20repository%20that%20runs%20%60caplo%20validate%60%20and%20%60caplo%20test%60%20on%20every%20pull%20request%20and%20push%2C%20and%20runs%20%60caplo%20eval%60%20and%20%60caplo%20publish%20--yes%60%20on%20pushes%20to%20%60main%60%2C%20authenticated%20with%20a%20Caplo%20API%20key.%0A%0ARead%20these%20pages%20first%3A%0A-%20https%3A%2F%2Fdocs.caplo.si%2Fcli%2Fci-cd.md%0A-%20https%3A%2F%2Fdocs.caplo.si%2Fcli%2Fauthentication.md%0A-%20https%3A%2F%2Fdocs.caplo.si%2Fcli%2Fprojects.md%0A-%20https%3A%2F%2Fdocs.caplo.si%2Fcli%2Fscripting.md%0A%0ASteps%3A%0A1.%20Find%20the%20Caplo%20project%3A%20the%20%60caplo.yaml%60%20with%20%60kind%3A%20Project%60.%20If%20it%20is%20not%20at%20the%20repository%20root%2C%20run%20every%20%60caplo%60%20command%20in%20the%20workflow%20with%20%60-C%20%3CPROJECT_DIR%3E%60%20and%20adjust%20the%20%60tools%2F*%2F%60%20path.%20Read%20its%20%60tools%60%20glob%20and%20%60environments%60%2C%20if%20any.%0A2.%20Run%20%60caplo%20validate%60%20locally%20and%20fix%20any%20problem%20it%20reports%20before%20you%20write%20the%20workflow.%20Do%20not%20change%20agent%20behavior%20to%20make%20it%20pass%20without%20asking%20me.%0A3.%20Check%20that%20every%20tool%20package%20directory%20has%20a%20committed%20%60package-lock.json%60.%20If%20one%20is%20missing%2C%20run%20%60npm%20install%60%20in%20that%20package%20and%20include%20the%20lock%20file%20in%20your%20change.%0A4.%20Create%20%60.github%2Fworkflows%2Fcaplo.yml%60%20from%20the%20GitHub%20Actions%20example%20on%20the%20CI%2FCD%20page%3A%0A%20%20%20-%20pin%20the%20CLI%20with%20%60CAPLO_VERSION%3A%20%3CCLI_VERSION%3E%60%20and%20install%20it%20with%20the%20install%20script%20from%20that%20version's%20tag%3B%0A%20%20%20-%20a%20%60check%60%20job%20with%20Node.js%2024%20that%20installs%20package%20dependencies%20with%20%60npm%20ci%60%20and%20runs%20%60caplo%20validate%60%20and%20%60caplo%20test%60%3B%0A%20%20%20-%20a%20%60publish%60%20job%20that%20runs%20only%20on%20pushes%20to%20%60main%60%2C%20needs%20%60check%60%2C%20uses%20%60concurrency%3A%20caplo-publish%60%2C%20sets%20%60CAPLO_API_KEY%60%20and%20%60CAPLO_WORKSPACE%60%20from%20repository%20secrets%2C%20and%20runs%20%60caplo%20auth%20status%60%2C%20%60caplo%20eval%60%20and%20%60caplo%20publish%20--yes%60.%0A%20%20%20If%20%60caplo.yaml%60%20defines%20environments%2C%20use%20%60caplo%20publish%20--env%20%3CENVIRONMENT%3E%20--yes%60%20and%20that%20environment's%20%60apiKeyEnv%60%20secret%20instead%2C%20as%20the%20page%20describes.%0A5.%20Do%20not%20run%20%60caplo%20push%60%2C%20%60caplo%20eval%60%20or%20%60caplo%20publish%60%20on%20pull%20requests.%0A6.%20Tell%20me%20the%20commands%20to%20create%20the%20API%20client%20and%20store%20the%20secrets%20myself%2C%20with%20the%20scopes%20the%20project%20needs%20\(%60agents%3Awrite%60%2C%20%60agents%3Apublish%60%2C%20plus%20%60tools%3Awrite%60%20and%20%60tools%3Apublish%60%20if%20it%20has%20tool%20packages%2C%20plus%20%60channels%3Awrite%60%20if%20an%20environment%20lists%20channels\)%3A%0A%20%20%20%60caplo%20workspace%20api-client%20create%20%3CCLIENT_NAME%3E%20--scope%20%3CSCOPES%3E%20%7C%20gh%20secret%20set%20CAPLO_API_KEY%60%0A%20%20%20and%20%60gh%20secret%20set%20CAPLO_WORKSPACE%20--body%20%3CWORKSPACE_ID%3E%60.%0A%0AVerify%3A%0A-%20%60caplo%20validate%60%20and%20%60caplo%20test%60%20pass%20locally.%0A-%20The%20workflow%20file%20is%20valid%20YAML%20and%20every%20%60caplo%60%20command%20and%20flag%20in%20it%20appears%20in%20https%3A%2F%2Fdocs.caplo.si%2Freference%2Fcli%2Fproject.md.%0A-%20Open%20a%20pull%20request%20so%20the%20%60check%60%20job%20runs%2C%20and%20report%20its%20result.%0A%0ARules%3A%0A-%20Never%20create%2C%20print%2C%20paste%20or%20commit%20an%20API%20key%2C%20and%20never%20put%20one%20in%20the%20workflow%20file.%20Keys%20go%20only%20into%20GitHub%20secrets%2C%20and%20I%20create%20them.%0A-%20Do%20not%20run%20%60caplo%20push%60%2C%20%60caplo%20eval%60%20or%20%60caplo%20publish%60%20yourself%2C%20and%20do%20not%20merge%20to%20%60main%60%2C%20without%20asking%20me%20first%3A%20on%20%60main%60%20the%20workflow%20publishes%20to%20the%20workspace%20customers%20use.%0A-%20Do%20not%20edit%20agent%20files%20or%20tool%20code%20beyond%20what%20validation%20requires%2C%20and%20ask%20before%20any%20such%20change.) ## GitLab CI [Section titled “GitLab CI”](#gitlab-ci) Add `CAPLO_API_KEY` and `CAPLO_WORKSPACE` under **Settings**, **CI/CD**, **Variables** in GitLab, masked and protected so only protected branches can read them. Then in `.gitlab-ci.yml`: 
+```yaml
+stages: [check, publish]
+
+
+variables:
+  CAPLO_VERSION: v0.4.0
+
+
+default:
+  image: node:24
+  before_script:
+    - curl -fsSL "https://raw.githubusercontent.com/getcaplo/homebrew-tap/$CAPLO_VERSION/install.sh" | sh
+    - export PATH="$HOME/.local/bin:$PATH"
+
+
+check:
+  stage: check
+  script:
+    - for dir in tools/*/; do if [ -f "$dir/package.json" ]; then npm ci --prefix "$dir"; fi; done
+    - caplo validate
+    - caplo test
+
+
+publish:
+  stage: publish
+  resource_group: caplo-publish
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - caplo eval
+    - caplo publish --yes
+```
+ ## Exit codes [Section titled “Exit codes”](#exit-codes) Pipelines stop on any non-zero exit code. The code tells you where to look: | Code | Meaning in CI | Typical fix | | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | | `0` | Success, including nothing to publish | | | `1` | An error, such as a refused API key, a missing scope, a network failure or a failed build | Read the error line; check scopes with `caplo auth status` | | `2` | A usage error: a missing `--yes`, a workspace given by name with an API key, `--workspace` disagreeing with `--env`, or `channels:write` missing for a channel deploy | Fix the command or the variables | | `3` | A failed gate: validation, tool fixtures, eval cases, or a promotion with no matching release | Fix the files, or publish to the `promoteFrom` environment first | | `130`, `143` | The job was cancelled | Rerun it | A publish that fails partway keeps what it already published, such as tool versions or child agent releases. Fix the cause and run it again; unchanged resources are skipped. See [Scripting](/cli/scripting/) for output formats and environment variables.
+
+# Publish to several environments
+
+> Define staging and production environments in caplo.yaml, vary agent settings per environment, deploy channels, and promote only what passed the previous environment.
+
+An environment is a named workspace that a project publishes to, such as `staging` or `prod`. Keep one workspace per environment so that testing never touches what customers use. With environments, one set of agent files publishes to every workspace, with small per-environment differences, and production can be limited to exactly what staging released. ## Define environments [Section titled “Define environments”](#define-environments) Add an `environments` map to the project’s `caplo.yaml`: 
+```yaml
+apiVersion: v1
+kind: Project
+name: shop
+agents: agents/*.yaml
+tools: tools/*
+environments:
+  staging:
+    workspace: <STAGING_WORKSPACE_ID>
+    apiKeyEnv: CAPLO_STAGING_KEY
+    channels:
+      concierge: [Staging website]
+  prod:
+    workspace: <PROD_WORKSPACE_ID>
+    apiKeyEnv: CAPLO_PROD_KEY
+    promoteFrom: staging
+    agents:
+      concierge:
+        model: {temperature: 0.2}
+        suggestedReplies: null
+    channels:
+      concierge: [Website, twilio/Support line]
+```
+ | Field | Required | Description | | ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | | `workspace` | Yes | The workspace ID. A workspace name also works when you are logged in, but an [API key](/cli/authentication/#api-keys-for-automation) needs the ID. | | `apiKeyEnv` | No | The name of an environment variable that holds this environment’s API key, such as `CAPLO_PROD_KEY`. When that variable is set, the CLI uses it instead of `CAPLO_API_KEY`. | | `promoteFrom` | No | Another environment. A publish here only goes ahead for agents that environment already released from the same source. See [Promote a release](#promote-a-release). | | `agents` | No | Agent fields by agent file key, merged over the agent files. See [Vary agents per environment](#vary-agents-per-environment). | | `channels` | No | Channels by agent file key. After a publish, each listed channel is pointed at the agent’s newest release. See [Deploy channels](#deploy-channels). | Environment names start with a lowercase letter and use only lowercase letters, digits and hyphens. `promoteFrom` must name another environment and must not loop back. ## Use an environment [Section titled “Use an environment”](#use-an-environment) Pass `--env` (`-e`), or set `CAPLO_ENV`, on `caplo validate`, `diff`, `push`, `eval` and `publish`: 
+```sh
+caplo diff --env staging
+caplo publish --env prod
+```
+ Selecting an environment does three things: 1. **Workspace.** The command acts on the environment’s workspace. If `--workspace` or `CAPLO_WORKSPACE` names a different one, the command stops with exit code 2 instead of guessing. 2. **Credentials.** If the environment’s `apiKeyEnv` variable is set, the command authenticates with that key. Otherwise it uses `CAPLO_API_KEY` if set, and your login if not. 3. **Agent fields.** The environment’s `agents` fields are merged over the agent files before anything is compared or pushed. Without `--env` or `CAPLO_ENV`, project commands act on the [selected workspace](/cli/workspaces/) and use the agent files unchanged. ## Vary agents per environment [Section titled “Vary agents per environment”](#vary-agents-per-environment) Under `agents`, each key is an agent file key and each value is a partial agent file. It merges over the file like a JSON merge patch: * Mappings merge key by key, so `model: {temperature: 0.2}` changes only the temperature and keeps the model name. * `null` removes a field, so `suggestedReplies: null` turns suggested replies off in that environment. * Any other value, including a list, replaces the field entirely. Use this for settings that should really differ, such as model, temperature, greeting or limits. Knowledge base and remote MCP server names already resolve in each command’s own workspace, so you rarely need to override them. `caplo validate` checks every environment’s fields merged over each file, whether or not you pass `--env`. With `--env`, it also checks the agents exactly as that environment publishes them. ## Deploy channels [Section titled “Deploy channels”](#deploy-channels) An environment’s `channels` lists, for each agent key, the channels that should serve that agent: 
+```yaml
+channels:
+  concierge: [Website, twilio/Support line, <CHANNEL_ID>]
+```
+ Name a channel by its name, by its ID, or as `<kind>/<name>` when two channels share a name. Kinds are `website`, `whatsapp`, `messenger`, `instagram`, `twilio` and `telnyx`; `caplo channel list` shows yours. After `caplo publish --env <name>` publishes, it points each listed channel at its agent’s newest release, if the channel does not serve it already. That happens even when this publish made no new release. The plan lists each channel as `channel/<kind>/<name>` with a `deploy` step, and the publish confirmation covers it. New conversations get the new release; conversations already open keep theirs. Every other channel setting stays as it is. The agent must have a release in that workspace. With an API key, deploying channels needs the `channels:write` scope. The CLI checks this before it starts, so a missing scope stops the publish with exit code 2 before anything changes. ## Promote a release [Section titled “Promote a release”](#promote-a-release) `promoteFrom` makes an environment accept only what the previous one released. Each release the CLI publishes from a project records a **source digest** of the agent: * its agent file as written, byte for byte, before any environment’s fields apply * the files of the project packages it uses, as `caplo push` uploads them * the source of its project sub-agents, in the same way `caplo.yaml` and environment fields are not part of the digest, so production can use different settings and still match staging. Any edit to the agent file, a package it uses, or a project sub-agent, even a comment, changes the digest. When you publish to an environment with `promoteFrom`, every agent the publish would release must have a release in the `promoteFrom` environment with the same digest that is not revoked. The plan prints the matching release for each agent. If one is missing, the publish stops with exit code 3 before changing anything, naming the agents that need publishing there first. 1. Publish to staging and test there: 
+   ```sh
+   caplo publish --env staging
+   ```
+ 2. When staging is good, publish the same commit to production: 
+   ```sh
+   caplo publish --env prod
+   ```
+ The plan shows lines such as `agent/concierge matches staging release 1.3.0`. Confirm to publish. 3. If you changed anything in between, publish to staging again first. Production refuses a source staging has not released. To read the `promoteFrom` environment, the CLI uses that environment’s own `apiKeyEnv` key when its variable is set, and otherwise your login. A key for one workspace cannot read another, so when you publish with an API key, the `promoteFrom` environment needs `apiKeyEnv` and that variable must hold a key of its workspace with at least `agents:read`: 
+```sh
+CAPLO_STAGING_KEY=<STAGING_KEY> CAPLO_PROD_KEY=<PROD_KEY> caplo publish --env prod --yes
+```
+ Caution Releases are numbered per workspace, so the same source can be 1.3.0 in staging and 2.1.0 in production. Compare environments by source digest, which the plan prints, not by version number. AI prompt Add staging and production environments to my Caplo project Adds staging and prod environments to caplo.yaml so production only publishes what staging released from the same source. Copy prompt[Open in Claude](https://claude.ai/new?q=Goal%3A%20add%20%60staging%60%20and%20%60prod%60%20environments%20to%20this%20repository's%20Caplo%20project%2C%20so%20%60caplo%20publish%20--env%20staging%60%20publishes%20to%20the%20staging%20workspace%20and%20%60caplo%20publish%20--env%20prod%60%20publishes%20only%20agents%20that%20staging%20already%20released%20from%20the%20same%20source.%0A%0ARead%20these%20pages%20first%3A%0A-%20https%3A%2F%2Fdocs.caplo.si%2Fcli%2Fenvironments.md%0A-%20https%3A%2F%2Fdocs.caplo.si%2Fcli%2Fprojects.md%0A-%20https%3A%2F%2Fdocs.caplo.si%2Fcli%2Fauthentication.md%0A%0AInputs%20I%20will%20give%20you%3A%0A-%20%60%3CSTAGING_WORKSPACE_ID%3E%60%20and%20%60%3CPROD_WORKSPACE_ID%3E%60%3A%20the%20workspace%20IDs%20\(from%20%60caplo%20workspace%20list%60\).%0A-%20Which%20settings%2C%20if%20any%2C%20should%20differ%20in%20production%2C%20and%20which%20channels%20each%20environment%20should%20deploy.%0A%0ASteps%3A%0A1.%20Find%20the%20project's%20%60caplo.yaml%60%20\(the%20one%20with%20%60kind%3A%20Project%60\)%20and%20read%20its%20agent%20files.%20Note%20each%20agent's%20file%20key%20\(its%20file%20name%20without%20%60.yaml%60\).%0A2.%20Add%20an%20%60environments%60%20map%3A%0A%20%20%20-%20%60staging%60%20with%20%60workspace%3A%20%3CSTAGING_WORKSPACE_ID%3E%60%20and%20%60apiKeyEnv%3A%20CAPLO_STAGING_KEY%60%3B%0A%20%20%20-%20%60prod%60%20with%20%60workspace%3A%20%3CPROD_WORKSPACE_ID%3E%60%2C%20%60apiKeyEnv%3A%20CAPLO_PROD_KEY%60%20and%20%60promoteFrom%3A%20staging%60.%0A3.%20Only%20if%20I%20asked%20for%20different%20settings%2C%20add%20them%20under%20%60prod.agents.%3CAGENT_KEY%3E%60%20as%20partial%20agent%20fields.%20Mappings%20merge%2C%20%60null%60%20removes%20a%20field%2C%20and%20anything%20else%20replaces%20it.%20Do%20not%20copy%20whole%20agent%20files%20into%20%60caplo.yaml%60.%0A4.%20Only%20if%20I%20named%20channels%2C%20add%20them%20under%20%60%3CENVIRONMENT%3E.channels.%3CAGENT_KEY%3E%60%20as%20a%20list%20of%20channel%20names%2C%20IDs%20or%20%60%3Ckind%3E%2F%3Cname%3E%60.%0A5.%20Run%20%60caplo%20validate%60%2C%20which%20checks%20every%20environment%2C%20and%20%60caplo%20validate%20--env%20prod%60.%20Fix%20what%20they%20report.%0A6.%20If%20the%20repository%20has%20a%20CI%20workflow%20that%20runs%20%60caplo%20publish%60%2C%20show%20me%20how%20to%20change%20it%20to%20%60caplo%20publish%20--env%20staging%20--yes%60%20with%20%60CAPLO_STAGING_KEY%60%2C%20and%20a%20separate%20production%20job%20with%20both%20%60CAPLO_STAGING_KEY%60%20and%20%60CAPLO_PROD_KEY%60%2C%20but%20do%20not%20change%20it%20without%20asking.%20Remove%20%60CAPLO_WORKSPACE%60%20from%20jobs%20that%20use%20%60--env%60.%0A%0AVerify%3A%0A-%20%60caplo%20validate%60%20and%20%60caplo%20validate%20--env%20prod%60%20exit%200.%0A-%20If%20I%20am%20logged%20in%2C%20%60caplo%20diff%20--env%20staging%60%20and%20%60caplo%20diff%20--env%20prod%60%20show%20the%20plan%20for%20each%20workspace%20without%20changing%20anything.%0A%0ARules%3A%0A-%20Never%20write%20API%20keys%20into%20%60caplo.yaml%60%20or%20any%20file.%20%60apiKeyEnv%60%20holds%20only%20the%20name%20of%20an%20environment%20variable.%0A-%20Do%20not%20run%20%60caplo%20push%60%2C%20%60caplo%20eval%60%20or%20%60caplo%20publish%60%20for%20any%20environment%20without%20asking%20me%20first.%0A-%20Use%20workspace%20IDs%2C%20not%20names%2C%20so%20the%20file%20also%20works%20with%20API%20keys%20in%20CI.)[Open in ChatGPT](https://chatgpt.com/?q=Goal%3A%20add%20%60staging%60%20and%20%60prod%60%20environments%20to%20this%20repository's%20Caplo%20project%2C%20so%20%60caplo%20publish%20--env%20staging%60%20publishes%20to%20the%20staging%20workspace%20and%20%60caplo%20publish%20--env%20prod%60%20publishes%20only%20agents%20that%20staging%20already%20released%20from%20the%20same%20source.%0A%0ARead%20these%20pages%20first%3A%0A-%20https%3A%2F%2Fdocs.caplo.si%2Fcli%2Fenvironments.md%0A-%20https%3A%2F%2Fdocs.caplo.si%2Fcli%2Fprojects.md%0A-%20https%3A%2F%2Fdocs.caplo.si%2Fcli%2Fauthentication.md%0A%0AInputs%20I%20will%20give%20you%3A%0A-%20%60%3CSTAGING_WORKSPACE_ID%3E%60%20and%20%60%3CPROD_WORKSPACE_ID%3E%60%3A%20the%20workspace%20IDs%20\(from%20%60caplo%20workspace%20list%60\).%0A-%20Which%20settings%2C%20if%20any%2C%20should%20differ%20in%20production%2C%20and%20which%20channels%20each%20environment%20should%20deploy.%0A%0ASteps%3A%0A1.%20Find%20the%20project's%20%60caplo.yaml%60%20\(the%20one%20with%20%60kind%3A%20Project%60\)%20and%20read%20its%20agent%20files.%20Note%20each%20agent's%20file%20key%20\(its%20file%20name%20without%20%60.yaml%60\).%0A2.%20Add%20an%20%60environments%60%20map%3A%0A%20%20%20-%20%60staging%60%20with%20%60workspace%3A%20%3CSTAGING_WORKSPACE_ID%3E%60%20and%20%60apiKeyEnv%3A%20CAPLO_STAGING_KEY%60%3B%0A%20%20%20-%20%60prod%60%20with%20%60workspace%3A%20%3CPROD_WORKSPACE_ID%3E%60%2C%20%60apiKeyEnv%3A%20CAPLO_PROD_KEY%60%20and%20%60promoteFrom%3A%20staging%60.%0A3.%20Only%20if%20I%20asked%20for%20different%20settings%2C%20add%20them%20under%20%60prod.agents.%3CAGENT_KEY%3E%60%20as%20partial%20agent%20fields.%20Mappings%20merge%2C%20%60null%60%20removes%20a%20field%2C%20and%20anything%20else%20replaces%20it.%20Do%20not%20copy%20whole%20agent%20files%20into%20%60caplo.yaml%60.%0A4.%20Only%20if%20I%20named%20channels%2C%20add%20them%20under%20%60%3CENVIRONMENT%3E.channels.%3CAGENT_KEY%3E%60%20as%20a%20list%20of%20channel%20names%2C%20IDs%20or%20%60%3Ckind%3E%2F%3Cname%3E%60.%0A5.%20Run%20%60caplo%20validate%60%2C%20which%20checks%20every%20environment%2C%20and%20%60caplo%20validate%20--env%20prod%60.%20Fix%20what%20they%20report.%0A6.%20If%20the%20repository%20has%20a%20CI%20workflow%20that%20runs%20%60caplo%20publish%60%2C%20show%20me%20how%20to%20change%20it%20to%20%60caplo%20publish%20--env%20staging%20--yes%60%20with%20%60CAPLO_STAGING_KEY%60%2C%20and%20a%20separate%20production%20job%20with%20both%20%60CAPLO_STAGING_KEY%60%20and%20%60CAPLO_PROD_KEY%60%2C%20but%20do%20not%20change%20it%20without%20asking.%20Remove%20%60CAPLO_WORKSPACE%60%20from%20jobs%20that%20use%20%60--env%60.%0A%0AVerify%3A%0A-%20%60caplo%20validate%60%20and%20%60caplo%20validate%20--env%20prod%60%20exit%200.%0A-%20If%20I%20am%20logged%20in%2C%20%60caplo%20diff%20--env%20staging%60%20and%20%60caplo%20diff%20--env%20prod%60%20show%20the%20plan%20for%20each%20workspace%20without%20changing%20anything.%0A%0ARules%3A%0A-%20Never%20write%20API%20keys%20into%20%60caplo.yaml%60%20or%20any%20file.%20%60apiKeyEnv%60%20holds%20only%20the%20name%20of%20an%20environment%20variable.%0A-%20Do%20not%20run%20%60caplo%20push%60%2C%20%60caplo%20eval%60%20or%20%60caplo%20publish%60%20for%20any%20environment%20without%20asking%20me%20first.%0A-%20Use%20workspace%20IDs%2C%20not%20names%2C%20so%20the%20file%20also%20works%20with%20API%20keys%20in%20CI.) ## Credentials per environment [Section titled “Credentials per environment”](#credentials-per-environment) | How you run | Workspace field | Keys | | ------------------------------------ | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | | Logged in as yourself | ID or name; you must be a member of every environment’s workspace | None needed | | One API key, one environment per job | ID | `CAPLO_API_KEY`, or the environment’s `apiKeyEnv` variable | | API keys, with `promoteFrom` | ID | The target’s key in `CAPLO_API_KEY` or its `apiKeyEnv` variable, and the `promoteFrom` environment’s key in its `apiKeyEnv` variable | Each key belongs to one workspace, so create one API client per environment workspace. See [Run the CLI in CI/CD](/cli/ci-cd/) for a complete pipeline.
+
+# Install the CLI
+
+> Install the caplo command-line tool on macOS, Linux or Windows, check the download, and keep it up to date.
+
+The `caplo` CLI is a single binary for macOS, Linux and Windows on ARM64 (Apple silicon, Graviton) and AMD64 (Intel, AMD). Every release is published on the [Caplo releases page](https://github.com/getcaplo/homebrew-tap/releases) with a checksum file and a signature. Running tool package fixtures on your machine (`caplo test` and `caplo tool test`) also needs Node.js 24 and the package’s dependencies installed. On Windows those commands run under WSL; everything else works natively. ## Install [Section titled “Install”](#install) * macOS With [Homebrew](https://brew.sh): 
+  ```sh
+  brew install getcaplo/tap/caplo
+  ```
+ Or with the install script, which needs no Homebrew and no `sudo`: 
+  ```sh
+  curl -fsSL https://cli.caplo.si/install.sh | sh
+  export PATH="$HOME/.local/bin:$PATH"
+  ```
+ Add the `export` line to your shell profile (for example `~/.zshrc`) so `caplo` stays on your `PATH` in new terminals. * Linux With [Homebrew](https://brew.sh): 
+  ```sh
+  brew install getcaplo/tap/caplo
+  ```
+ Or with the install script. It needs `curl`, `tar` and `sha256sum`; on Ubuntu or Debian install them first with `sudo apt-get install curl ca-certificates tar coreutils`. 
+  ```sh
+  curl -fsSL https://cli.caplo.si/install.sh | sh
+  export PATH="$HOME/.local/bin:$PATH"
+  ```
+ Add the `export` line to your shell profile (for example `~/.bashrc`) so `caplo` stays on your `PATH` in new terminals. * Windows Windows has no installer. Download the archive and put `caplo.exe` on your `PATH`. 1. Open the [releases page](https://github.com/getcaplo/homebrew-tap/releases) and download `caplo_<VERSION>_windows_amd64.zip` (or `windows_arm64` on an ARM device) and `checksums.txt` from the latest release. 2. [Check the archive](#verify-a-download) against `checksums.txt`. 3. Extract `caplo.exe` to a folder of your own and add that folder to your user `PATH`. In PowerShell, from the download folder: 
+     ```powershell
+     $dir = "$env:LOCALAPPDATA\Programs\caplo"
+     Expand-Archive .\caplo_<VERSION>_windows_amd64.zip -DestinationPath $dir
+     $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+     [Environment]::SetEnvironmentVariable("Path", "$userPath;$dir", "User")
+     ```
+ 4. Open a new terminal so it picks up the new `PATH`. Use one installation method. If you install with both Homebrew and the script, two copies end up on your `PATH` and the one that runs depends on its order. ## Check the installation [Section titled “Check the installation”](#check-the-installation) 
+```sh
+caplo version
+```
+ It prints the CLI version, the commit it was built from, and the Go version and platform. `caplo --version` prints the version alone, and `caplo version -o json` prints the same details as JSON. Next, [log in](/cli/authentication/). ## Install script options [Section titled “Install script options”](#install-script-options) The script detects your operating system and architecture, downloads the matching archive and `checksums.txt` from the release over HTTPS, checks the archive’s SHA-256 hash, and only then replaces `caplo` in the install directory. It never runs `sudo` and never edits your shell profile. Set these variables on the `sh` side of the pipe: | Variable | Default | Effect | | ------------------- | -------------- | --------------------------------------------------------------------------------------------- | | `CAPLO_VERSION` | `latest` | The release to install, as `vX.Y.Z`, for example `v0.4.0`. Only stable versions are accepted. | | `CAPLO_INSTALL_DIR` | `~/.local/bin` | The directory to install `caplo` into. It is created if missing. | To pin both the script and the CLI to one release, fetch the script from that release’s tag: 
+```sh
+curl -fsSL https://raw.githubusercontent.com/getcaplo/homebrew-tap/v0.4.0/install.sh \
+  | CAPLO_VERSION=v0.4.0 CAPLO_INSTALL_DIR="$HOME/bin" sh
+```
+ You can also download `install.sh`, read it, and run it yourself. The same script is attached to every release. ## Verify a download [Section titled “Verify a download”](#verify-a-download) The install script and Homebrew check the SHA-256 hash for you. When you download an archive by hand, check it yourself: download `checksums.txt` from the same release into the folder that holds the archive. * macOS 
+  ```sh
+  shasum -a 256 --ignore-missing -c checksums.txt
+  ```
+ * Linux 
+  ```sh
+  sha256sum --ignore-missing -c checksums.txt
+  ```
+ * Windows 
+  ```powershell
+  (Get-FileHash .\caplo_<VERSION>_windows_amd64.zip -Algorithm SHA256).Hash.ToLower()
+  Select-String "windows_amd64.zip" .\checksums.txt
+  ```
+ The two hashes must be identical. A matching line ends in `OK`. If the hash does not match, delete the archive and download it again. ### Check the signature [Section titled “Check the signature”](#check-the-signature) Each release also signs `checksums.txt` with a keyless [Sigstore](https://www.sigstore.dev) signature, so you can confirm that Caplo published the checksums and not someone else. Download `checksums.txt.sigstore.json` from the release and verify it with [cosign](https://docs.sigstore.dev/cosign/system_config/installation/): 
+```sh
+cosign verify-blob checksums.txt \
+  --bundle checksums.txt.sigstore.json \
+  --certificate-identity-regexp '@getcaplo\.com$' \
+  --certificate-oidc-issuer https://accounts.google.com
+```
+ It prints `Verified OK`. A verified `checksums.txt` plus a matching hash means the archive is the one Caplo released. ## Update [Section titled “Update”](#update) * macOS 
+  ```sh
+  brew update && brew upgrade getcaplo/tap/caplo
+  ```
+ If you used the install script, run it again. It installs the latest release over the old binary. * Linux 
+  ```sh
+  brew update && brew upgrade getcaplo/tap/caplo
+  ```
+ If you used the install script, run it again. It installs the latest release over the old binary. * Windows Download the new archive, check it, and extract `caplo.exe` over the old one. Your login, settings and selected workspace are kept across updates. ## Uninstall [Section titled “Uninstall”](#uninstall) 1. End your session so it stops working on the server too: 
+   ```sh
+   caplo auth logout
+   ```
+ 2. Remove the binary: `brew uninstall caplo` for Homebrew, or delete `caplo` from the install directory (`~/.local/bin` by default). On Windows, delete the folder that holds `caplo.exe` and remove it from your `PATH`. 3. Optionally delete the configuration directory: `~/.config/caplo` (or `$XDG_CONFIG_HOME/caplo`) on macOS and Linux, `%AppData%\caplo` on Windows, or the directory `CAPLO_CONFIG_DIR` names. See [Authentication](/cli/authentication/#where-the-session-is-stored) for what it holds.
+
+# Work with a project
+
+> Keep agents and tool packages as files in a caplo project, understand caplo.yaml, and choose what each command acts on.
+
+A project is a folder, usually a Git repository, that holds a set of agents and the tool packages they use as plain files. The project commands (`caplo validate`, `diff`, `push`, `test`, `eval`, `publish` and `pull`) read the folder, compare it with a workspace, and create or update what changed. Review changes in pull requests, then publish from your terminal or [from CI](/cli/ci-cd/). ## Create a project [Section titled “Create a project”](#create-a-project) 
+```sh
+caplo init support
+caplo init shop --template summit
+```
+ `caplo init [dir]` creates the project in `dir`, or in the current directory, which must be missing or empty. The project name defaults to the folder name; set another with `--name`. A name starts with a lowercase letter and uses only lowercase letters, digits and hyphens. | Template | What you get | | ----------------- | --------------------------------------------------------------------------------------------------------------------------------- | | `blank` (default) | One agent with a starter eval case | | `summit` | A sample outdoor shop: a concierge agent with fast routing, three specialist sub-agents, and two tool packages with test fixtures | The `summit` template creates this layout: 
+```text
+shop/
+  caplo.yaml                  the project file
+  agents/
+    concierge.yaml            one agent file per agent
+    gear.yaml
+    orders.yaml
+    returns.yaml
+  tools/
+    order-desk/               one directory per tool package
+      caplo.yaml              the package's own caplo.yaml
+      package.json
+      tsconfig.json
+      src/
+      tests/
+    store-stock/
+      ...
+```
+ Each tool package gets `package.json` and `tsconfig.json` from the current tool SDK templates. Run `npm install` in each package before you run its fixtures; `caplo init` prints the commands. To start from an agent that already exists in a workspace, use [`caplo pull`](#pull-an-existing-agent) instead. ## The project file [Section titled “The project file”](#the-project-file) The project’s `caplo.yaml` sits at the root of the folder: 
+```yaml
+apiVersion: v1
+kind: Project
+name: shop
+agents: agents/*.yaml
+tools: tools/*
+```
+ | Field | Required | Description | | -------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------- | | `apiVersion` | Yes | Always `v1`. | | `kind` | Yes | Always `Project`. This is what tells it apart from a tool package’s `caplo.yaml`. | | `name` | Yes | The project name: a lowercase letter, then lowercase letters, digits and hyphens. Releases published from the project record it. | | `agents` | No | Glob for agent files, relative to the project root. Default `agents/*.yaml`. | | `tools` | No | Glob for tool package directories, relative to the project root. Default `tools/*`. | | `environments` | No | Named workspaces the project publishes to. See [Environments](/cli/environments/). | Unknown fields are an error. Globs must stay inside the project, and they skip hidden files and folders such as `.DS_Store`. A directory the `tools` glob matches is a package only if it contains a `caplo.yaml`; others are ignored. ## Agent files [Section titled “Agent files”](#agent-files) Each agent is one YAML file in the agent YAML format the console exports, with `apiVersion: v2.0.0`. Files with `apiVersion` v1 are refused. See [Agent YAML](/agents/agent-yaml/) for how to write one and the [agent YAML reference](/reference/agent-yaml/) for every field. The file name without `.yaml` is the agent’s **key**, for example `orders` for `agents/orders.yaml`. Keys start with a lowercase letter and use only lowercase letters, digits and hyphens. Other agents in the project link to an agent by its key, and selectors can use it, so renaming the file is a breaking change inside the project. The agent’s `name` field is what customers and the console see. Inside a project, agent files refer to other resources like this: | In the agent file | Refers to | | ---------------------------------- | -------------------------------------------------------------------------------------------------------- | | `subAgents: [{local: orders}]` | The project agent with key `orders` | | `subAgents: [{agentId: <ID>}]` | Any agent already in the workspace | | `tools: [order-desk/lookup_order]` | Tool `lookup_order` of the project package named `order-desk`; `order-desk` alone selects all its tools | | `tools: [crm/find_contact]` | A published tool of the workspace’s remote MCP server named `crm`, when no project package has that name | | `tools: [<PACKAGE_ID>/<TOOL>]` | A tool of any workspace package, by package ID | | `knowledgeBases: [Returns policy]` | The workspace knowledge base with that name, or an ID | A package’s name is the `name` in its own `caplo.yaml`, not its folder name. Names of remote MCP servers and knowledge bases are looked up in the workspace a command acts on, so the same file works in several workspaces. A sub-agent link with `release: latest`, or with no `release`, follows the child’s newest release; see [Sub-agents and routing](/agents/sub-agents-and-routing/). ## How files map to the workspace [Section titled “How files map to the workspace”](#how-files-map-to-the-workspace) The CLI matches project files to workspace resources **by name**: agents by their `name` field and packages by their package name. It never stores workspace IDs in your files. * A name the workspace does not have yet is created on the next push or publish. * A name it has is updated. * Nothing is ever deleted. Renaming an agent in its file therefore creates a new agent and leaves the old one in place. After a publish, `caplo publish --prune` archives agents that an earlier publish of this project created and that the project no longer defines. * If the workspace agent with that name is archived, the command stops. Restore the agent in the console, or rename it in the file. Agent names must be unique in the project, ignoring case. ## Select part of a project [Section titled “Select part of a project”](#select-part-of-a-project) Without arguments, `diff`, `push`, `test`, `eval` and `publish` act on the whole project. Pass selectors to act on part of it: 
+```sh
+caplo push agent/orders
+caplo test tool/order-desk
+caplo publish "agent/Shop Concierge" tool/store-stock
+```
+ | Selector | Selects | | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | | `agent/<KEY_OR_NAME>` | One agent, by file key or by its `name`; a key wins over a name. It brings its project sub-agents and the project packages they use. | | `tool/<PACKAGE>` | One project package, by package name. | `caplo publish` also brings the project agents that link a selected agent at `release: latest`, because publishing the child publishes them again. A selector that matches nothing is a usage error. ## Run commands from anywhere in the project [Section titled “Run commands from anywhere in the project”](#run-commands-from-anywhere-in-the-project) Project commands look for the project file in the current directory, then in each parent directory, skipping tool packages’ own `caplo.yaml` files. So you can run them from inside `agents/` or a package folder. To point at a project elsewhere, pass `-C` (`--dir`): 
+```sh
+caplo validate -C ~/src/shop
+```
+ ## Check a project offline [Section titled “Check a project offline”](#check-a-project-offline) 
+```sh
+caplo validate
+```
+ `caplo validate` checks the project without calling the workspace: * `caplo.yaml` and every package’s `caplo.yaml` * every agent file against the agent schema, and unique file keys and agent names * references to project agents and packages, and the tools an `mcp` package declares * sub-agent link cycles, and each agent’s depth limit: at most `policy.maxDepth` (1 to 4, default 3) links below it * fast routing: at least one sub-agent and `doNotUseWhen` on every link, and, when the file has evals, two cases with `routedBy` per sub-agent * every [environment](/cli/environments/) in `caplo.yaml`, with its agent fields applied Problems are printed with their file and the command exits with code 3. Tools of remote MCP servers are checked against the workspace on `diff`, `push` and `publish`. `diff`, `push`, `test`, `eval` and `publish` run the same checks first and stop on any problem. ## Pull an existing agent [Section titled “Pull an existing agent”](#pull-an-existing-agent) To bring an agent you built in the console under version control: 
+```sh
+caplo pull "agent/Shop Concierge"
+caplo pull agent/concierge ./shop
+```
+ `caplo pull` writes the agent, every sub-agent it links, and their eval cases as agent files. It also pulls the source of any package they use that the project lacks into the `tools` directory. Agents the project already defines are written to their existing files; new ones get a file named after the agent. The target is the project at the directory you give, or the project above `-C`. If there is none, the CLI creates a new project there, but never inside another project. Links name the exact release the draft pins, because a draft does not record `release: latest`; change them back to `release: latest` if you want parents to follow new child releases. Tools of remote MCP servers stay as `<server>/<tool>`. Caution `caplo pull` overwrites the agent files it writes. Commit or stash local changes first so you can review the difference. Next, see the [day-to-day workflow](/cli/workflow/).
+
+# Script the CLI
+
+> Machine-readable output, exit codes, environment variables, non-interactive use and shell completion for the caplo CLI.
+
+Everything you need to call `caplo` from scripts, Makefiles and pipelines. For a ready-made pipeline, see [CI/CD](/cli/ci-cd/). ## Output formats [Section titled “Output formats”](#output-formats) Commands that show data take `--output` (`-o`) with `table` (the default), `json` or `yaml`: 
+```sh
+caplo agent list -o json
+caplo workspace get -o yaml
+caplo version -o json
+```
+ This covers the `list` and `get` commands, `caplo auth status`, `caplo config list`, `caplo version`, and `caplo workspace api-client` `list`, `create` and `rotate`. With `json` or `yaml`, standard output holds only that document, so you can pipe it straight into `jq`; prompts, warnings and errors go to standard error. Other commands print plain text meant for people. `caplo config get <key>` prints just the value: 
+```sh
+API_URL=$(caplo config get api-url)
+```
+ ### Plans as JSON [Section titled “Plans as JSON”](#plans-as-json) `caplo diff`, `caplo push --dry-run` and `caplo publish --dry-run` print their plan as one JSON or YAML document with `-o json` or `-o yaml`. `push` and `publish` accept `-o` only together with `--dry-run`, so the output stays a single document; without it they stop with exit code 2. | Field | Description | | -------------- | ------------------------------------------------------------------------------------------------------------------------------- | | `project` | The project name | | `workspace` | `id` and `name` of the workspace; with an API key the name is the ID | | `environment` | The `--env` environment, if any | | `changes` | `true` if any resource has a step | | `resources` | One entry per package, agent and channel, in the order the command acts on them | | `firstPublish` | Publish only: `true` on the project’s first publish to this workspace | | `promotions` | Publish only, with `promoteFrom`: per agent, the environment it promotes `from`, the `source` digest and the matching `release` | Each entry in `resources` has: | Field | Description | | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | | `resource` | `tool/<package>`, `agent/<key>` or `channel/<kind>/<name>` | | `steps` | What the command does, in order, from `create`, `update`, `save-evals`, `build`, `test`, `evaluate`, `publish`, `archive` and `deploy`; empty when unchanged | | `summary` | The line the table shows | | `files` | A package’s changed files, prefixed `+` added, `-` removed, `~` changed | | `reasons` | Why an agent publishes or is evaluated | | `current`, `next` | The current release or package version, and the release a publish makes | | `diff` | A unified diff of the agent’s draft and eval cases | For example, to run a step only when a publish would change something: 
+```sh
+if caplo publish --dry-run -o json | jq -e '.changes' > /dev/null; then
+  echo "Publishing"
+fi
+```
+ ## Exit codes [Section titled “Exit codes”](#exit-codes) | Code | Meaning | | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | | `0` | Success. | | `1` | An error: the API refused the request, a file could not be read, a build failed, or the command failed in another way. | | `2` | A usage error: an unknown command or flag, a wrong argument, a confirmation that needs `--yes` because there is no terminal, or conflicting settings such as `--workspace` disagreeing with `--env`. | | `3` | A failed check: project validation, tool fixtures, eval cases, a promotion with no matching release, or a failed `caplo identity verify-assertion` check. | | `130` | Interrupted with Ctrl-C. A second Ctrl-C ends the process at once. | | `143` | Ended with SIGTERM. | Errors are printed to standard error as one line starting with `error:`. For a failed validation, each problem is printed above it with its file. ## Environment variables [Section titled “Environment variables”](#environment-variables) | Variable | Effect | | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | | `CAPLO_API_KEY` | Authenticate as an API client with this key instead of your login. See [API keys](/cli/authentication/#api-keys-for-automation). | | `CAPLO_WORKSPACE` | The workspace for every command, by ID or name, unless `--workspace` is given. With an API key it must be the ID. | | `CAPLO_ENV` | The project [environment](/cli/environments/) for `validate`, `diff`, `push`, `eval` and `publish`, unless `--env` is given. | | `CAPLO_API_URL` | The API that `caplo auth login` saves, unless `--api-url` is given, and the API an API key calls. | | `CAPLO_ISSUER` | The sign-in server that `caplo auth login` uses, unless `--issuer` is given. | | `CAPLO_CONFIG_DIR` | The configuration directory, instead of the default below. Use a separate one per Caplo login. | | `XDG_CONFIG_HOME` | On macOS and Linux, the configuration directory is `$XDG_CONFIG_HOME/caplo` when `CAPLO_CONFIG_DIR` is not set; otherwise `~/.config/caplo`. On Windows it is `%AppData%\caplo`. | An environment’s `apiKeyEnv` in `caplo.yaml` names one more variable per environment, such as `CAPLO_PROD_KEY`; see [Environments](/cli/environments/#define-environments). ## Run without a terminal [Section titled “Run without a terminal”](#run-without-a-terminal) Commands that change something important ask first: `caplo publish`, `caplo agent publish`, `caplo channel deploy` and `rollback`, `caplo knowledge sync` when it removes documents, release and version revokes, archive, delete and remove commands, and secret unset, unbind and delete. Pass `--yes` (`-y`) to skip the question. When standard input is not a terminal, these commands do not read an answer from it. Without `--yes` they stop with exit code 2, so piping `y` into them does not work. `caplo publish` also requires `--yes` on a project’s first publish to a workspace, even in a terminal. ### Secrets from standard input [Section titled “Secrets from standard input”](#secrets-from-standard-input) Commands that take a secret never accept it as an argument, so it does not end up in your shell history or process list. They read it from a hidden prompt in a terminal, or from standard input otherwise: 
+```sh
+printf %s "$ORDERS_API_KEY" | caplo secret set orders-api-key
+printf %s "$ORDERS_API_KEY" | caplo tool secret set ORDERS_API_KEY -p order-desk
+```
+ One trailing newline is removed; `printf %s` avoids adding one in the first place. Values are 1 to 8192 bytes. Remote MCP server credentials come from standard input or from a named environment variable, for example `caplo mcp add` with `--secret-stdin` or `--secret-env <VARIABLE>`. See [Secrets and egress](/tools/secrets-and-egress/) and [Remote MCP servers](/tools/remote-mcp/). API keys work the other way round: `caplo workspace api-client create` and `rotate` print the new key on standard output once, so you can pipe it into a secret store. With `-o json`, the key is in the `secret` field. ## Shell completion [Section titled “Shell completion”](#shell-completion) `caplo completion` prints a completion script for `bash`, `zsh`, `fish` or `powershell`. To try it in the current shell: 
+```sh
+source <(caplo completion zsh)
+```
+ To load it in every new zsh session, add that line to `~/.zshrc`. For bash, install the `bash-completion` package and save the script once: 
+```sh
+# macOS with Homebrew
+dir="$(brew --prefix)/etc/bash_completion.d"
+caplo completion bash > "$dir/caplo"
+
+
+# Linux
+caplo completion bash | sudo tee /etc/bash_completion.d/caplo > /dev/null
+```
+ For fish, run `caplo completion fish > ~/.config/fish/completions/caplo.fish`. For PowerShell, add `caplo completion powershell | Out-String | Invoke-Expression` to your profile. Homebrew installs do not set up completion for you. The [CLI reference](/reference/cli/#caplo-completion) lists the options.
+
+# Build, test and publish a project
+
+> The everyday caplo loop for a project, from validating files to publishing releases bottom up, and what each step changes in the workspace.
+
+This page walks through the loop you repeat while building a [project](/cli/projects/). Every command below acts on the whole project unless you pass [selectors](/cli/projects/#select-part-of-a-project) such as `agent/orders` or `tool/order-desk`, and on the [selected workspace](/cli/workspaces/) unless you pass [`--env`](/cli/environments/). ## The loop at a glance [Section titled “The loop at a glance”](#the-loop-at-a-glance) 1. **Edit** agent files and tool code in your editor. 2. **Validate** offline with `caplo validate`. 3. **Test tools** locally with `caplo test`. 4. **Review** the difference from the workspace with `caplo diff`. 5. **Push** drafts with `caplo push`, then try the agent in a test chat. 6. **Evaluate** the drafts with `caplo eval`. 7. **Publish** releases with `caplo publish`. 8. **Pull** changes someone made in the console with `caplo pull`, when needed. Steps 2 to 4 change nothing in the workspace. Steps 5 and 6 change only drafts, which customers never see. Only step 7 creates releases. ## Validate [Section titled “Validate”](#validate) 
+```sh
+caplo validate
+```
+ Checks schemas, references, link cycles, the sub-agent depth limit, fast routing rules and every environment, without network access. It exits with code 3 and lists each problem with its file. The other project commands run the same checks first. See [Check a project offline](/cli/projects/#check-a-project-offline). ## Test tool packages [Section titled “Test tool packages”](#test-tool-packages) 
+```sh
+caplo test
+caplo test tool/order-desk -v
+```
+ Runs each selected package’s fixtures on your machine, the same way as `caplo tool test`: it bundles the package like the Caplo builder and runs the fixtures in Node.js 24. It calls no workspace. Run `npm install` in each package first. A failing fixture exits with code 3; `-v` also prints log lines for passing fixtures. See [Test tools](/tools/testing/). ## Review the difference [Section titled “Review the difference”](#review-the-difference) 
+```sh
+caplo diff
+caplo diff agent/concierge -o json
+```
+ Compares each package’s files with its workspace draft, and each agent file and its eval cases with the agent’s draft and eval suite. It prints a plan, one line per resource, and a unified diff for each changed agent. A new agent is shown against nothing. With `-o json` or `-o yaml`, it prints the plan as one document that a pipeline can post on a pull request; see [Scripting](/cli/scripting/#plans-as-json). ## Push drafts [Section titled “Push drafts”](#push-drafts) 
+```sh
+caplo push
+caplo push --dry-run
+```
+ `caplo push` prints the plan, then: 1. Uploads each changed package as its workspace draft and builds it, streaming the build log. 2. Saves each agent file as its agent’s draft, children before parents, creating any agent the workspace does not have. 3. Saves each agent’s `evals` as its eval suite. An agent file without an `evals` key leaves the suite alone. Nothing is published. `--dry-run` prints the plan and diffs and stops. If nothing changed, push says so and does nothing. Caution A push replaces the workspace draft with your file. Edits someone made to that draft in the console since your last push are overwritten. Pull them first with `caplo pull` if you want to keep them. ### Try it in a test chat [Section titled “Try it in a test chat”](#try-it-in-a-test-chat) 
+```sh
+caplo agent chat "Shop Concierge"
+```
+ This opens a private test conversation with the agent’s draft in your terminal; you can also use the console’s test chat. A test conversation runs linked sub-agents from their **releases**, not their drafts, so a sub-agent you have never published cannot answer yet. Push tells you when that is the case and names the `caplo publish agent/<key>` that releases it. See [Test an agent](/agents/testing/). ## Evaluate [Section titled “Evaluate”](#evaluate) 
+```sh
+caplo eval
+caplo eval agent/concierge
+```
+ Pushes the selection like `caplo push`, then runs each selected agent’s eval cases against its saved draft in isolated test conversations and prints the result of every case. A grader model also judges each case’s `desiredOutcome`; a failed case prints its rationale, and a case it could not grade counts as failed. If a passing run already exists for the same draft and eval cases, it is reused instead of run again. It exits with code 3 when any case fails or a selected agent has no eval cases. See [Evals](/agents/evals/) for how to write cases. ## Publish [Section titled “Publish”](#publish) 
+```sh
+caplo publish
+caplo publish agent/orders --dry-run
+caplo publish --yes
+```
+ `caplo publish` validates the project, works out what needs releasing, prints the plan with diffs, and asks `Publish to workspace <name>? [y/N]`. Then it publishes **bottom up**: 1. **Tool packages.** Each package that changed or has an unpublished build is pushed, built, tested with its fixtures in the workspace’s test runner, and published as a new version. 2. **Child agents.** Each sub-agent’s draft is saved, pinned to the package versions just published, its eval cases run, and it is published as a release. 3. **Parent agents.** Each parent’s draft is saved pinned to its children’s new releases, evaluated and published, until the top of the project. Every agent it publishes needs at least one eval case, and every case must pass. If a step fails, publishing stops there; what was already published stays published. ### What gets a new release [Section titled “What gets a new release”](#what-gets-a-new-release) An agent is published when any of these is true: * its file or eval cases differ from the workspace * its saved draft has never been published * a project package it uses publishes a new version, or its packages have newer versions than its release * a project sub-agent it links at `release: latest` publishes a new release An agent whose eval cases alone changed since its release is evaluated against the new cases and **keeps** its release, because a release does not include eval cases. Everything else is left unchanged and shown as `unchanged` in the plan. The plan shows each new version. A first release is 1.0.0. After that, changing the model or provider, changing sub-agent links, or removing a tool or knowledge base is a major bump; adding one is a minor bump; anything else is a patch. A new child release forces a major bump of its parents. ### Confirming [Section titled “Confirming”](#confirming) | Situation | What happens | | --------------------------------------------------------------- | ----------------------------------------------------------------------------- | | A terminal, after the project’s first publish to this workspace | The CLI asks; answer `y` to publish | | `--yes` (`-y`) | Publishes without asking | | No terminal, such as CI, without `--yes` | Stops with exit code 2 | | The project’s first publish to a workspace, without `--yes` | Stops with exit code 2, even in a terminal, so you review the full plan first | `--dry-run` prints the plan and stops. Add `-o json` to get the plan as a document. ### Clean up removed agents [Section titled “Clean up removed agents”](#clean-up-removed-agents) 
+```sh
+caplo publish --prune
+```
+ Agents are never deleted when you remove their file. `--prune` adds an `archive` step to the plan for each agent that an earlier publish of this project created and that the project no longer defines, and archives them after publishing. It works on the whole project only, so it takes no selectors. Archived agents can be restored in the console. ## Pull console changes [Section titled “Pull console changes”](#pull-console-changes) 
+```sh
+caplo pull "agent/Shop Concierge"
+```
+ Writes the agent’s current draft, its sub-agents and their eval cases back into the project files, so you can commit changes made in the console. See [Pull an existing agent](/cli/projects/#pull-an-existing-agent). ## Next [Section titled “Next”](#next) * Publish to staging and production from the same files: [Environments](/cli/environments/). * Run this loop in a pipeline: [CI/CD](/cli/ci-cd/). * Every flag of these commands: [project command reference](/reference/cli/project/).
+
+# Choose a workspace
+
+> List, create and select workspaces with the caplo CLI, and control which workspace each command acts on.
+
+Every command that reads or changes agents, tools, channels or knowledge acts on one workspace. The CLI remembers a selected workspace, and you can override it per command or per shell. For what a workspace holds and what each role can do, see [Workspaces and roles](/concepts/workspaces-and-roles/). ## List and inspect [Section titled “List and inspect”](#list-and-inspect) 
+```sh
+caplo workspace list
+caplo workspace get
+caplo workspace get "Acme Support"
+```
+ `caplo workspace list` shows each workspace you belong to with your role, its status and its ID; the selected one is marked with `*`. `caplo workspace get` shows one workspace, by default the selected one. Both take `-o json` or `-o yaml`. ## Select a workspace [Section titled “Select a workspace”](#select-a-workspace) 
+```sh
+caplo workspace use "Acme Support"
+```
+ You can name a workspace by its exact name or its ID. If two of your workspaces share a name, use the ID. The selection is saved in your [CLI configuration](/cli/authentication/#cli-settings) and applies to every later command. You rarely need to select one by hand: `caplo auth login` keeps your previous selection if you still belong to it, and selects your only workspace if you belong to exactly one. Changing the `api-url` setting clears the selection. ## Create a workspace [Section titled “Create a workspace”](#create-a-workspace) 
+```sh
+caplo workspace create "Acme Staging"
+```
+ You become its Owner, and the CLI selects it. Invite teammates in the console under **Settings**, **Members**. ## Which workspace a command uses [Section titled “Which workspace a command uses”](#which-workspace-a-command-uses) For each command, the CLI takes the first of these that is set: 1. The `--workspace` (`-w`) flag, for one command: `caplo agent list -w "Acme Staging"`. 2. The `CAPLO_WORKSPACE` environment variable, for every command in that shell or CI job. 3. The workspace selected with `caplo workspace use`. Project commands that take `--env` use the [environment’s](/cli/environments/) workspace instead. If `--workspace` or `CAPLO_WORKSPACE` names a different workspace, the command stops with a usage error (exit code 2) rather than guess which one you meant. Unset `CAPLO_WORKSPACE`, or set it to exactly the value in `caplo.yaml`, when you use environments. ## With an API key [Section titled “With an API key”](#with-an-api-key) When `CAPLO_API_KEY` is set, the workspace is always the key’s own workspace, and you must name it by ID with `--workspace`, `CAPLO_WORKSPACE` or an environment. A name is refused because a key cannot list workspaces. The `caplo workspace` commands themselves need a person’s login. See [API keys for automation](/cli/authentication/#api-keys-for-automation). API clients are managed under `caplo workspace api-client`; that is covered on the [authentication page](/cli/authentication/#create-a-client).
+
+# CLI reference
+
+> Every caplo command, flag, environment variable and exit code, generated from the released CLI.
+
+Install the CLI with the [installation guide](/cli/install/). Task guides are under [CLI](/cli/workflow/). 
+```sh
+caplo [flags]
+```
+ ## Commands [Section titled “Commands”](#commands) ### Project [Section titled “Project”](#project) | Command | Description | | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------- | | [`caplo diff`](/reference/cli/project/#caplo-diff) | Show how the project differs from the workspace drafts | | [`caplo eval`](/reference/cli/project/#caplo-eval) | Push the selection, then run each selected agent’s eval cases against its draft | | [`caplo init`](/reference/cli/project/#caplo-init) | Create a project: caplo.yaml, agent files, and tool packages | | [`caplo publish`](/reference/cli/project/#caplo-publish) | Validate, push, test, evaluate, and publish bottom up: tools, then child agents, then parents | | [`caplo pull`](/reference/cli/project/#caplo-pull) | Write a workspace agent, its sub-agents, and their packages into a project | | [`caplo push`](/reference/cli/project/#caplo-push) | Create or update the workspace drafts, children first, so you can live test them | | [`caplo test`](/reference/cli/project/#caplo-test) | Run the selected tool packages’ fixtures locally, like caplo tool test | | [`caplo validate`](/reference/cli/project/#caplo-validate) | Check the project offline: schemas, references, link cycles, and the depth limit | ### Workspace resources [Section titled “Workspace resources”](#workspace-resources) | Command | Description | | ---------------------------------------------- | ---------------------------------------------------------------- | | [`caplo agent`](/reference/cli/agent/) | Build, test, evaluate, and publish one agent | | [`caplo channel`](/reference/cli/channel/) | List channels and deploy agent releases to them | | [`caplo identity`](/reference/cli/identity/) | Generate keys and sign or check host sign-in assertions locally | | [`caplo knowledge`](/reference/cli/knowledge/) | Manage knowledge bases and sync their documents from a directory | | [`caplo mcp`](/reference/cli/mcp/) | Connect remote MCP servers and publish their reviewed tools | | [`caplo secret`](/reference/cli/secret/) | Manage workspace secrets that package secrets bind to | | [`caplo tool`](/reference/cli/tool/) | Build, test, publish, and run tool packages | ### Account [Section titled “Account”](#account) | Command | Description | | ---------------------------------------------- | ----------------------------------------- | | [`caplo auth`](/reference/cli/auth/) | Log in, log out, and show the session | | [`caplo config`](/reference/cli/config/) | Show and change CLI settings | | [`caplo workspace`](/reference/cli/workspace/) | List, show, create, and select workspaces | ### Other [Section titled “Other”](#other) | Command | Description | | ------------------------------------------------------ | ---------------------------------------------------------- | | [`caplo completion`](/reference/cli/#caplo-completion) | Generate the autocompletion script for the specified shell | | [`caplo version`](/reference/cli/#caplo-version) | Show the caplo version | ## Global flags [Section titled “Global flags”](#global-flags) These flags work with every command. | Flag | Value | Default | Description | | ------------------- | ------ | ------- | ------------------------------------------------------------------------------------------------ | | `--workspace`, `-w` | string | | workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use) | ## Environment variables [Section titled “Environment variables”](#environment-variables) | Variable | Description | | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------- | | `CAPLO_API_KEY` | Authenticate as an API client instead of the login session, for CI and automation. Create one with caplo workspace api-client. | | `CAPLO_WORKSPACE` | Workspace ID or name for every command, unless –workspace is given. | | `CAPLO_ENV` | Project environment from caplo.yaml, unless –env is given. | | `CAPLO_API_URL` | API base URL used by caplo auth login, unless –api-url is given. | | `CAPLO_ISSUER` | OpenID issuer used by caplo auth login, unless –issuer is given. | | `CAPLO_CONFIG_DIR` | Directory for the CLI configuration and session, instead of \~/.config/caplo ($XDG_CONFIG_HOME/caplo), or %AppData%\caplo on Windows. | | `XDG_CONFIG_HOME` | Base configuration directory when CAPLO_CONFIG_DIR is not set. | ## Exit codes [Section titled “Exit codes”](#exit-codes) | Code | Meaning | | ----- | ------------------------------------------------------------------------------------------ | | `0` | Success. | | `1` | An error: the API refused the request, a file could not be read, or the command failed. | | `2` | A usage error: an unknown command or flag, a wrong argument, or a publish that needs –yes. | | `3` | A failed gate: validation, tool fixtures, or eval cases did not pass. | | `130` | Interrupted with Ctrl-C (SIGINT). A second Ctrl-C ends the process at once. | | `143` | Terminated with SIGTERM. | ## caplo completion [Section titled “caplo completion”](#caplo-completion) Generate the autocompletion script for the specified shell. 
+```sh
+caplo completion
+```
+ Generate the autocompletion script for caplo for the specified shell. See each sub-command’s help for details on how to use the generated script. **Commands** * [`caplo completion bash`](#caplo-completion-bash) * [`caplo completion fish`](#caplo-completion-fish) * [`caplo completion powershell`](#caplo-completion-powershell) * [`caplo completion zsh`](#caplo-completion-zsh) ## caplo completion bash [Section titled “caplo completion bash”](#caplo-completion-bash) Generate the autocompletion script for bash. 
+```sh
+caplo completion bash
+```
+ Generate the autocompletion script for the bash shell. This script depends on the ‘bash-completion’ package. If it is not installed already, you can install it via your OS’s package manager. To load completions in your current shell session: 
+```sh
+source <(caplo completion bash)
+```
+ To load completions for every new session, execute once: #### Linux: [Section titled “Linux:”](#linux) 
+```sh
+caplo completion bash > /etc/bash_completion.d/caplo
+```
+ #### macOS: [Section titled “macOS:”](#macos) 
+```sh
+caplo completion bash > $(brew --prefix)/etc/bash_completion.d/caplo
+```
+ You will need to start a new shell for this setup to take effect. **Flags** | Flag | Value | Default | Description | | ------------------- | ----- | ------- | ------------------------------- | | `--no-descriptions` | | | disable completion descriptions | ## caplo completion fish [Section titled “caplo completion fish”](#caplo-completion-fish) Generate the autocompletion script for fish. 
+```sh
+caplo completion fish [flags]
+```
+ Generate the autocompletion script for the fish shell. To load completions in your current shell session: 
+```sh
+caplo completion fish | source
+```
+ To load completions for every new session, execute once: 
+```sh
+caplo completion fish > ~/.config/fish/completions/caplo.fish
+```
+ You will need to start a new shell for this setup to take effect. **Flags** | Flag | Value | Default | Description | | ------------------- | ----- | ------- | ------------------------------- | | `--no-descriptions` | | | disable completion descriptions | ## caplo completion powershell [Section titled “caplo completion powershell”](#caplo-completion-powershell) Generate the autocompletion script for powershell. 
+```sh
+caplo completion powershell [flags]
+```
+ Generate the autocompletion script for powershell. To load completions in your current shell session: 
+```sh
+caplo completion powershell | Out-String | Invoke-Expression
+```
+ To load completions for every new session, add the output of the above command to your powershell profile. **Flags** | Flag | Value | Default | Description | | ------------------- | ----- | ------- | ------------------------------- | | `--no-descriptions` | | | disable completion descriptions | ## caplo completion zsh [Section titled “caplo completion zsh”](#caplo-completion-zsh) Generate the autocompletion script for zsh. 
+```sh
+caplo completion zsh [flags]
+```
+ Generate the autocompletion script for the zsh shell. If shell completion is not already enabled in your environment you will need to enable it. You can execute the following once: 
+```sh
+echo "autoload -U compinit; compinit" >> ~/.zshrc
+```
+ To load completions in your current shell session: 
+```sh
+source <(caplo completion zsh)
+```
+ To load completions for every new session, execute once: #### Linux: [Section titled “Linux:”](#linux-1) 
+```sh
+caplo completion zsh > "${fpath[1]}/_caplo"
+```
+ #### macOS: [Section titled “macOS:”](#macos-1) 
+```sh
+caplo completion zsh > $(brew --prefix)/share/zsh/site-functions/_caplo
+```
+ You will need to start a new shell for this setup to take effect. **Flags** | Flag | Value | Default | Description | | ------------------- | ----- | ------- | ------------------------------- | | `--no-descriptions` | | | disable completion descriptions | ## caplo version [Section titled “caplo version”](#caplo-version) Show the caplo version. 
+```sh
+caplo version [flags]
+```
+ Shows the CLI version, the commit it was built from, and the Go version and platform. caplo –version prints the version alone. **Examples** 
+```sh
+caplo version
+caplo version -o json
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--output`, `-o` | string | `table` | output format: table, json, or yaml |
+
+# caplo agent
+
+> Build, test, evaluate, and publish one agent.
+
+Build, test, evaluate, and publish one agent. 
+```sh
+caplo agent
+```
+ Commands for a single agent file or workspace agent. A workspace agent is named by its name or ID. To push and publish the agents of a project together, children first, use caplo push and caplo publish. **Examples** 
+```sh
+caplo agent init -f support.yaml
+caplo agent push -f support.yaml
+caplo agent chat "Support"
+caplo agent publish "Support"
+```
+ **Commands** * [`caplo agent chat`](#caplo-agent-chat) * [`caplo agent eval`](#caplo-agent-eval) * [`caplo agent get`](#caplo-agent-get) * [`caplo agent init`](#caplo-agent-init) * [`caplo agent list`](#caplo-agent-list) * [`caplo agent publish`](#caplo-agent-publish) * [`caplo agent pull`](#caplo-agent-pull) * [`caplo agent push`](#caplo-agent-push) * [`caplo agent release`](#caplo-agent-release) * [`caplo agent test`](#caplo-agent-test) * [`caplo agent validate`](#caplo-agent-validate) ## caplo agent chat [Section titled “caplo agent chat”](#caplo-agent-chat) Chat with the agent’s saved draft, or a release, in a private test conversation. 
+```sh
+caplo agent chat <agent> [flags]
+```
+ Starts a private test conversation with the agent’s saved draft, or with a release named by –release, and reads one message per line from standard input. Each reply is printed with the sub-agents and tools the turn used. End with Ctrl-D, /exit, or /quit; the test session is closed when the chat ends. A write awaiting a decision is shown as its review, as a review of the whole plan, or as a write that can only be declined: one with no review here, or one waiting for the customer to sign in. /confirm or /cancel decides the write shown last, as the widget’s buttons do; ordinary text never approves a write. If the write changed meanwhile, the current one is shown to answer again, and a refused (409) message or decision is reported without ending the chat. A message or decision that was not sent makes the command exit 1 at its end; without a terminal, a failed turn makes it exit 3. Replies arrive on the agent-test event stream. It resumes after the last event when it reconnects, reloads the history on a reset, reconnects with a fresh token when asked to reauthenticate, and retries network failures, 429, and 5xx, but not an unknown host, a rejected TLS certificate, or another 4xx. When no test session is free, caplo agent test list and caplo agent test close free one. **Examples** 
+```sh
+caplo agent chat "Shop Concierge"
+caplo agent chat "Shop Concierge" --release 2.1.0
+printf 'Where is order 1042?\n/confirm\n' | caplo agent chat "Shop Concierge"
+```
+ **Flags** | Flag | Value | Default | Description | | ----------- | ------ | ------- | ------------------------------------------------------------------ | | `--release` | string | | chat with this release, by number or version, instead of the draft | ## caplo agent eval [Section titled “caplo agent eval”](#caplo-agent-eval) Run and inspect an agent’s evaluations. 
+```sh
+caplo agent eval
+```
+ **Examples** 
+```sh
+caplo agent eval run "Shop Concierge"
+caplo agent eval list "Shop Concierge"
+```
+ **Commands** * [`caplo agent eval get`](#caplo-agent-eval-get) * [`caplo agent eval list`](#caplo-agent-eval-list) * [`caplo agent eval run`](#caplo-agent-eval-run) ## caplo agent eval get [Section titled “caplo agent eval get”](#caplo-agent-eval-get) Show an evaluation run and its cases. 
+```sh
+caplo agent eval get <agent> <run> [flags]
+```
+ **Examples** 
+```sh
+caplo agent eval get "Shop Concierge" 0c9e7a52-1d4b-4e8f-a3c6-5b2d9f0e1a47
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo agent eval list [Section titled “caplo agent eval list”](#caplo-agent-eval-list) List the agent’s evaluation runs, newest first. 
+```sh
+caplo agent eval list <agent> [flags]
+```
+ **Examples** 
+```sh
+caplo agent eval list "Shop Concierge"
+caplo agent eval list "Shop Concierge" -n 5 -o json
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--limit`, `-n` | int | `20` | most runs to show (at most 100) | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo agent eval run [Section titled “caplo agent eval run”](#caplo-agent-eval-run) Run the agent’s eval cases against its saved draft. 
+```sh
+caplo agent eval run <agent>
+```
+ Runs every case of the agent’s eval suite against its saved draft in isolated test conversations, as publishing does, and prints each case with its failed checks and the grader’s rationale. A passing run for the same draft and suite is reused. It waits up to 12 minutes for the run and exits 3 when a case fails. **Examples** 
+```sh
+caplo agent eval run "Shop Concierge"
+```
+ ## caplo agent get [Section titled “caplo agent get”](#caplo-agent-get) Show an agent: draft, model, tools, sub-agents, and latest release. 
+```sh
+caplo agent get <agent> [flags]
+```
+ **Examples** 
+```sh
+caplo agent get "Shop Concierge"
+caplo agent get 6f1d2c3b-8a4e-4f0a-9b7c-2d1e0f3a4b5c -o yaml
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo agent init [Section titled “caplo agent init”](#caplo-agent-init) Write a new agent file to edit, validate, and push. 
+```sh
+caplo agent init [flags]
+```
+ Writes a starter agent file with one eval case. The file must not exist. Without –name, the agent is named after the file: its first letter capitalized and dashes as spaces. **Examples** 
+```sh
+caplo agent init
+caplo agent init -f agents/help-desk.yaml
+caplo agent init -f support.yaml --name "Support Desk"
+```
+ **Flags** | Flag | Value | Default | Description | | -------------- | ------ | ------------ | ---------------------------------------- | | `--file`, `-f` | string | `agent.yaml` | agent file to write | | `--name` | string | | agent name (default: from the file name) | ## caplo agent list [Section titled “caplo agent list”](#caplo-agent-list) List the workspace’s agents. 
+```sh
+caplo agent list [flags]
+```
+ Lists the workspace’s agents with their latest release, draft revision, and status. Archived agents are left out unless –archived. **Examples** 
+```sh
+caplo agent list
+caplo agent list --archived -o json
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--archived` | | | include archived agents | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo agent publish [Section titled “caplo agent publish”](#caplo-agent-publish) Pin tools, run the evals, and publish the agent’s saved draft as a release. 
+```sh
+caplo agent publish <agent> [flags]
+```
+ Publishes the saved draft of a workspace agent: it pins the draft’s tool versions, checks that the draft is ready, runs its eval cases, and publishes it. The agent needs at least one eval case, and every case must pass. Its sub-agents must have releases already; caplo publish releases a project’s agents together. A released draft is published again only when its packages have newer versions. When its eval cases changed since its release, they run against it and the release is kept. Without –bump the version follows the console: a first release, or a change of sub-agents, provider, or model, or a removed tool, action, or knowledge base, is major; an added one is minor; anything else is a patch. It asks before publishing; –yes skips the question. **Examples** 
+```sh
+caplo agent publish "Shop Concierge"
+caplo agent publish "Shop Concierge" --bump minor --yes
+```
+ **Flags** | Flag | Value | Default | Description | | ------------- | ------ | ------- | -------------------------------------------------------------------------- | | `--bump` | string | | version bump: major, minor, or patch (default: suggested from the changes) | | `--yes`, `-y` | | | publish without asking | ## caplo agent pull [Section titled “caplo agent pull”](#caplo-agent-pull) Write an agent’s draft as the console’s Export YAML, to –file or standard output. 
+```sh
+caplo agent pull <agent> [flags]
+```
+ Writes the agent’s draft byte for byte as the console’s Export YAML. Sub-agents are linked by agentId, and the eval cases are not included; caplo pull writes an agent with its sub-agents and eval cases into a project. **Examples** 
+```sh
+caplo agent pull "Shop Concierge"
+caplo agent pull "Shop Concierge" -f concierge.yaml
+```
+ **Flags** | Flag | Value | Default | Description | | -------------- | ------ | ------- | ---------------------------------------- | | `--file`, `-f` | string | | file to write (default: standard output) | ## caplo agent push [Section titled “caplo agent push”](#caplo-agent-push) Save an agent file as the agent’s draft, creating the agent if needed, and its evals as the eval suite. 
+```sh
+caplo agent push [flags]
+```
+ Saves the file as the draft of the workspace agent with its name, creating the agent when there is none. The file’s evals replace the agent’s eval suite; without an evals key the suite is left alone. Inside a project, local references resolve, and the sub-agents and packages they name must exist in the workspace already. –dry-run prints the draft diff without saving. **Examples** 
+```sh
+caplo agent push -f agent.yaml
+caplo agent push -f agent.yaml --dry-run
+```
+ **Flags** | Flag | Value | Default | Description | | -------------- | ------ | ------- | ---------------------------------- | | `--dry-run` | | | show the draft diff without saving | | `--file`, `-f` | string | | agent file | ## caplo agent release [Section titled “caplo agent release”](#caplo-agent-release) List, show, and revoke an agent’s releases. 
+```sh
+caplo agent release
+```
+ A release is a published draft revision with its tool versions and sub-agent releases pinned. Channels serve releases, and parents link them. A release is named by its number, its version with or without a leading v, or its ID. **Examples** 
+```sh
+caplo agent release list "Shop Concierge"
+caplo agent release revoke "Shop Concierge" 2.1.0 --reason "wrong refund policy"
+```
+ **Commands** * [`caplo agent release get`](#caplo-agent-release-get) * [`caplo agent release list`](#caplo-agent-release-list) * [`caplo agent release revoke`](#caplo-agent-release-revoke) ## caplo agent release get [Section titled “caplo agent release get”](#caplo-agent-release-get) Show a release: version, tools, sub-agent releases, and eval gate. 
+```sh
+caplo agent release get <agent> <release> [flags]
+```
+ **Examples** 
+```sh
+caplo agent release get "Shop Concierge" 2.1.0
+caplo agent release get "Shop Concierge" 7 -o json
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo agent release list [Section titled “caplo agent release list”](#caplo-agent-release-list) List the agent’s releases, newest first. 
+```sh
+caplo agent release list <agent> [flags]
+```
+ **Examples** 
+```sh
+caplo agent release list "Shop Concierge"
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo agent release revoke [Section titled “caplo agent release revoke”](#caplo-agent-release-revoke) Permanently revoke a release, so channels and parents can no longer run it. 
+```sh
+caplo agent release revoke <agent> <release> [flags]
+```
+ Revokes a release permanently; it cannot be undone. Channels that serve it and parents that link it can no longer run it, and links at release: latest and channel deploys skip it. It needs –reason and asks first; –yes skips the question. **Examples** 
+```sh
+caplo agent release revoke "Shop Concierge" 2.1.0 --reason "wrong refund policy"
+```
+ **Flags** | Flag | Value | Default | Description | | ------------- | ------ | ------- | ------------------------------------- | | `--reason` | string | | why the release is revoked (required) | | `--yes`, `-y` | | | do not ask for confirmation | ## caplo agent test [Section titled “caplo agent test”](#caplo-agent-test) Manage your private test sessions. 
+```sh
+caplo agent test
+```
+ Each caplo agent chat runs in a private test session, which holds test capacity until it is closed. The chat closes its session when it ends; list and close find and free sessions left open. **Examples** 
+```sh
+caplo agent test list
+caplo agent test close 4d2f8b1e-6c3a-4f7e-9d05-1a2b3c4d5e6f
+```
+ **Commands** * [`caplo agent test close`](#caplo-agent-test-close) * [`caplo agent test list`](#caplo-agent-test-list) ## caplo agent test close [Section titled “caplo agent test close”](#caplo-agent-test-close) Close one of your private test sessions and release its capacity. 
+```sh
+caplo agent test close <session-id>
+```
+ **Examples** 
+```sh
+caplo agent test close 4d2f8b1e-6c3a-4f7e-9d05-1a2b3c4d5e6f
+```
+ ## caplo agent test list [Section titled “caplo agent test list”](#caplo-agent-test-list) List your open test sessions across agents in this workspace. 
+```sh
+caplo agent test list
+```
+ **Examples** 
+```sh
+caplo agent test list
+```
+ ## caplo agent validate [Section titled “caplo agent validate”](#caplo-agent-validate) Check an agent file offline: schema, references, and link policies. 
+```sh
+caplo agent validate [flags]
+```
+ Checks the file against the agent schema and its references without calling the workspace. When the file is an agent of a project, by the project’s agents glob, local references resolve and the project’s problems with the file are reported too. Outside a project, sub-agents are linked by agentId and tools name a package ID or a remote MCP server. Problems are printed and the command exits 3. **Examples** 
+```sh
+caplo agent validate -f agent.yaml
+caplo agent validate -f agents/orders.yaml
+```
+ **Flags** | Flag | Value | Default | Description | | -------------- | ------ | ------- | ----------- | | `--file`, `-f` | string | | agent file |
+
+# caplo auth
+
+> Log in, log out, and show the session.
+
+Log in, log out, and show the session. 
+```sh
+caplo auth
+```
+ A login session authenticates a person. CI and automation use an API client’s key in CAPLO_API_KEY instead; see caplo workspace api-client. **Examples** 
+```sh
+caplo auth login
+caplo auth status
+```
+ **Commands** * [`caplo auth login`](#caplo-auth-login) * [`caplo auth logout`](#caplo-auth-logout) * [`caplo auth status`](#caplo-auth-status) ## caplo auth login [Section titled “caplo auth login”](#caplo-auth-login) Log in through the browser, or with –device on a machine without one. 
+```sh
+caplo auth login [flags]
+```
+ Logs in with the caplo-cli OpenID client: in the browser with the authorization code flow and PKCE, answered on a 127.0.0.1 port, or with –device through the device authorization grant. The refresh token is stored in the OS keychain, or with –insecure-storage (or credential-storage file) in a 0600 file in the configuration directory; access tokens stay in memory. Refresh tokens rotate on every use, and caplo processes share a lock so that none reuses a token another has used. The API and issuer are –api-url and –issuer, else CAPLO_API_URL and CAPLO_ISSUER, else the saved settings, else production (<https://api.caplo.si> and <https://auth.caplo.si/realms/caplo>). A successful login saves them, so the variables affect login only and never redirect an existing session. Login keeps the selected workspace while you still belong to it, and otherwise selects your only workspace. **Examples** 
+```sh
+caplo auth login
+caplo auth login --device
+caplo auth login --api-url https://api.staging.example.com --issuer https://auth.staging.example.com/realms/caplo
+```
+ **Flags** | Flag | Value | Default | Description | | -------------------- | ------ | ------- | -------------------------------------------------------------------------------------------------------- | | `--api-url` | string | | Caplo API URL, for example <https://api.caplo.si> | | `--device` | | | use the device authorization grant | | `--insecure-storage` | | | keep the refresh token in a 0600 file instead of the OS keychain (default: the saved credential-storage) | | `--issuer` | string | | OpenID issuer URL, for example <https://auth.caplo.si/realms/caplo> | | `--no-browser` | | | print the login URL without opening a browser | ## caplo auth logout [Section titled “caplo auth logout”](#caplo-auth-logout) Revoke the session and delete the stored refresh token. 
+```sh
+caplo auth logout
+```
+ Deletes the stored refresh token, then revokes the session at the issuer. When the revocation fails, the local token is deleted all the same and the command reports the failure. **Examples** 
+```sh
+caplo auth logout
+```
+ ## caplo auth status [Section titled “caplo auth status”](#caplo-auth-status) Show the logged-in user, API, and selected workspace. 
+```sh
+caplo auth status [flags]
+```
+ Shows the logged-in user, the API and issuer, where the credentials are stored, and the selected workspace. With CAPLO_API_KEY it shows the API client, its workspace, and its scopes instead. **Examples** 
+```sh
+caplo auth status
+caplo auth status -o json
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--output`, `-o` | string | `table` | output format: table, json, or yaml |
+
+# caplo channel
+
+> List channels and deploy agent releases to them.
+
+List channels and deploy agent releases to them. 
+```sh
+caplo channel
+```
+ A channel is a website widget, WhatsApp number, Messenger or Instagram account, Outlook mailbox, or phone number, and serves one agent release. Channels are created in the console; deploy and rollback change the release they serve. New conversations get the new release, and open ones keep the release they started with. A channel is named by its ID, its name, or \<kind>/\<name>. Every other setting of a channel stays as it is, and its revision guards a deploy against a concurrent change in the console. **Examples** 
+```sh
+caplo channel list
+caplo channel deploy Website --agent "Shop Concierge"
+```
+ **Commands** * [`caplo channel deploy`](#caplo-channel-deploy) * [`caplo channel get`](#caplo-channel-get) * [`caplo channel list`](#caplo-channel-list) * [`caplo channel rollback`](#caplo-channel-rollback) ## caplo channel deploy [Section titled “caplo channel deploy”](#caplo-channel-deploy) Point channels at an agent release, by default their agent’s newest release. 
+```sh
+caplo channel deploy <channel>... [--agent <agent>[@<version>]] [flags]
+```
+ Points each channel at the release: –agent names the agent and, after @, its version (1.4.0) or release number; without a version it is the agent’s newest release that is not revoked. Without –agent each channel keeps its agent. A revoked release is never deployed. It asks for confirmation; –yes skips it. **Examples** 
+```sh
+caplo channel deploy Website
+caplo channel deploy Website "twilio/Support line" --agent "Shop Concierge@2.1.0" --yes
+```
+ **Flags** | Flag | Value | Default | Description | | ------------- | ------ | ------- | ------------------------------------------------------------ | | `--agent` | string | | agent name or ID, with @version or @number to pick a release | | `--yes`, `-y` | | | deploy without asking | ## caplo channel get [Section titled “caplo channel get”](#caplo-channel-get) Show a channel and the release it serves. 
+```sh
+caplo channel get <channel> [flags]
+```
+ **Examples** 
+```sh
+caplo channel get Website
+caplo channel get "twilio/Support line"
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo channel list [Section titled “caplo channel list”](#caplo-channel-list) List the workspace’s channels and the release each serves. 
+```sh
+caplo channel list [flags]
+```
+ **Examples** 
+```sh
+caplo channel list
+caplo channel list --agent "Shop Concierge" -o json
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ------------------------------------------------- | | `--agent` | string | | only the channels serving this agent (name or ID) | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo channel rollback [Section titled “caplo channel rollback”](#caplo-channel-rollback) Point channels back at their agent’s release before the one they serve. 
+```sh
+caplo channel rollback <channel>... [flags]
+```
+ Points each channel at the newest release of its agent, older than the one it serves, that is not revoked. The release is served as it was published; publish again to move forward. It asks for confirmation; –yes skips it. **Examples** 
+```sh
+caplo channel rollback Website --yes
+```
+ **Flags** | Flag | Value | Default | Description | | ------------- | ----- | ------- | ------------------------ | | `--yes`, `-y` | | | roll back without asking |
+
+# caplo config
+
+> Show and change CLI settings.
+
+Show and change CLI settings. 
+```sh
+caplo config
+```
+ Settings are saved in config.yaml in the configuration directory: CAPLO_CONFIG_DIR, else \~/.config/caplo ($XDG_CONFIG_HOME/caplo), or %AppData%\caplo on Windows. caplo workspace use saves the selected workspace there too. **Examples** 
+```sh
+caplo config list
+caplo config set credential-storage file
+```
+ **Commands** * [`caplo config get`](#caplo-config-get) * [`caplo config list`](#caplo-config-list) * [`caplo config set`](#caplo-config-set) ## caplo config get [Section titled “caplo config get”](#caplo-config-get) Show one setting. 
+```sh
+caplo config get <key>
+```
+ **Examples** 
+```sh
+caplo config get api-url
+```
+ ## caplo config list [Section titled “caplo config list”](#caplo-config-list) Show every setting. 
+```sh
+caplo config list [flags]
+```
+ Shows the saved settings, the production defaults for those not saved, and the selected workspace. Defaults are not saved. **Examples** 
+```sh
+caplo config list
+caplo config list -o json
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo config set [Section titled “caplo config set”](#caplo-config-set) Change one setting: api-url, issuer, client-id, credential-storage. 
+```sh
+caplo config set <key> <value>
+```
+ Changes a saved setting: api-url, issuer, client-id (the OAuth client, caplo-cli by default), or credential-storage (keychain or file). Changing api-url clears the selected workspace. Run caplo auth login afterwards to start a session with the new setting. **Examples** 
+```sh
+caplo config set credential-storage file
+caplo config set api-url https://api.staging.example.com
+```
+
+# caplo identity
+
+> Generate keys and sign or check host sign-in assertions locally.
+
+Generate keys and sign or check host sign-in assertions locally. 
+```sh
+caplo identity
+```
+ Local helpers for a host that signs its customers in to Caplo with signed assertions, through a customer identity connection of type signed_assertion. Nothing is sent to Caplo. Only verify-assertion makes a request, to fetch a JWKS from an https URL as Identity does: within 3 seconds, at most 64 KiB, and without redirects. **Examples** 
+```sh
+caplo identity keygen --out keys
+caplo identity sign-assertion --key keys/<kid>.private.jwk.json --iss https://shop.example.com \
+  --aud urn:caplo:customer-identity:<id> --sub cust-1042 --nonce <nonce> > assertion.jwt
+caplo identity verify-assertion --jwks keys/<kid>.public.jwk.json --iss https://shop.example.com \
+  --aud urn:caplo:customer-identity:<id> - < assertion.jwt
+```
+ **Commands** * [`caplo identity keygen`](#caplo-identity-keygen) * [`caplo identity sign-assertion`](#caplo-identity-sign-assertion) * [`caplo identity verify-assertion`](#caplo-identity-verify-assertion) ## caplo identity keygen [Section titled “caplo identity keygen”](#caplo-identity-keygen) Write a new signing key: private JWK and PEM, and the public JWK to give the connection; nothing is sent. 
+```sh
+caplo identity keygen [flags]
+```
+ Writes \<kid>.private.jwk.json and \<kid>.private.pem, readable only by you, and \<kid>.public.jwk.json, with kid, alg, and use sig, into –out. Add the public JWK to the connection’s keys or your JWKS, and keep the private key on your server. RSA keys have 3072 bits, and the key ID defaults to the key’s RFC 7638 thumbprint. Existing files are never overwritten. **Examples** 
+```sh
+caplo identity keygen
+caplo identity keygen --alg EdDSA --kid shop-2026 --out keys
+```
+ **Flags** | Flag | Value | Default | Description | | ------- | ------ | ------- | --------------------------------------------------------------------- | | `--alg` | string | `ES256` | algorithm: ES256, ES384, PS256, RS256, EdDSA; RSA keys have 3072 bits | | `--kid` | string | | key ID (default: the RFC 7638 thumbprint) | | `--out` | string | `.` | directory to write the key files in | ## caplo identity sign-assertion [Section titled “caplo identity sign-assertion”](#caplo-identity-sign-assertion) Print a signed caplo-customer+jwt assertion, as a host backend would make one, for local tests. 
+```sh
+caplo identity sign-assertion [flags]
+```
+ Signs a caplo-customer+jwt assertion with a private JWK or PEM key and prints it as a compact JWS, as a host’s backend would for a challenge nonce. –key, –iss, –aud, –sub, and –nonce are required. The assertion lives –ttl seconds, at most 300. An –attr value that is a JSON number, boolean, or quoted string keeps its type; any other value is a string. **Examples** 
+```sh
+caplo identity sign-assertion --key keys/shop-2026.private.jwk.json --iss https://shop.example.com \
+  --aud urn:caplo:customer-identity:<id> --sub cust-1042 --nonce <nonce>
+caplo identity sign-assertion --key key.pem --alg PS256 --kid shop-rsa --iss https://shop.example.com \
+  --aud urn:caplo:customer-identity:<id> --sub cust-1042 --nonce <nonce> --amr pwd,otp --auth-time now \
+  --attr tier=gold --attr orders=12 --act-for cust-7:guardian
+```
+ **Flags** | Flag | Value | Default | Description | | ------------- | ----------- | ------- | -------------------------------------------------------------------------------------------- | | `--acr` | string | | authentication context class, mapped to a level by the connection | | `--act-for` | string | | subject the customer acts for, as sub:relationship | | `--alg` | string | | algorithm (default: the JWK’s alg, or the one an EC or Ed25519 PEM key fits) | | `--amr` | stringSlice | | authentication methods, comma separated, e.g. pwd,otp | | `--attr` | stringArray | | verified attribute k=v, repeatable; a JSON number, boolean or “quoted string” keeps its type | | `--aud` | string | | audience: the connection’s urn:caplo:customer-identity:\<id> | | `--auth-time` | string | | when the customer last authenticated: Unix time or now | | `--iss` | string | | issuer: the connection’s issuer | | `--key` | string | | private key file: JWK or PEM | | `--kid` | string | | key ID (default: the JWK’s kid) | | `--name` | string | | display name | | `--nonce` | string | | the challenge nonce | | `--sid` | string | | the host’s session ID, for back-channel logout | | `--sub` | string | | the customer’s stable, opaque ID | | `--ttl` | int64 | `60` | lifetime in seconds, at most 300 | ## caplo identity verify-assertion [Section titled “caplo identity verify-assertion”](#caplo-identity-verify-assertion) Run Identity’s assertion checks locally and print each; challenge state and connection policy are skipped. 
+```sh
+caplo identity verify-assertion <token|-> [flags]
+```
+ Runs Identity’s checks on an assertion, given as an argument or read from standard input with -, and prints each as pass, fail, or skip: format, typ, key, signature, issuer and audience, nonce, times, subject and the claim allow-list, and claim values such as amr, sid, jti, profile claims, attributes, and act_for. The nonce is compared only with –nonce. Challenge state and the connection’s policy (acr mapping, allowed profile claims, declared attributes and their types, and delegation relationships) are Identity’s and are skipped. Exits 3 when a check fails. **Examples** 
+```sh
+caplo identity verify-assertion --jwks keys/shop-2026.public.jwk.json --iss https://shop.example.com \
+  --aud urn:caplo:customer-identity:<id> "$ASSERTION"
+caplo identity sign-assertion ... | caplo identity verify-assertion --jwks https://shop.example.com/jwks.json \
+  --iss https://shop.example.com --aud urn:caplo:customer-identity:<id> --nonce <nonce> -
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ----------- | --------------------------------- | -------------------------------------------------- | | `--alg` | stringSlice | `[ES256,ES384,PS256,RS256,EdDSA]` | the connection’s pinned algorithms | | `--aud` | string | | the connection’s audience | | `--iss` | string | | the connection’s issuer | | `--jwks` | string | | JWKS or public JWK: a file or an https URL | | `--nonce` | string | | the challenge nonce (default: skip the comparison) | | `--output`, `-o` | string | `table` | output format: table, json, or yaml |
+
+# caplo knowledge
+
+> Manage knowledge bases and sync their documents from a directory.
+
+Manage knowledge bases and sync their documents from a directory. 
+```sh
+caplo knowledge
+```
+ Aliases: `kb` A knowledge base holds documents an agent answers from. Each upload is extracted and waits for review; a person approves it in the console, or caplo knowledge approve does. Publishing snapshots the approved documents into a version, and an agent release pins the newest ready version. Agent files name knowledge bases by name or ID, and so do these commands. **Examples** 
+```sh
+caplo knowledge create "Returns policy" --owner support
+caplo knowledge sync "Returns policy" ./docs/returns --approve --publish --yes
+```
+ **Commands** * [`caplo knowledge approve`](#caplo-knowledge-approve) * [`caplo knowledge create`](#caplo-knowledge-create) * [`caplo knowledge get`](#caplo-knowledge-get) * [`caplo knowledge list`](#caplo-knowledge-list) * [`caplo knowledge publish`](#caplo-knowledge-publish) * [`caplo knowledge sync`](#caplo-knowledge-sync) ## caplo knowledge approve [Section titled “caplo knowledge approve”](#caplo-knowledge-approve) Wait for extraction and approve documents for the next version, by default every one awaiting review. 
+```sh
+caplo knowledge approve <kb> [document]... [flags]
+```
+ Approving a document skips reviewing its extracted text in the console. It waits for documents still being extracted and fails when one fails to extract. It needs agents:publish. **Examples** 
+```sh
+caplo knowledge approve "Returns policy"
+caplo knowledge approve "Returns policy" refunds.md exchanges.pdf
+```
+ **Flags** | Flag | Value | Default | Description | | ----------- | -------- | ------- | ------------------------------- | | `--timeout` | duration | `15m0s` | how long to wait for extraction | ## caplo knowledge create [Section titled “caplo knowledge create”](#caplo-knowledge-create) Create a knowledge base. 
+```sh
+caplo knowledge create <name> --owner <team> [flags]
+```
+ Creates a knowledge base. –owner names the team that owns its content. –audience verified_customer limits its content to customers who signed in; the default is public. **Examples** 
+```sh
+caplo knowledge create "Returns policy" --owner support --description "Return and refund rules"
+caplo knowledge create "Account help" --owner support --audience verified_customer
+```
+ **Flags** | Flag | Value | Default | Description | | --------------- | ------ | ------- | ----------------------------------------------------------------------------------- | | `--audience` | string | | public (default) or verified_customer, for content only signed-in customers may get | | `--description` | string | | what the knowledge base covers | | `--owner` | string | | team that owns the content | ## caplo knowledge get [Section titled “caplo knowledge get”](#caplo-knowledge-get) Show a knowledge base, its documents, and its versions. 
+```sh
+caplo knowledge get <kb> [flags]
+```
+ Shows the knowledge base, its newest version, and its documents with their extraction and review state. -o json or yaml includes every version. **Examples** 
+```sh
+caplo knowledge get "Returns policy"
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo knowledge list [Section titled “caplo knowledge list”](#caplo-knowledge-list) List the workspace’s knowledge bases. 
+```sh
+caplo knowledge list [flags]
+```
+ **Examples** 
+```sh
+caplo kb list
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo knowledge publish [Section titled “caplo knowledge publish”](#caplo-knowledge-publish) Publish a version from the approved documents and wait for it to index. 
+```sh
+caplo knowledge publish <kb> [flags]
+```
+ Publishes a version from the approved documents, unless the newest version holds exactly them, and waits until it is ready. Agent releases published from then on use it. Exits 3 when there are no approved documents or the version does not become ready. **Examples** 
+```sh
+caplo knowledge publish "Returns policy"
+caplo knowledge publish "Returns policy" --timeout 30m
+```
+ **Flags** | Flag | Value | Default | Description | | ----------- | -------- | ------- | ----------------------------- | | `--timeout` | duration | `15m0s` | how long to wait for indexing | ## caplo knowledge sync [Section titled “caplo knowledge sync”](#caplo-knowledge-sync) Make a knowledge base’s documents match a directory, and optionally approve and publish them. 
+```sh
+caplo knowledge sync <kb> <dir> [flags]
+```
+ Uploads the directory’s new and changed documents and removes the ones whose file is gone. The older copy of a changed file is removed once the new copy is approved, so a version never lacks the document; a document a published version holds stays in that version. Files are matched by name and content, so an unchanged file is not uploaded again. Documents are named by file name, so two files in the tree may not share one. Supported types, up to 25 MiB each: .txt .md .markdown .html .pdf .docx .png .jpg .jpeg .webp. Other files are skipped, and so are hidden files and directories. –approve waits for extraction and approves the directory’s documents, which skips reviewing their extracted text in the console; it needs agents:publish. –publish then publishes a version from the approved documents and waits for it to index. It asks for confirmation before removing documents; –yes skips it. –dry-run prints the changes only. **Examples** 
+```sh
+caplo knowledge sync "Returns policy" ./docs/returns --dry-run
+caplo knowledge sync "Returns policy" ./docs/returns --approve --publish --yes
+```
+ **Flags** | Flag | Value | Default | Description | | ------------- | -------- | ------- | ---------------------------------------------------------------------- | | `--approve` | | | wait for extraction and approve the directory’s documents | | `--dry-run` | | | show the changes without making them | | `--publish` | | | publish a version from the approved documents and wait for it to index | | `--timeout` | duration | `15m0s` | how long –approve and –publish wait for extraction and indexing | | `--yes`, `-y` | | | remove documents without asking |
+
+# caplo mcp
+
+> Connect remote MCP servers and publish their reviewed tools.
+
+Connect remote MCP servers and publish their reviewed tools. 
+```sh
+caplo mcp
+```
+ A remote MCP server is an MCP server reachable over HTTPS whose tools agents can call. Add it with caplo mcp add, authorize it with caplo mcp connect when it uses OAuth, review its discovered tools with caplo mcp review, and publish them with caplo mcp publish. Agent files then name them \<server>/\<tool>. A server is named by its name or ID. Secrets are read only from standard input or an environment variable, so they stay out of shell history and process listings, and are never shown again. **Examples** 
+```sh
+caplo mcp check https://mcp.example.com/mcp
+caplo mcp add crm --url https://mcp.example.com/mcp --auth oauth
+caplo mcp connect crm --open
+caplo mcp review crm --enable search_contacts=read && caplo mcp publish crm
+```
+ **Commands** * [`caplo mcp add`](#caplo-mcp-add) * [`caplo mcp check`](#caplo-mcp-check) * [`caplo mcp connect`](#caplo-mcp-connect) * [`caplo mcp get`](#caplo-mcp-get) * [`caplo mcp list`](#caplo-mcp-list) * [`caplo mcp publish`](#caplo-mcp-publish) * [`caplo mcp refresh`](#caplo-mcp-refresh) * [`caplo mcp remove`](#caplo-mcp-remove) * [`caplo mcp review`](#caplo-mcp-review) * [`caplo mcp tools`](#caplo-mcp-tools) * [`caplo mcp update`](#caplo-mcp-update) ## caplo mcp add [Section titled “caplo mcp add”](#caplo-mcp-add) Add a remote MCP server; its name prefixes every tool’s model name. 
+```sh
+caplo mcp add <name> [flags]
+```
+ Adds a remote MCP server. Its name matches \[a-z]\[a-z0-9-]{1,39}, must differ from every package and server in the workspace, and prefixes every tool’s model name. –auth is none, bearer, header (with –header-name), or oauth. A bearer token or header value comes from –secret-stdin or –secret-env. With –auth oauth the client is registered through a Client ID Metadata Document or dynamic registration, unless –client-id names a pre-registered client; its secret comes from –client-secret-stdin or –client-secret-env, and it must allow the callback URL that caplo mcp get shows. –oauth-grant is authorization_code, authorized with caplo mcp connect, or client_credentials. The command prints the server’s status and what to do next. **Examples** 
+```sh
+caplo mcp add crm --url https://mcp.example.com/mcp --auth oauth
+CRM_TOKEN=... caplo mcp add crm --url https://mcp.example.com/mcp --auth bearer --secret-env CRM_TOKEN
+caplo mcp add erp --url https://erp.example.com/mcp --auth header --header-name X-Api-Key --secret-stdin
+```
+ **Flags** | Flag | Value | Default | Description | | ----------------------- | ----------- | -------------------- | ----------------------------------------------------------------------------------------------- | | `--auth` | string | | authentication: none, bearer, header, or oauth | | `--client-id` | string | | pre-registered OAuth client ID (default: a Client ID Metadata Document or dynamic registration) | | `--client-secret-env` | string | | read the pre-registered client’s secret from this environment variable | | `--client-secret-stdin` | | | read the pre-registered client’s secret from stdin | | `--description` | string | | what the server is for | | `--display-name` | string | | name shown in the console (default: the name) | | `--header-name` | string | | credential header of –auth header | | `--oauth-grant` | string | `authorization_code` | OAuth grant: authorization_code or client_credentials; update keeps the current one unless set | | `--scope` | stringArray | | OAuth scope to request, repeatable (default: the server’s) | | `--secret-env` | string | | read the bearer token or header value from this environment variable | | `--secret-stdin` | | | read the bearer token or header value from stdin (a hidden prompt on a terminal) | | `--token-auth-method` | string | | token endpoint authentication: none, client_secret_basic, or client_secret_post | | `--transport` | string | | auto, streamable_http, or sse (default auto) | | `--url` | string | | HTTPS endpoint of the server | ## caplo mcp check [Section titled “caplo mcp check”](#caplo-mcp-check) Check a remote MCP server without saving it: transport, protocol, tools, and OAuth discovery. 
+```sh
+caplo mcp check <url> [flags]
+```
+ Has Caplo probe a server URL without saving anything: whether it is reachable, its transport, protocol, and tool count, and, when it needs authorization, what OAuth discovery found. A bearer token or header value for the check is read from standard input and not stored. **Examples** 
+```sh
+caplo mcp check https://mcp.example.com/mcp
+printf %s "$CRM_TOKEN" | caplo mcp check https://mcp.example.com/mcp --bearer-stdin
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ------------------------------------------------------------------------ | | `--bearer-stdin` | | | check with a bearer token read from stdin; it is not stored | | `--header` | string | | check with a credential in this header, its value read with –value-stdin | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | | `--transport` | string | | auto, streamable_http, or sse (default auto) | | `--value-stdin` | | | read the –header value from stdin; it is not stored | ## caplo mcp connect [Section titled “caplo mcp connect”](#caplo-mcp-connect) Authorize a remote MCP server that uses OAuth. 
+```sh
+caplo mcp connect <name|id> [flags]
+```
+ Authorize a remote MCP server that uses OAuth. For the authorization code grant, open the printed URL in a browser signed in to the Caplo console: the authorization server redirects to the console, which completes the authorization. The command waits for it unless –wait is 0, retrying network and 5xx failures while it checks. The client credentials grant completes at once. **Examples** 
+```sh
+caplo mcp connect crm --open
+caplo mcp connect crm --wait 0
+```
+ **Flags** | Flag | Value | Default | Description | | -------- | -------- | ------- | --------------------------------------------------------- | | `--open` | | | open the authorization URL in the default browser | | `--wait` | duration | `10m0s` | how long to wait for the authorization; 0 returns at once | ## caplo mcp get [Section titled “caplo mcp get”](#caplo-mcp-get) Show a remote MCP server: status, authentication, last error, and its discovered tools. 
+```sh
+caplo mcp get <name|id> [flags]
+```
+ Shows the server’s status, transport and protocol, authentication without secrets, last error, published version, and its discovered tools with their review, change, and published state. For OAuth it shows the callback URL a pre-registered client must allow. **Examples** 
+```sh
+caplo mcp get crm
+caplo mcp get crm -o json
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo mcp list [Section titled “caplo mcp list”](#caplo-mcp-list) List the workspace’s remote MCP servers. 
+```sh
+caplo mcp list [flags]
+```
+ **Examples** 
+```sh
+caplo mcp list
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo mcp publish [Section titled “caplo mcp publish”](#caplo-mcp-publish) Pin the enabled tools of the latest tool list as a new version that agents can use. 
+```sh
+caplo mcp publish <name|id>
+```
+ Pins the enabled tools of the latest tool list, as reviewed, as a new version. It fails when the tool list changed since the review; check it with caplo mcp tools, review it again, and publish. Agent files name the tools \<server>/\<tool>. **Examples** 
+```sh
+caplo mcp publish crm
+```
+ ## caplo mcp refresh [Section titled “caplo mcp refresh”](#caplo-mcp-refresh) Test a remote MCP server and refresh its tool list against the published version. 
+```sh
+caplo mcp refresh <name|id>
+```
+ Connects to the server, lists its tools again, and marks each new, changed, or removed against the published version. Published tools that changed on the server are blocked until they are reviewed and published again. **Examples** 
+```sh
+caplo mcp refresh crm
+```
+ ## caplo mcp remove [Section titled “caplo mcp remove”](#caplo-mcp-remove) Remove a remote MCP server: its published tools stop working and its credentials are deleted. 
+```sh
+caplo mcp remove <name|id> [flags]
+```
+ Removes a remote MCP server. Its published tools stop working for every agent that uses them, its stored credentials are deleted, and its name stays reserved. It asks first; –yes skips the question. **Examples** 
+```sh
+caplo mcp remove crm --yes
+```
+ **Flags** | Flag | Value | Default | Description | | ------------- | ----- | ------- | --------------------------- | | `--yes`, `-y` | | | do not ask for confirmation | ## caplo mcp review [Section titled “caplo mcp review”](#caplo-mcp-review) Enable, classify, and configure discovered tools; nothing reaches agents until caplo mcp publish. 
+```sh
+caplo mcp review <name|id> [flags]
+```
+ Enable, classify, and configure discovered tools by their remote name. –enable without an effect keeps the tool’s effect, or takes the one the server’s hints suggest. Write tools ask the customer to confirm unless –confirmation \<tool>=none. –timeout takes 1 to 30 seconds. Tools not named keep their review. Nothing reaches agents until caplo mcp publish. **Examples** 
+```sh
+caplo mcp review crm --enable search_contacts=read --enable create_note=write
+caplo mcp review crm --confirmation create_note=none --timeout create_note=20
+caplo mcp review crm --disable delete_contact
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ----------- | ------- | ----------------------------------------------------------- | | `--confirmation` | stringArray | | for a write tool, \<remote tool>=required\|none, repeatable | | `--disable` | stringArray | | disable a tool by its remote name, repeatable | | `--enable` | stringArray | | enable a tool, as \<remote tool>\[=read\|write], repeatable | | `--timeout` | stringArray | | \<remote tool>=\<seconds from 1 to 30>, repeatable | ## caplo mcp tools [Section titled “caplo mcp tools”](#caplo-mcp-tools) List a remote MCP server’s discovered tools with their review and publish state. 
+```sh
+caplo mcp tools <name|id> [flags]
+```
+ **Examples** 
+```sh
+caplo mcp tools crm
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo mcp update [Section titled “caplo mcp update”](#caplo-mcp-update) Change a remote MCP server’s endpoint, transport, or authentication. 
+```sh
+caplo mcp update <name|id> [flags]
+```
+ Change a remote MCP server’s endpoint, transport, or authentication. Authentication flags change the current setup; a stored secret is kept unless a new one is given. A new URL or authentication setup discards stored OAuth tokens and clients, so the server must be authorized again with caplo mcp connect. **Examples** 
+```sh
+caplo mcp update crm --url https://mcp.example.com/v2/mcp
+caplo mcp update crm --scope contacts.read --scope contacts.write
+printf %s "$NEW_TOKEN" | caplo mcp update erp --secret-stdin
+```
+ **Flags** | Flag | Value | Default | Description | | ----------------------- | ----------- | -------------------- | ----------------------------------------------------------------------------------------------- | | `--auth` | string | | authentication: none, bearer, header, or oauth | | `--client-id` | string | | pre-registered OAuth client ID (default: a Client ID Metadata Document or dynamic registration) | | `--client-secret-env` | string | | read the pre-registered client’s secret from this environment variable | | `--client-secret-stdin` | | | read the pre-registered client’s secret from stdin | | `--description` | string | | what the server is for | | `--display-name` | string | | name shown in the console | | `--header-name` | string | | credential header of –auth header | | `--oauth-grant` | string | `authorization_code` | OAuth grant: authorization_code or client_credentials; update keeps the current one unless set | | `--scope` | stringArray | | OAuth scope to request, repeatable (default: the server’s) | | `--secret-env` | string | | read the bearer token or header value from this environment variable | | `--secret-stdin` | | | read the bearer token or header value from stdin (a hidden prompt on a terminal) | | `--token-auth-method` | string | | token endpoint authentication: none, client_secret_basic, or client_secret_post | | `--transport` | string | | auto, streamable_http, or sse | | `--url` | string | | HTTPS endpoint of the server |
+
+# Project commands
+
+> caplo init, validate, diff, push, test, eval, publish and pull: commands that work on a project folder.
+
+These commands work on the project around the current directory, or the one `-C` names. See [Projects](/cli/projects/). ## caplo diff [Section titled “caplo diff”](#caplo-diff) Show how the project differs from the workspace drafts. 
+```sh
+caplo diff [agent/<name> | tool/<name>]... [flags]
+```
+ Compares each selected package’s files with its workspace draft, and each agent file and its evals with the agent’s draft and eval suite. It prints the plan, one line per resource, and a unified diff per changed agent; a new agent diffs against nothing. It changes nothing. Selectors are agent/\<file key or name>, where a file key wins over a name, and tool/\<package>. An agent brings its project sub-agents and the project packages they use. Without selectors the command acts on the whole project. With -o json or yaml the plan is one document: the project, workspace, environment, whether anything changes, and per resource its steps (create, update, save-evals, build, test, evaluate, publish, archive, deploy; none when unchanged), summary, changed files, reasons, current and next versions, and diff. A pipeline can post it on a pull request or check it with a policy. push and publish print it only with –dry-run. **Examples** 
+```sh
+caplo diff
+caplo diff agent/concierge tool/order-desk
+caplo diff --env prod -o json
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ------------------------------------------------------------------------------------------------------- | | `--dir`, `-C` | string | `.` | start looking for the project’s caplo.yaml here | | `--env`, `-e` | string | | environment from caplo.yaml: its workspace, agent fields, channels, and promotion (default: $CAPLO_ENV) | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo eval [Section titled “caplo eval”](#caplo-eval) Push the selection, then run each selected agent’s eval cases against its draft. 
+```sh
+caplo eval [agent/<name> | tool/<name>]... [flags]
+```
+ Pushes the selection like caplo push, then runs each selected agent’s eval cases against its saved draft in isolated test conversations and prints every case. A passing run for the same draft and suite is reused. Exits 3 when a case fails or an agent has no eval cases. An agent file’s evals list cases with the console’s fields: name, input, desiredOutcome, uncertainty, prohibitedAction, answerContains, answerExcludes, subAgent, avoidSubAgent, routedBy, and tool. A push matches them to the suite’s cases by name and replaces the agent’s eval suite with them; without an evals key the suite is left alone. In every run a grader model also judges each case’s desiredOutcome. A failed case prints the grader’s rationale, and a case the grader could not judge reads desired outcome not graded and does not pass. routedBy (fast, model, or any) checks how an agent with fast routing routed the case. Selectors are agent/\<file key or name>, where a file key wins over a name, and tool/\<package>. An agent brings its project sub-agents and the project packages they use. Without selectors the command acts on the whole project. **Examples** 
+```sh
+caplo eval
+caplo eval agent/concierge
+caplo eval --env staging
+```
+ **Flags** | Flag | Value | Default | Description | | ------------- | ------ | ------- | ------------------------------------------------------------------------------------------------------- | | `--dir`, `-C` | string | `.` | start looking for the project’s caplo.yaml here | | `--env`, `-e` | string | | environment from caplo.yaml: its workspace, agent fields, channels, and promotion (default: $CAPLO_ENV) | ## caplo init [Section titled “caplo init”](#caplo-init) Create a project: caplo.yaml, agent files, and tool packages. 
+```sh
+caplo init [dir] [flags]
+```
+ Creates a project in dir (default: the current directory), which must be missing or empty. The blank template has one agent; summit is a sample shop with a concierge agent, three sub-agents, and two tool packages. Each tool package gets package.json and tsconfig.json from the @caplo/tools templates; run npm install in it before testing it. A project is a folder with caplo.yaml: apiVersion v1, kind Project, a name, and the agents and tools globs (default agents/*.yaml and tools/*). Project commands find it by walking up from the current directory or –dir. Each agent file is an agent YAML document with apiVersion v2.0.0, the format of the console’s Export YAML; v1 files are refused. The file name without .yaml is the agent’s key, which links and selectors use. Each tool package is a directory with its own caplo.yaml, as caplo tool init makes it. In an agent file: 
+```sh
+subAgents link a project agent with local: <file key>, or any workspace agent with agentId. With release:
+latest, or no release, the link pins the child's newest release that is not revoked whenever the parent is
+pushed or published, so a child's new release publishes its parents again. A version pins that release. The
+child runs with its own release's tools and knowledge.
+```
+ 
+```sh
+tools name <package>/<tool> for a project package, <server>/<tool> for a published tool of a workspace remote
+MCP server (caplo mcp), or <package ID>/<tool>; a package alone selects all its tools. A name that is no
+project package is looked up as a remote MCP server when the project is diffed, pushed, or published.
+```
+ 
+```sh
+knowledgeBases name a workspace knowledge base by name or ID. A name resolves in the workspace the command acts
+on, so one file works in every environment.
+```
+ 
+```sh
+evals are the agent's eval cases; see caplo eval.
+```
+ Workspace agents and packages are matched by name: a missing one is created and an existing one updated. Nothing is deleted; caplo publish –prune archives agents the project no longer defines. **Examples** 
+```sh
+caplo init shop --template summit
+cd shop && (cd tools/order-desk && npm install) && (cd tools/store-stock && npm install)
+caplo init --name support
+```
+ **Flags** | Flag | Value | Default | Description | | ------------------ | ------ | ------- | ------------------------------------------ | | `--name` | string | | project name (default: the directory name) | | `--template`, `-t` | string | `blank` | project template: blank or summit | ## caplo publish [Section titled “caplo publish”](#caplo-publish) Validate, push, test, evaluate, and publish bottom up: tools, then child agents, then parents. 
+```sh
+caplo publish [agent/<name> | tool/<name>]... [flags]
+```
+ Publishes the selection, or the whole project, bottom up. Changed packages are pushed, built, tested with their fixtures on the workspace’s test runner, and published first. Then agents publish with children before parents: each draft is saved pinned to its children’s new releases, its eval cases run, and it is published. An agent publishes when its file changed, its saved draft is unpublished, or a package or release: latest sub-agent it uses publishes. A release does not pin eval cases, so an agent whose cases alone changed since its release is evaluated and keeps the release. A published agent needs at least one eval case, and every case must pass. It validates the project, prints the plan and diffs, and asks before publishing; –yes skips the question. Without a terminal, and on a project’s first publish to a workspace, it needs –yes. –dry-run prints the plan only. –prune archives the agents an earlier publish of this project created that it no longer defines; it takes no selectors. Selectors are agent/\<file key or name>, where a file key wins over a name, and tool/\<package>. An agent brings its project sub-agents and the project packages they use. Without selectors the command acts on the whole project. Selecting an agent also selects the project agents that link it at release: latest, since its new release publishes them again. Environments. caplo.yaml may define environments, each a workspace the project publishes to: 
+```sh
+environments:
+  staging:
+    workspace: 5b1e9c2a-...        # an ID, or a name when you log in rather than use an API key
+    apiKeyEnv: CAPLO_STAGING_KEY   # optional: the variable with this environment's API key
+  prod:
+    workspace: 0d6a3c87-...
+    apiKeyEnv: CAPLO_PROD_KEY
+    promoteFrom: staging           # publish only what staging released from the same source
+    agents:                        # agent fields by file key, merged over the agent file
+      front: {model: {name: claude-sonnet-4-5}}
+    channels:                      # channels a publish points at the agent's newest release
+      front: [Website, twilio/Support line]
+```
+ –env, or CAPLO_ENV, selects one for validate, diff, push, eval, and publish: its workspace (a different –workspace or CAPLO_WORKSPACE is refused), its API key when its apiKeyEnv variable is set (used instead of CAPLO_API_KEY), and its agent fields, which merge like a JSON merge patch: mappings merge, null removes a key, and anything else replaces. Each release’s note names the project and the agent’s source digest: its file as written, the files of the project packages it uses, and its project sub-agents. With promoteFrom, the publish exits 3 unless every agent it publishes has a release in that environment, not revoked, with the same digest. That environment is read with its own apiKeyEnv key, else the login session; a publish that uses an API key needs the other environment’s key, with agents:read. After publishing, it deploys the environment’s channels that do not serve their agent’s newest release, which needs channels:write; the plan lists them as channel/\<kind>/\<name>. With -o json or yaml the plan is one document: the project, workspace, environment, whether anything changes, and per resource its steps (create, update, save-evals, build, test, evaluate, publish, archive, deploy; none when unchanged), summary, changed files, reasons, current and next versions, and diff. A pipeline can post it on a pull request or check it with a policy. push and publish print it only with –dry-run. **Examples** 
+```sh
+caplo publish
+caplo publish agent/orders --dry-run
+caplo publish --env prod --yes
+caplo publish --prune
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ------------------------------------------------------------------------------------------------------- | | `--dir`, `-C` | string | `.` | start looking for the project’s caplo.yaml here | | `--dry-run` | | | show the plan and diffs without publishing | | `--env`, `-e` | string | | environment from caplo.yaml: its workspace, agent fields, channels, and promotion (default: $CAPLO_ENV) | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | | `--prune` | | | archive agents an earlier publish of this project created that it no longer defines | | `--yes`, `-y` | | | publish without asking | ## caplo pull [Section titled “caplo pull”](#caplo-pull) Write a workspace agent, its sub-agents, and their packages into a project. 
+```sh
+caplo pull agent/<name> [dir] [flags]
+```
+ Writes a workspace agent, named by name or ID, and every sub-agent it links, with their drafts and eval cases, as agent files of a project. The project is the one at dir; a dir without caplo.yaml becomes a new project unless it is inside another one. Without dir it is the project above –dir, or a new one in –dir. Agents the project defines are written to their own files, others to new files in the directory the agents glob names. Packages the agents use that the project lacks are pulled from their workspace drafts into the directory the tools glob names; remote MCP server tools stay \<server>/\<tool>. Links name the release the draft pins, since a draft does not record release: latest. **Examples** 
+```sh
+caplo pull "agent/Shop Concierge"
+caplo pull agent/concierge ./shop
+```
+ **Flags** | Flag | Value | Default | Description | | ------------- | ------ | ------- | ----------------------------------------------- | | `--dir`, `-C` | string | `.` | start looking for the project’s caplo.yaml here | ## caplo push [Section titled “caplo push”](#caplo-push) Create or update the workspace drafts, children first, so you can live test them. 
+```sh
+caplo push [agent/<name> | tool/<name>]... [flags]
+```
+ Prints the plan, then uploads and builds each changed package as its workspace draft, and saves each agent file as its agent’s draft and its evals as the agent’s eval suite, children before parents. A missing package or agent is created. Nothing is published. A live test runs linked sub-agents from their releases, so push names the project sub-agents that have no release yet and the caplo publish that releases them. –dry-run prints the plan and diffs without pushing. Selectors are agent/\<file key or name>, where a file key wins over a name, and tool/\<package>. An agent brings its project sub-agents and the project packages they use. Without selectors the command acts on the whole project. With -o json or yaml the plan is one document: the project, workspace, environment, whether anything changes, and per resource its steps (create, update, save-evals, build, test, evaluate, publish, archive, deploy; none when unchanged), summary, changed files, reasons, current and next versions, and diff. A pipeline can post it on a pull request or check it with a policy. push and publish print it only with –dry-run. **Examples** 
+```sh
+caplo push
+caplo push agent/concierge
+caplo push --dry-run -o json
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ------------------------------------------------------------------------------------------------------- | | `--dir`, `-C` | string | `.` | start looking for the project’s caplo.yaml here | | `--dry-run` | | | show the changes and diffs without pushing | | `--env`, `-e` | string | | environment from caplo.yaml: its workspace, agent fields, channels, and promotion (default: $CAPLO_ENV) | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo test [Section titled “caplo test”](#caplo-test) Run the selected tool packages’ fixtures locally, like caplo tool test. 
+```sh
+caplo test [agent/<name> | tool/<name>]... [flags]
+```
+ Runs caplo tool test in each selected package: it bundles the package like the builder and runs its fixtures in local Node 24. It calls no workspace. Exits 3 when a fixture fails. Selectors are agent/\<file key or name>, where a file key wins over a name, and tool/\<package>. An agent brings its project sub-agents and the project packages they use. Without selectors the command acts on the whole project. **Examples** 
+```sh
+caplo test
+caplo test tool/order-desk -v
+caplo test agent/orders
+```
+ **Flags** | Flag | Value | Default | Description | | ----------------- | ------ | ------- | ----------------------------------------------- | | `--dir`, `-C` | string | `.` | start looking for the project’s caplo.yaml here | | `--verbose`, `-v` | | | print log lines for passing fixtures too | ## caplo validate [Section titled “caplo validate”](#caplo-validate) Check the project offline: schemas, references, link cycles, and the depth limit. 
+```sh
+caplo validate [flags]
+```
+ Checks the project without calling the workspace: caplo.yaml and each package’s caplo.yaml, every agent file against the agent schema, unique agent names and file keys, references to project agents and packages, the tools an mcp package declares, sub-agent link cycles, and each agent’s depth limit: at most policy.maxDepth (1 to 4, default 3) sub-agent links below it. Tools of remote MCP servers are checked when the project is diffed, pushed, or published. An agent with routing mode fast needs at least one sub-agent and doNotUseWhen on every link. When its file lists evals, each sub-agent also needs two cases that set routedBy and name it in subAgent. Every environment in caplo.yaml is checked: the agent keys it names and its agent fields merged over each file. With –env, the agents are checked as that environment publishes them. Problems are printed and the command exits 3. **Examples** 
+```sh
+caplo validate
+caplo validate --env prod
+caplo validate -C ~/src/shop
+```
+ **Flags** | Flag | Value | Default | Description | | ------------- | ------ | ------- | ------------------------------------------------------------------------------------------------------- | | `--dir`, `-C` | string | `.` | start looking for the project’s caplo.yaml here | | `--env`, `-e` | string | | environment from caplo.yaml: its workspace, agent fields, channels, and promotion (default: $CAPLO_ENV) |
+
+# caplo secret
+
+> Manage workspace secrets that package secrets bind to.
+
+Manage workspace secrets that package secrets bind to. 
+```sh
+caplo secret
+```
+ A workspace secret holds one value for many packages: each package secret bound to it with caplo tool secret bind receives its value. Rotating it with caplo secret set changes the value for every bound package within a minute. Values are never shown again. Names match \[a-z]\[a-z0-9-]{1,63}. **Examples** 
+```sh
+caplo secret set orders-api-key
+caplo secret usage orders-api-key
+```
+ **Commands** * [`caplo secret delete`](#caplo-secret-delete) * [`caplo secret list`](#caplo-secret-list) * [`caplo secret set`](#caplo-secret-set) * [`caplo secret usage`](#caplo-secret-usage) ## caplo secret delete [Section titled “caplo secret delete”](#caplo-secret-delete) Delete a workspace secret that no package secret binds. 
+```sh
+caplo secret delete <name> [flags]
+```
+ Deletes a workspace secret. A secret that package secrets are bound to is not deleted; the command lists the bindings to remove first with caplo tool secret unbind. It asks first; –yes skips the question. **Examples** 
+```sh
+caplo secret delete orders-api-key --yes
+```
+ **Flags** | Flag | Value | Default | Description | | ------------- | ----- | ------- | --------------------------- | | `--yes`, `-y` | | | do not ask for confirmation | ## caplo secret list [Section titled “caplo secret list”](#caplo-secret-list) List the workspace secrets and how many package secrets bind each. 
+```sh
+caplo secret list [flags]
+```
+ **Examples** 
+```sh
+caplo secret list
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo secret set [Section titled “caplo secret set”](#caplo-secret-set) Create a workspace secret or rotate its value, from a hidden prompt or from stdin when it is not a terminal. 
+```sh
+caplo secret set <name> [flags]
+```
+ Creates a workspace secret, or rotates the value of an existing one for every package secret bound to it. The value comes from a hidden prompt, or from standard input without its final newline when that is not a terminal, and is 1 to 8192 bytes. –description sets what it is for; without it, a rotation keeps the current description. **Examples** 
+```sh
+caplo secret set orders-api-key --description "Orders API key"
+printf %s "$ORDERS_API_KEY" | caplo secret set orders-api-key
+```
+ **Flags** | Flag | Value | Default | Description | | --------------- | ------ | ------- | ------------------------------------------------------ | | `--description` | string | | what the secret is for (default: keep the current one) | ## caplo secret usage [Section titled “caplo secret usage”](#caplo-secret-usage) List the package secrets bound to a workspace secret. 
+```sh
+caplo secret usage <name> [flags]
+```
+ **Examples** 
+```sh
+caplo secret usage orders-api-key
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--output`, `-o` | string | `table` | output format: table, json, or yaml |
+
+# caplo tool
+
+> Build, test, publish, and run tool packages.
+
+Build, test, publish, and run tool packages. 
+```sh
+caplo tool
+```
+ A tool package is a TypeScript package of tools that agents call, of type function or mcp. Its caplo.yaml names it and declares its tools’ policy, egress, secrets, and fixtures. caplo tool init creates one, caplo tool test runs its fixtures locally, caplo tool push uploads and builds its workspace draft, and caplo tool publish makes a build a version that agents can use. Writing tools is covered at <https://docs.caplo.si/tools/>. Commands that act on a workspace package take its name, or read caplo.yaml in –dir (default: the current directory). Inside a project, caplo push and caplo publish handle its packages. **Examples** 
+```sh
+caplo tool init orders --type mcp
+cd orders && npm install
+caplo tool test
+caplo tool push && caplo tool publish
+```
+ **Commands** * [`caplo tool archive`](#caplo-tool-archive) * [`caplo tool build`](#caplo-tool-build) * [`caplo tool delete`](#caplo-tool-delete) * [`caplo tool dev`](#caplo-tool-dev) * [`caplo tool get`](#caplo-tool-get) * [`caplo tool init`](#caplo-tool-init) * [`caplo tool list`](#caplo-tool-list) * [`caplo tool logs`](#caplo-tool-logs) * [`caplo tool publish`](#caplo-tool-publish) * [`caplo tool pull`](#caplo-tool-pull) * [`caplo tool push`](#caplo-tool-push) * [`caplo tool restore`](#caplo-tool-restore) * [`caplo tool secret`](#caplo-tool-secret) * [`caplo tool test`](#caplo-tool-test) * [`caplo tool version`](#caplo-tool-version) ## caplo tool archive [Section titled “caplo tool archive”](#caplo-tool-archive) Archive a package: no more pushes, builds, or publishes; its versions stay live until revoked. 
+```sh
+caplo tool archive [package] [flags]
+```
+ Archives a package: it can no longer be pushed, built, or published. Its published versions stay live for the agents that use them until they are revoked with caplo tool version revoke. caplo tool restore undoes it. It asks first; –yes skips the question. **Examples** 
+```sh
+caplo tool archive orders --yes
+```
+ **Flags** | Flag | Value | Default | Description | | ------------- | ------ | ------- | --------------------------- | | `--dir`, `-C` | string | `.` | package directory | | `--yes`, `-y` | | | do not ask for confirmation | ## caplo tool build [Section titled “caplo tool build”](#caplo-tool-build) Show, follow, and cancel builds. 
+```sh
+caplo tool build
+```
+ A build is named by its ID; \[package] defaults to the one caplo.yaml in –dir names. **Examples** 
+```sh
+caplo tool build list orders
+caplo tool build logs orders 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f
+```
+ **Commands** * [`caplo tool build cancel`](#caplo-tool-build-cancel) * [`caplo tool build get`](#caplo-tool-build-get) * [`caplo tool build list`](#caplo-tool-build-list) * [`caplo tool build logs`](#caplo-tool-build-logs) ## caplo tool build cancel [Section titled “caplo tool build cancel”](#caplo-tool-build-cancel) Cancel a queued or running build. 
+```sh
+caplo tool build cancel [package] <build> [flags]
+```
+ **Examples** 
+```sh
+caplo tool build cancel orders 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f
+```
+ **Flags** | Flag | Value | Default | Description | | ------------- | ------ | ------- | ----------------- | | `--dir`, `-C` | string | `.` | package directory | ## caplo tool build get [Section titled “caplo tool build get”](#caplo-tool-build-get) Show a build: status, bundle, tools, and diagnostics. 
+```sh
+caplo tool build get [package] <build> [flags]
+```
+ **Examples** 
+```sh
+caplo tool build get orders 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--dir`, `-C` | string | `.` | package directory | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo tool build list [Section titled “caplo tool build list”](#caplo-tool-build-list) List a package’s builds, newest first. 
+```sh
+caplo tool build list [package] [flags]
+```
+ **Examples** 
+```sh
+caplo tool build list orders
+caplo tool build list orders --status failed -n 5
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ------------------------------------------------ | | `--dir`, `-C` | string | `.` | package directory | | `--limit`, `-n` | int | `20` | most builds to show (at most 100) | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | | `--status` | string | | only builds with this status, for example failed | ## caplo tool build logs [Section titled “caplo tool build logs”](#caplo-tool-build-logs) Print a build’s log, following it until the build finishes. 
+```sh
+caplo tool build logs [package] <build> [flags]
+```
+ **Examples** 
+```sh
+caplo tool build logs orders 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f
+```
+ **Flags** | Flag | Value | Default | Description | | ------------- | ------ | ------- | ----------------- | | `--dir`, `-C` | string | `.` | package directory | ## caplo tool delete [Section titled “caplo tool delete”](#caplo-tool-delete) Delete a package that was never published; archive a published one instead. 
+```sh
+caplo tool delete [package] [flags]
+```
+ Deletes a package that has never published a version, with its draft and builds. A package with versions can only be archived. It asks first; –yes skips the question. **Examples** 
+```sh
+caplo tool delete orders-draft --yes
+```
+ **Flags** | Flag | Value | Default | Description | | ------------- | ------ | ------- | --------------------------- | | `--dir`, `-C` | string | `.` | package directory | | `--yes`, `-y` | | | do not ask for confirmation | ## caplo tool dev [Section titled “caplo tool dev”](#caplo-tool-dev) Run the package over stdio in MCP Inspector, or for another MCP client with –no-inspector. 
+```sh
+caplo tool dev [flags]
+```
+ Runs the package’s src/stdio.ts with Node 24 in MCP Inspector, started with npx, to call its tools by hand. The secrets caplo.yaml declares are read from environment variables of the same name. With –no-inspector the server speaks MCP on this process’s standard input and output, so another MCP client can start it. **Examples** 
+```sh
+caplo tool dev
+ORDERS_API_KEY=test caplo tool dev --no-inspector --dir ~/src/orders
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | --------------------------------------------------- | | `--dir`, `-C` | string | `.` | package directory | | `--no-inspector` | | | serve MCP on stdio instead of opening MCP Inspector | ## caplo tool get [Section titled “caplo tool get”](#caplo-tool-get) Show a package, its latest build, and the tools of its latest active version. 
+```sh
+caplo tool get [package] [flags]
+```
+ **Examples** 
+```sh
+caplo tool get orders
+caplo tool get -o json
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--dir`, `-C` | string | `.` | package directory | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo tool init [Section titled “caplo tool init”](#caplo-tool-init) Create a function or mcp package from the SDK templates. 
+```sh
+caplo tool init <directory> [flags]
+```
+ Creates a package in directory, which must be missing or empty, from the function or mcp template of the @caplo/tools SDK, which is embedded in the CLI at build time. –type is required. The package is named after the directory unless –name is given. Run npm install in it before testing it. **Examples** 
+```sh
+caplo tool init orders --type mcp
+caplo tool init tools/weather --type function
+```
+ **Flags** | Flag | Value | Default | Description | | -------------- | ------ | ------- | ------------------------------------------ | | `--name` | string | | package name (default: the directory name) | | `--type`, `-t` | string | | package type: function or mcp | ## caplo tool list [Section titled “caplo tool list”](#caplo-tool-list) List the workspace’s tool packages. 
+```sh
+caplo tool list [flags]
+```
+ Lists the packages with their type, latest active version, latest build, and draft revision. Remote MCP servers are packages of type remote_mcp. **Examples** 
+```sh
+caplo tool list
+caplo tool list --type mcp --archived
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | -------------------------------------------------------- | | `--archived` | | | include archived packages | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | | `--type`, `-t` | string | | only packages of this type: function, mcp, or remote_mcp | ## caplo tool logs [Section titled “caplo tool logs”](#caplo-tool-logs) Show recent live invocations of the package with their log lines; the runners keep the last hour. 
+```sh
+caplo tool logs [package] [flags]
+```
+ Prints the package’s recent live invocations with each tool’s status, timing, error, egress denials, and log lines. -n sets how many come first, and -f keeps streaming new ones. **Examples** 
+```sh
+caplo tool logs orders
+caplo tool logs orders -n 50 -f
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ---------------------------------------------- | | `--dir`, `-C` | string | `.` | package directory | | `--follow`, `-f` | | | keep streaming new invocations | | `--tail`, `-n` | int | `20` | recent invocations to show first (at most 200) | ## caplo tool publish [Section titled “caplo tool publish”](#caplo-tool-publish) Publish the latest succeeded build, or –build \<id>, as a new version. 
+```sh
+caplo tool publish [package] [flags]
+```
+ Publishes the package’s latest succeeded build, or the build –build names, as its next version. An agent pins its tools’ versions when it is published, so agents use the new version from their next release. **Examples** 
+```sh
+caplo tool publish
+caplo tool publish orders --build 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f
+```
+ **Flags** | Flag | Value | Default | Description | | ------------- | ------ | ------- | ------------------- | | `--build` | string | | build ID to publish | | `--dir`, `-C` | string | `.` | package directory | ## caplo tool pull [Section titled “caplo tool pull”](#caplo-tool-pull) Download the draft, or the exact source of a published version, to run it locally. 
+```sh
+caplo tool pull <package>[@version] [flags]
+```
+ Writes the package’s draft, or with @version the exact source of the build that version was published from, into an empty or new directory (default: ./\<package>). Every file is downloaded and checked against its listed SHA-256 before anything is written, so all files or none are written. Listed paths outside the package are refused, and files under .git or node_modules are left out. Run the package locally with caplo tool dev –no-inspector. **Examples** 
+```sh
+caplo tool pull orders
+caplo tool pull orders@3 --dir /tmp/orders-v3
+```
+ **Flags** | Flag | Value | Default | Description | | ------------- | ------ | ------- | -------------------------------------------------------------------------- | | `--dir`, `-C` | string | | directory to write, which must be empty or missing (default: ./\<package>) | ## caplo tool push [Section titled “caplo tool push”](#caplo-tool-push) Upload the package as the workspace draft, build it, and stream the build log. 
+```sh
+caplo tool push [flags]
+```
+ Uploads the package directory as its workspace draft, creating the package on its first push, then builds the draft and streams the build log. node_modules, .git, and what git ignores are left out, by the .gitignore files from the enclosing git repository, else the project, down through the package; symlinks and other special files are refused. The builder installs dependencies from the lockfile. Publish the build with caplo tool publish. **Examples** 
+```sh
+caplo tool push
+caplo tool push --dir tools/orders
+```
+ **Flags** | Flag | Value | Default | Description | | ------------- | ------ | ------- | ----------------- | | `--dir`, `-C` | string | `.` | package directory | ## caplo tool restore [Section titled “caplo tool restore”](#caplo-tool-restore) Restore an archived package. 
+```sh
+caplo tool restore [package] [flags]
+```
+ Restores an archived package, so it can be pushed, built, and published again. **Examples** 
+```sh
+caplo tool restore orders
+```
+ **Flags** | Flag | Value | Default | Description | | ------------- | ------ | ------- | ----------------- | | `--dir`, `-C` | string | `.` | package directory | ## caplo tool secret [Section titled “caplo tool secret”](#caplo-tool-secret) Manage the secret values live calls receive. 
+```sh
+caplo tool secret
+```
+ A package’s live calls receive the secrets its caplo.yaml declares, by name. Each one is the package’s own value, set with caplo tool secret set, or is bound to a workspace secret that several packages can share (caplo secret). Values are never shown again, and live calls use a change within a minute. The commands act on the package -p names, else the one caplo.yaml in –dir names. **Examples** 
+```sh
+caplo tool secret list orders
+caplo tool secret bind ORDERS_API_KEY orders-api-key -p orders
+```
+ **Commands** * [`caplo tool secret bind`](#caplo-tool-secret-bind) * [`caplo tool secret list`](#caplo-tool-secret-list) * [`caplo tool secret set`](#caplo-tool-secret-set) * [`caplo tool secret unbind`](#caplo-tool-secret-unbind) * [`caplo tool secret unset`](#caplo-tool-secret-unset) ## caplo tool secret bind [Section titled “caplo tool secret bind”](#caplo-tool-secret-bind) Fill a secret from a workspace secret, replacing the package’s own value. 
+```sh
+caplo tool secret bind <NAME> <workspace-secret> [flags]
+```
+ **Examples** 
+```sh
+caplo tool secret bind ORDERS_API_KEY orders-api-key -p orders
+```
+ **Flags** | Flag | Value | Default | Description | | ----------------- | ------ | ------- | -------------------------------------------------------- | | `--dir`, `-C` | string | `.` | package directory | | `--package`, `-p` | string | | package name (default: the one caplo.yaml in –dir names) | ## caplo tool secret list [Section titled “caplo tool secret list”](#caplo-tool-secret-list) List the secrets the latest active version declares and where each value comes from. 
+```sh
+caplo tool secret list [package] [flags]
+```
+ Lists the names the package’s latest active version declares, and any other name that is set or bound, with the source of each value: workspace: \<secret>, package, or none. **Examples** 
+```sh
+caplo tool secret list orders
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--dir`, `-C` | string | `.` | package directory | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo tool secret set [Section titled “caplo tool secret set”](#caplo-tool-secret-set) Set a secret from a hidden prompt, or from stdin when it is not a terminal. 
+```sh
+caplo tool secret set <NAME> [flags]
+```
+ Sets the package’s own value of a secret for live calls. The value comes from a hidden prompt, or from standard input without its final newline when that is not a terminal, and is 1 to 8192 bytes. Names match \[A-Z]\[A-Z0-9\_]{0,63}. A name bound to a workspace secret must be unbound first. **Examples** 
+```sh
+caplo tool secret set ORDERS_API_KEY -p orders
+printf %s "$ORDERS_API_KEY" | caplo tool secret set ORDERS_API_KEY -p orders
+```
+ **Flags** | Flag | Value | Default | Description | | ----------------- | ------ | ------- | -------------------------------------------------------- | | `--dir`, `-C` | string | `.` | package directory | | `--package`, `-p` | string | | package name (default: the one caplo.yaml in –dir names) | ## caplo tool secret unbind [Section titled “caplo tool secret unbind”](#caplo-tool-secret-unbind) Remove a secret’s workspace secret binding; live calls that need it fail until it is bound or set. 
+```sh
+caplo tool secret unbind <NAME> [flags]
+```
+ Removes the binding and leaves the secret unset. It asks first; –yes skips the question. **Examples** 
+```sh
+caplo tool secret unbind ORDERS_API_KEY -p orders
+```
+ **Flags** | Flag | Value | Default | Description | | ----------------- | ------ | ------- | -------------------------------------------------------- | | `--dir`, `-C` | string | `.` | package directory | | `--package`, `-p` | string | | package name (default: the one caplo.yaml in –dir names) | | `--yes`, `-y` | | | do not ask for confirmation | ## caplo tool secret unset [Section titled “caplo tool secret unset”](#caplo-tool-secret-unset) Remove a secret; live calls that need it fail. 
+```sh
+caplo tool secret unset <NAME> [flags]
+```
+ Removes the package’s own value of a secret. It asks first; –yes skips the question. **Examples** 
+```sh
+caplo tool secret unset ORDERS_API_KEY -p orders --yes
+```
+ **Flags** | Flag | Value | Default | Description | | ----------------- | ------ | ------- | -------------------------------------------------------- | | `--dir`, `-C` | string | `.` | package directory | | `--package`, `-p` | string | | package name (default: the one caplo.yaml in –dir names) | | `--yes`, `-y` | | | do not ask for confirmation | ## caplo tool test [Section titled “caplo tool test”](#caplo-tool-test) Bundle the package like the builder and run its fixtures in local Node 24, or with –remote on Caplo’s test runner. 
+```sh
+caplo tool test [flags]
+```
+ Bundles the package with the builder’s esbuild version, options, and rejection rules, loads it through the @caplo/tools host harness from an empty directory with no environment, checks the tool policy in caplo.yaml, and runs the fixtures (tests/\*.json unless caplo.yaml sets tests) in local Node 24. It prints the capabilities the builder records from the installed @caplo/tools release beside the ones the running server advertises; the runner requires both. Run npm install first. Local tests run on macOS and Linux; on Windows, use WSL. The server build stays authoritative, since local dependencies may differ from the lockfile. –remote instead pushes and builds the draft like caplo tool push and runs the fixtures on the workspace’s test runner. It exits 3 when a fixture fails. **Examples** 
+```sh
+caplo tool test
+caplo tool test -v
+caplo tool test --remote
+```
+ **Flags** | Flag | Value | Default | Description | | ----------------- | ------ | ------- | ---------------------------------------------------------------- | | `--dir`, `-C` | string | `.` | package directory | | `--remote` | | | push, build, and run the fixtures on the workspace’s test runner | | `--verbose`, `-v` | | | print log lines for passing fixtures too | ## caplo tool version [Section titled “caplo tool version”](#caplo-tool-version) Show and revoke published versions. 
+```sh
+caplo tool version
+```
+ **Examples** 
+```sh
+caplo tool version list orders
+caplo tool version revoke orders@3 --reason "leaks order notes"
+```
+ **Commands** * [`caplo tool version get`](#caplo-tool-version-get) * [`caplo tool version list`](#caplo-tool-version-list) * [`caplo tool version revoke`](#caplo-tool-version-revoke) ## caplo tool version get [Section titled “caplo tool version get”](#caplo-tool-version-get) Show a published version and its tools. 
+```sh
+caplo tool version get [<package>@]<version> [flags]
+```
+ Shows a published version: its status, build, bundle digest, egress, declared secrets, and tools. Without \<package>@ the package is the one caplo.yaml in –dir names. **Examples** 
+```sh
+caplo tool version get orders@3
+caplo tool version get 3 --dir tools/orders
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--dir`, `-C` | string | `.` | package directory | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo tool version list [Section titled “caplo tool version list”](#caplo-tool-version-list) List a package’s published versions. 
+```sh
+caplo tool version list [package] [flags]
+```
+ **Examples** 
+```sh
+caplo tool version list orders
+caplo tool version list -o json
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--dir`, `-C` | string | `.` | package directory | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo tool version revoke [Section titled “caplo tool version revoke”](#caplo-tool-version-revoke) Revoke a published version so agents stop resolving it. 
+```sh
+caplo tool version revoke [<package>@]<version> [flags]
+```
+ Revokes a published version so agents stop resolving it. It needs –reason and asks first; –yes skips the question. **Examples** 
+```sh
+caplo tool version revoke orders@3 --reason "leaks order notes"
+```
+ **Flags** | Flag | Value | Default | Description | | ------------- | ------ | ------- | ------------------------------------- | | `--dir`, `-C` | string | `.` | package directory | | `--reason` | string | | why the version is revoked (required) | | `--yes`, `-y` | | | do not ask for confirmation |
+
+# caplo workspace
+
+> List, show, create, and select workspaces.
+
+List, show, create, and select workspaces. 
+```sh
+caplo workspace
+```
+ Commands act on the workspace that –workspace or CAPLO_WORKSPACE names, by ID or exact name, else on the one selected with caplo workspace use. With an API key the workspace must be named by ID, since a key cannot list workspaces. **Examples** 
+```sh
+caplo workspace list
+caplo workspace use "Shop staging"
+```
+ **Commands** * [`caplo workspace api-client`](#caplo-workspace-api-client) * [`caplo workspace create`](#caplo-workspace-create) * [`caplo workspace get`](#caplo-workspace-get) * [`caplo workspace list`](#caplo-workspace-list) * [`caplo workspace use`](#caplo-workspace-use) ## caplo workspace api-client [Section titled “caplo workspace api-client”](#caplo-workspace-api-client) Manage API clients and their keys for CI and automation. 
+```sh
+caplo workspace api-client
+```
+ An API client authenticates CI and automation without a person’s login. Set CAPLO_API_KEY to one of its keys and CAPLO_WORKSPACE (or –workspace, or a project environment’s workspace) to its workspace ID, and caplo commands act as the client with its scopes, at CAPLO_API_URL, else the configured API, else production. caplo auth status shows the client and its scopes. A key cannot list workspaces, so a workspace named by name is refused. Scopes: agents:read, agents:write, agents:publish tools:read, tools:write, tools:publish channels:read, channels:write conversations:read, usage:read endpoints:read, endpoints:write A write or publish scope includes its read scope, and a member can grant only the actions their own role holds. A CI publish needs agents:write and agents:publish, and tools:write and tools:publish when the project has packages. An environment that deploys channels needs channels:write, which a publish checks before it starts. Channel commands also read agents, and knowledge commands use the agent scopes. A project environment can name its own key variable with apiKeyEnv; see caplo publish. **Examples** 
+```sh
+caplo workspace api-client create ci --scope agents:write,agents:publish,tools:write,tools:publish
+CAPLO_API_KEY=... CAPLO_WORKSPACE=5b1e9c2a-... caplo publish --yes
+```
+ **Commands** * [`caplo workspace api-client create`](#caplo-workspace-api-client-create) * [`caplo workspace api-client list`](#caplo-workspace-api-client-list) * [`caplo workspace api-client revoke`](#caplo-workspace-api-client-revoke) * [`caplo workspace api-client rotate`](#caplo-workspace-api-client-rotate) ## caplo workspace api-client create [Section titled “caplo workspace api-client create”](#caplo-workspace-api-client-create) Create an API client and print its first key. 
+```sh
+caplo workspace api-client create <name> --scope <scope>... [flags]
+```
+ Creates an API client with the scopes and prints its first key on standard output, once; store it at once, for example as the CI secret CAPLO_API_KEY. Scopes: agents:read, agents:write, agents:publish tools:read, tools:write, tools:publish channels:read, channels:write conversations:read, usage:read endpoints:read, endpoints:write **Examples** 
+```sh
+caplo workspace api-client create ci --scope agents:write --scope agents:publish
+caplo workspace api-client create reports --scope conversations:read,usage:read
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ----------- | ------- | ---------------------------------------------- | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | | `--scope` | stringSlice | | scope to grant; repeat or separate with commas | ## caplo workspace api-client list [Section titled “caplo workspace api-client list”](#caplo-workspace-api-client-list) List the workspace’s API clients and their keys. 
+```sh
+caplo workspace api-client list [flags]
+```
+ **Examples** 
+```sh
+caplo workspace api-client list
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo workspace api-client revoke [Section titled “caplo workspace api-client revoke”](#caplo-workspace-api-client-revoke) Revoke an API client’s active keys, or only the ones –key names. 
+```sh
+caplo workspace api-client revoke <client> [flags]
+```
+ Revokes the API client’s active keys: every one, the ones –key names, or all but the one –except names. Keys are named by ID or prefix. Anything using a revoked key stops working. It asks first; –yes skips the question. **Examples** 
+```sh
+caplo workspace api-client revoke ci --except 9d3e1f20-4b5a-4c6d-8e7f-0a1b2c3d4e5f
+caplo workspace api-client revoke ci --key caplo_sk_3f9a6b1c --yes
+```
+ **Flags** | Flag | Value | Default | Description | | ------------- | ----------- | ------- | --------------------------------------------------------------------- | | `--except` | string | | revoke every active key but this one (ID or prefix), after a rotation | | `--key` | stringSlice | | key ID or prefix to revoke (default: every active key) | | `--yes`, `-y` | | | revoke without asking | ## caplo workspace api-client rotate [Section titled “caplo workspace api-client rotate”](#caplo-workspace-api-client-rotate) Add a new key to an API client and print it; its other keys stay active until revoked. 
+```sh
+caplo workspace api-client rotate <client> [flags]
+```
+ Adds a key to the API client and prints it on standard output, once. The client’s other keys stay active, so CI keeps working while you replace the key; then revoke the old ones with caplo workspace api-client revoke \<client> –except \<new key>. **Examples** 
+```sh
+caplo workspace api-client rotate ci
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo workspace create [Section titled “caplo workspace create”](#caplo-workspace-create) Create a workspace you own and select it. 
+```sh
+caplo workspace create <name>
+```
+ **Examples** 
+```sh
+caplo workspace create "Shop staging"
+```
+ ## caplo workspace get [Section titled “caplo workspace get”](#caplo-workspace-get) Show a workspace, by default the selected one. 
+```sh
+caplo workspace get [name or ID] [flags]
+```
+ **Examples** 
+```sh
+caplo workspace get
+caplo workspace get "Shop staging" -o json
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo workspace list [Section titled “caplo workspace list”](#caplo-workspace-list) List your workspaces. 
+```sh
+caplo workspace list [flags]
+```
+ Lists the workspaces you belong to with your role; \* marks the selected one. **Examples** 
+```sh
+caplo workspace list
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo workspace use [Section titled “caplo workspace use”](#caplo-workspace-use) Select the workspace for later commands. 
+```sh
+caplo workspace use <name or ID>
+```
+ Saves the workspace, by ID or exact name, as the one later commands act on. –workspace or CAPLO_WORKSPACE overrides it for one command. **Examples** 
+```sh
+caplo workspace use "Shop staging"
+```

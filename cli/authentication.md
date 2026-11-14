@@ -1,0 +1,186 @@
+# Log in and use API keys
+
+> Log in to the caplo CLI as yourself, see where the session is kept, change CLI settings, and create API keys for CI and automation.
+
+The CLI authenticates in one of two ways:
+
+* **As you**, after `caplo auth login`. Commands act with your workspace role, the same as in the console.
+* **As an API client**, when `CAPLO_API_KEY` holds an API key. Commands act with the key’s scopes. Use this in CI and other automation where nobody can log in.
+
+## Log in
+
+```sh
+caplo auth login
+```
+
+1. The CLI opens your browser at the Caplo sign-in page. If it does not open, copy the URL the CLI prints.
+
+2. Sign in as you do in the console. The browser then shows that you are logged in to the Caplo CLI, and you can close it.
+
+3. The CLI prints your name and email. If you belong to exactly one workspace, it selects that workspace. If you belong to several, run `caplo workspace use <name>` to choose one; see [Workspaces](/cli/workspaces/).
+
+The browser returns to a short-lived listener on `127.0.0.1` on your machine, so the browser and the CLI must run on the same computer. The sign-in must finish within five minutes.
+
+### On a machine without a browser
+
+On a remote server, in a container, or over SSH, use the device flow:
+
+```sh
+caplo auth login --device
+```
+
+The CLI prints a URL and a code. Open the URL on any device, sign in, and confirm the code; the CLI finishes as soon as you do.
+
+`--no-browser` only stops the CLI from opening a browser itself. It still needs a browser on the same machine to finish, so prefer `--device` when there is none.
+
+### Check and end the session
+
+```sh
+caplo auth status
+caplo auth logout
+```
+
+`caplo auth status` shows who you are logged in as, the API and sign-in server, where the session is stored, and the selected workspace. With `CAPLO_API_KEY` set, it shows the API client, its workspace and its scopes instead.
+
+`caplo auth logout` deletes the stored session from your machine and then ends it on the server. If ending it on the server fails, the CLI says so; the local copy is already gone.
+
+## Where the session is stored
+
+Logging in creates a long-lived session. The CLI keeps it as a refresh token and gets short-lived access tokens from it as needed; access tokens stay in memory and are never written to disk. Several `caplo` commands can run at once safely.
+
+| Storage              | Where                                                                                                                                                                       | When                                                                |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `keychain` (default) | The operating system’s credential store: macOS Keychain, Windows Credential Manager, or the Secret Service (such as GNOME Keyring) on Linux, under the service name `caplo` | Desktops and laptops                                                |
+| `file`               | `credentials.json` in the configuration directory, readable only by your user (mode 0600)                                                                                   | Machines without a credential store, such as a minimal Linux server |
+
+To use file storage, log in with `--insecure-storage`, or set it first with `caplo config set credential-storage file`. The choice is saved and applies to later logins too.
+
+Caution
+
+Anyone who can read `credentials.json` can act as you in Caplo until you log out. Use file storage only on a machine and account you control, and prefer an [API key](#api-keys-for-automation) for unattended jobs.
+
+The configuration directory is `CAPLO_CONFIG_DIR` if set, otherwise `$XDG_CONFIG_HOME/caplo` or `~/.config/caplo` on macOS and Linux, and `%AppData%\caplo` on Windows. It holds `config.yaml` with your settings and selected workspace, and `credentials.json` when you use file storage.
+
+## CLI settings
+
+`caplo config` shows and changes the settings in `config.yaml`:
+
+```sh
+caplo config list
+caplo config get api-url
+caplo config set credential-storage file
+```
+
+| Key                  | Default                              | What it is                                       |
+| -------------------- | ------------------------------------ | ------------------------------------------------ |
+| `api-url`            | `https://api.caplo.si`               | The Caplo API the CLI calls.                     |
+| `issuer`             | `https://auth.caplo.si/realms/caplo` | The sign-in server.                              |
+| `client-id`          | `caplo-cli`                          | The sign-in client the CLI identifies as.        |
+| `credential-storage` | `keychain`                           | Where the session is kept: `keychain` or `file`. |
+
+`caplo config list` also shows the selected workspace. You only need to change `api-url`, `issuer` or `client-id` if Caplo support gives you different values. Changing `api-url` clears the selected workspace. After changing a setting, run `caplo auth login` again.
+
+When you log in, the API and sign-in server come from, in order: the `--api-url` and `--issuer` flags, the `CAPLO_API_URL` and `CAPLO_ISSUER` environment variables, the saved settings, then the defaults above. A successful login saves them. To keep two separate logins on one machine, give each its own `CAPLO_CONFIG_DIR`.
+
+## API keys for automation
+
+An API client is a workspace identity for CI and scripts. It is not a member: it has no role, cannot use the console, and can only do what its scopes allow in its own workspace. Each client can have several keys, so you can rotate a key without downtime. Keys start with `caplo_sk_`.
+
+### Who can create one
+
+Workspace Owners, Admins and Developers can manage API clients. You can only give a client scopes whose actions your own role holds: for example, a Developer can create a client with tool scopes but not with `agents:write` or `agents:publish`. See [Workspaces and roles](/concepts/workspaces-and-roles/).
+
+### Create a client
+
+**Console**
+
+1. Open **Settings**, then **API access**.
+2. Click **Create client**, enter a **Client name**, and turn on the permissions it needs.
+3. Click **Create key** and copy the key from **Copy your API key**. It is shown only once.
+
+**CLI**
+
+Log in as yourself, select the workspace, then:
+
+```sh
+caplo workspace api-client create github-deploy \
+  --scope agents:write,agents:publish,tools:write,tools:publish
+```
+
+The key is printed once on standard output, so you can pipe it straight into your CI’s secret store. Repeat `--scope` or separate scopes with commas.
+
+Store the key as a secret in your CI system right away. Caplo keeps only a hash of it and cannot show it again.
+
+### Scopes
+
+A write or publish scope includes the read scope of the same resource.
+
+| Scope            | Console label                | Allows                                                                                                                   |
+| ---------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `agents:read`    | Read agents                  | Read agents, releases, eval suites and runs, and knowledge bases                                                         |
+| `agents:write`   | Edit agents and knowledge    | Create agents, save drafts and eval suites, create knowledge bases and upload documents                                  |
+| `agents:publish` | Publish agents and knowledge | Run evals, publish and revoke agent releases, archive agents, approve documents and publish knowledge versions           |
+| `tools:read`     | Read tools                   | Read tool packages, builds, versions, logs, remote MCP servers and secret names                                          |
+| `tools:write`    | Edit tools                   | Create and upload packages, build them, run remote fixtures, archive and delete packages, review remote MCP server tools |
+| `tools:publish`  | Publish tools                | Publish and revoke package versions, publish remote MCP server tools, set a package’s own secret values                  |
+| `channels:read`  | Read channels                | Read channels and the release each serves                                                                                |
+| `channels:write` | Deploy to channels           | Point channels at a release and roll them back                                                                           |
+
+The workspace also accepts `conversations:read`, `usage:read`, `endpoints:read` and `endpoints:write`, but no `caplo` command uses them.
+
+### Use the key
+
+Set two environment variables. The CLI then authenticates as the client for every command, instead of any login on the machine:
+
+```sh
+export CAPLO_API_KEY=<API_KEY>
+export CAPLO_WORKSPACE=<WORKSPACE_ID>
+caplo auth status
+```
+
+`CAPLO_WORKSPACE` (or `--workspace`, or a project [environment](/cli/environments/)) must name the client’s workspace by ID, not by name, because a key cannot list workspaces. The CLI checks that the key belongs to that workspace before it does anything else. `caplo workspace get` while logged in, or the console, shows the ID. The key calls `CAPLO_API_URL` if set, then the saved `api-url`, then `https://api.caplo.si`.
+
+### What works with an API key
+
+| Commands                                                                                          | Scopes needed                                                                                                                                          |
+| ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `caplo validate`, `caplo test`, `caplo identity`                                                  | None: they do not call the Caplo API                                                                                                                   |
+| `caplo diff`, `caplo pull`, `caplo agent list`, `get` and `pull`                                  | `agents:read`, plus `tools:read` when packages are involved                                                                                            |
+| `caplo push`, `caplo agent push`                                                                  | `agents:write`, plus `tools:write` when the project has packages                                                                                       |
+| `caplo eval`, `caplo agent eval run`                                                              | `agents:write` and `agents:publish`, plus `tools:write` with packages                                                                                  |
+| `caplo publish`, `caplo agent publish`                                                            | `agents:write` and `agents:publish`, plus `tools:write` and `tools:publish` with packages, plus `channels:write` when the environment deploys channels |
+| `caplo tool` list, push, build, publish and version commands, `caplo tool secret set` and `unset` | `tools:read`, `tools:write` or `tools:publish`                                                                                                         |
+| `caplo mcp list`, `get`, `tools`, `review` and `publish`                                          | `tools:read`, `tools:write` or `tools:publish`                                                                                                         |
+| `caplo secret list` and `usage`, `caplo tool secret list`                                         | `tools:read`                                                                                                                                           |
+| `caplo knowledge`                                                                                 | `agents:read`; `agents:write` to create and sync; `agents:publish` to approve and publish                                                              |
+| `caplo channel list` and `get`                                                                    | `channels:read` and `agents:read`                                                                                                                      |
+| `caplo channel deploy` and `rollback`                                                             | `channels:write` and `agents:read`                                                                                                                     |
+
+These need a person’s login and do not work with an API key:
+
+* `caplo workspace` commands, including `caplo workspace api-client`: an API client cannot manage workspaces or other clients.
+* `caplo secret set` and `delete`, and `caplo tool secret bind` and `unbind`: managing workspace secrets needs a member with the secrets permission.
+* `caplo mcp add`, `update`, `remove`, `check`, `connect` and `refresh`: connecting remote MCP servers needs a member who can manage integrations.
+* `caplo agent chat` and `caplo agent test`: test conversations belong to a person.
+
+If the API refuses a key, the CLI says that an API key cannot do this or that it was revoked. Check the scopes with `caplo auth status`.
+
+### Rotate a key
+
+Add a new key, switch your CI secret to it, then revoke the old ones:
+
+```sh
+caplo workspace api-client rotate github-deploy
+caplo workspace api-client revoke github-deploy --except <NEW_KEY_ID_OR_PREFIX>
+```
+
+`rotate` prints the new key once and leaves the old keys active, so nothing breaks while you update the secret. `caplo workspace api-client list` shows each client’s scopes and the prefixes of its active keys. In the console, use **Add rotation key** on the client.
+
+### Revoke keys
+
+```sh
+caplo workspace api-client revoke github-deploy
+caplo workspace api-client revoke github-deploy --key <KEY_ID_OR_PREFIX>
+```
+
+Without `--key`, every active key of the client is revoked. The command asks first; pass `--yes` in scripts. Anything still using a revoked key stops working at once. A client’s scopes cannot be changed; to change them, create a new client and revoke the old one’s keys.

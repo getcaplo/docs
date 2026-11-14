@@ -1,0 +1,1 @@
+async function e(e){try{if(typeof e!=`string`&&`ClipboardItem`in window){let t=e.then(e=>new Blob([e],{type:`text/plain`}));await navigator.clipboard.write([new ClipboardItem({"text/plain":t})])}else await navigator.clipboard.writeText(await e);return!0}catch{return!1}}function t(e,t,n){e.textContent=t,setTimeout(()=>e.textContent=n,2e3)}export{t as n,e as t};

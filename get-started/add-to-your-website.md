@@ -1,0 +1,49 @@
+# Add an agent to your website
+
+> The short path from a published agent release to a chat widget on your site.
+
+Once an agent has a published release, three things put it on your website: a published widget design, a website channel that serves the release, and the channel’s embed code on your pages. This page is the short version; [Install the widget](/channels/website-widget/install/) covers every option.
+
+## Before you start
+
+* A published agent release. If you do not have one yet, follow [Build your first agent in the console](/get-started/quickstart-console/) or [Build your first agent with the CLI](/get-started/quickstart-cli/).
+* The **Owner**, **Admin** or **Builder** role, which can configure channels and widgets.
+* Your website’s origin: the scheme and host, without a path, such as `https://www.example.com`. For local development you can use `http://localhost:3000`.
+
+## Steps
+
+1. **Publish a widget design.** In the console, open **Widget designs** and select **Create design**. Name it, select **Create design**, and adjust colours, logo and welcome screen if you like. Select **Save draft**, then in **Publish and install** select **Publish revision 1** and confirm. See [Design the widget](/channels/website-widget/design/).
+
+2. **Create a website channel.** Open **Channels**, select **Create channel**, then **Live chat widget**. Enter a **Channel name**, choose the **Agent** and the **Agent release** to serve, and select **Set up connection**.
+
+3. **Allow your website.** Enter your site in **Allowed website origin**. To add another origin, such as a staging site, select **Add origin**. Choose the **Widget design** and select **Create channel**. The widget refuses to load on any origin you have not listed.
+
+4. **Apply the design.** Caplo opens the new website entry point. On the **General** tab, under **Appearance**, choose the design’s published revision and select **Apply revision 1**. Applying takes effect right away.
+
+5. **Copy the embed code.** On the **Install** tab, select **Copy embed code**. It looks like this:
+
+   ```html
+   <script
+     src="https://api.caplo.si/v1/messaging/widget/loader.js"
+     data-widget-id="<WIDGET_ID>"
+     async
+   ></script>
+   ```
+
+   A design with the inline layout adds a `<div>` that marks where the chat appears; copy both parts.
+
+6. **Add it to your site.** Paste the code into your site’s HTML just before `</body>`, on every page that should show the widget. In a site builder or CMS, use its custom code or footer script setting.
+
+7. **Check it.** Load a page on an allowed origin. The launcher appears, and opening it shows the agent’s greeting.
+
+Note
+
+If your site sends a Content-Security-Policy header, the widget is blocked until you allow Caplo’s sources. The **Install** tab lists the exact additions under **Content Security Policy additions**. See [Install the widget](/channels/website-widget/install/).
+
+## After you go live
+
+* **New releases do not reach the website on their own.** When you publish a new agent release, open the channel and select **Update to** the new version (or **Change release** to pick any release), or run `caplo channel deploy "<CHANNEL_NAME>"`. New conversations use the new release; conversations in progress keep the one they started with. See [Channels](/concepts/channels/).
+* **The embed code stays the same** when you apply a new design revision, unless you switch between the popup and inline layouts.
+* **Conversations** appear in the console under **Conversations**, where your team can read them and take over. See [Conversations and handoff](/concepts/conversations-and-handoff/).
+
+If something does not work, see [Troubleshoot the widget](/channels/website-widget/troubleshooting/).

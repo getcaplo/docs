@@ -1,0 +1,26 @@
+# Caplo
+
+> Caplo is a platform for building, testing and publishing AI agents that talk to customers over a website widget, voice, phone and messaging channels. Agents are configured in the Caplo console or as YAML files with the `caplo` CLI, call tool packages (TypeScript functions or MCP servers) and remote MCP servers, search knowledge bases, and are published as immutable releases that channels serve.
+
+- Every page is also available as Markdown: append `.md` to its URL without the trailing slash, for example https://docs.caplo.si/agents/publishing.md.
+- JSON Schemas for agent files, tool package `caplo.yaml` and fixtures are at https://docs.caplo.si/schemas/.
+- The CLI reference is generated from the released `caplo` binary; prefer it over guesses about flags.
+
+## Documentation Sets
+
+- [Abridged documentation](https://docs.caplo.si/llms-small.txt): a compact version of the documentation for Caplo, with non-essential content removed
+- [Complete documentation](https://docs.caplo.si/llms-full.txt): the full documentation for Caplo
+- [Build agents](https://docs.caplo.si/_llms-txt/build-agents.txt): agent configuration, knowledge, sub-agents, evals and publishing
+- [Tools](https://docs.caplo.si/_llms-txt/tools.txt): writing, testing and publishing tool packages and remote MCP servers
+- [CLI](https://docs.caplo.si/_llms-txt/cli.txt): installing and using the caplo CLI, with the full command reference
+- [Website widget](https://docs.caplo.si/_llms-txt/website-widget.txt): installing, designing and scripting the website widget
+
+## Notes
+
+- The complete documentation includes all content from the official documentation
+- The content is automatically generated from the same source as the official documentation
+
+## Optional
+
+- [Caplo console](https://app.caplo.si): Sign in to build and operate agents.
+- [Caplo website](https://caplo.si)

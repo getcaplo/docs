@@ -1,0 +1,107 @@
+# Channels
+
+> Connect a website, phone number or messaging account to a published agent release, then update or roll back the release it serves.
+
+A channel is how customers reach an agent. Each channel has one entry point, such as a website widget or a phone number, and serves one published release of one agent. Publishing a new release does not change any channel: you choose when each channel moves to it.
+
+New conversations use the release the channel serves when they start. Conversations already in progress keep the release they started with, so updating or rolling back a channel never changes an open conversation.
+
+## Channel types
+
+| Type           | Console name           | How customers reach the agent                                                                                            |
+| -------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Website widget | **Live chat widget**   | A chat (and optional voice) widget on your website. See [Install the website widget](/channels/website-widget/install/). |
+| WhatsApp       | **WhatsApp Business**  | Messages to a connected WhatsApp Business number.                                                                        |
+| Messenger      | **Facebook Messenger** | Messages to a connected Facebook Page.                                                                                   |
+| Instagram      | **Instagram**          | Messages to a connected Instagram professional account.                                                                  |
+| Phone          | **Telephone**          | Inbound calls to a Twilio or Telnyx number you connect.                                                                  |
+
+For WhatsApp, Messenger, Instagram and phone, you first connect the provider account in the console under **Integrations** then **Communication channels**. Caplo verifies the account before you can choose it in a channel. Detailed setup guides for these channel types will be added to these docs later.
+
+## Before you start
+
+* Publish at least one release of the agent. Only agents with a published release can be chosen for a channel. See [Publish an agent](/agents/publishing/).
+* You need a workspace role that can configure channels: Owner, Admin or Builder. Other roles can view channels but not change them. See [Workspaces and roles](/concepts/workspaces-and-roles/).
+
+## Create a channel
+
+1. In the console, open **Channels** under **Deploy**.
+
+2. Select **Create channel** and choose the channel type.
+
+3. Enter a **Channel name**, choose the **Agent** and the **Agent release** it should serve, then select **Set up connection**.
+
+4. Complete the entry point details for the type. For a website widget, add the allowed website origins and a widget design. For a provider channel, choose the connected account and number, Page or profile.
+
+5. Select **Create channel**. For a website widget, the console opens the entry point editor, where you configure the conversation and copy the embed code. See [Install the website widget](/channels/website-widget/install/).
+
+The channel page shows **What customers get**: the agent release, each entry point and its state, and **Launch checks**. Select **Review checks** to see which release, tool, knowledge or entry point settings still need attention.
+
+## Deploy a new release
+
+When the agent has a newer release than the one a channel serves, the channel shows **Update available**.
+
+**Console**
+
+1. Open the channel in **Channels**.
+
+2. Under **Agent release**, select **Update to** followed by the newest release. The dialog shows the release you serve now, the release after the update and its release note.
+
+3. Confirm the update. New conversations start on the new release.
+
+To pick a specific release, or to point the channel at a different agent, select **Change release** (or **Edit channel**), choose the **Agent** and **Agent release**, then select **Save changes**.
+
+**CLI**
+
+List your channels and the release each one serves:
+
+```sh
+caplo channel list
+caplo channel get "Website"
+```
+
+Point a channel at its agent’s newest release that is not revoked:
+
+```sh
+caplo channel deploy "Website"
+```
+
+Pick a release with `@` and a version or release number, or point the channel at another agent:
+
+```sh
+caplo channel deploy "Website" --agent "Shop Concierge@1.4.0"
+```
+
+When two channels share a name, name the channel as `kind/name` (for example `website/Website` or `whatsapp/Support`) or use its ID. `deploy` asks for confirmation; add `--yes` in scripts. See [`caplo channel deploy`](/reference/cli/channel/#caplo-channel-deploy).
+
+## Roll back
+
+**Console**
+
+Open the channel, select **Change release**, choose the earlier **Agent release** and select **Save changes**. New conversations use that release from then on.
+
+**CLI**
+
+Point a channel back at the newest release of its agent that is older than the one it serves and not revoked:
+
+```sh
+caplo channel rollback "Website"
+```
+
+The release is served exactly as it was published. To move forward again, run `caplo channel deploy`. See [`caplo channel rollback`](/reference/cli/channel/#caplo-channel-rollback).
+
+Note
+
+A channel’s **Deployment history** lists every saved revision. Restoring a revision from there restores its connection settings only; the agent release stays as it is. Use **Change release** or `caplo channel rollback` to change the release.
+
+## Pause a channel
+
+**Pause channel** stops new conversations on every entry point of the channel. Conversations in progress continue. Select **Resume channel** to accept new conversations again.
+
+A website widget channel can be deleted with **Delete**. WhatsApp, Messenger, Instagram and phone channels can be paused but not deleted from the console.
+
+## Related
+
+* [Channels concept](/concepts/channels/)
+* [Agents and releases](/concepts/agents-and-releases/)
+* [`caplo channel` reference](/reference/cli/channel/)

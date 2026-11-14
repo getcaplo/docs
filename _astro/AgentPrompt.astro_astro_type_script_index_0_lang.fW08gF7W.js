@@ -1,0 +1,1 @@
+import{n as e,t}from"./clipboard.8P9oXKo3.js";for(let n of document.querySelectorAll(`[data-agent-prompt]`)){let r=n.querySelector(`[data-copy-prompt]`),i=n.querySelector(`[data-label]`),a=n.querySelector(`[data-prompt-text]`).textContent??``;r.addEventListener(`click`,async()=>e(i,await t(a)?`Copied`:`Copy failed`,`Copy prompt`))}

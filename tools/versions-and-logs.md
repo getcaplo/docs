@@ -1,0 +1,104 @@
+# Manage versions and read logs
+
+> Follow builds, publish and revoke versions, archive or delete packages, pull a version's exact source, and read recent invocation logs.
+
+A tool package moves through three stages:
+
+1. **Draft.** The files you push or edit in Tool Studio. There is one draft per package, and each change raises its revision (`r1`, `r2`…).
+2. **Build.** A snapshot of the draft, installed, bundled, checked and introspected. A build is `queued`, `running`, `succeeded`, `failed` or `cancelled`.
+3. **Version.** A succeeded build you published, numbered `v1`, `v2`… A version never changes. Agents pin versions.
+
+## Builds
+
+`caplo tool push` starts a build and streams its log; so does **Build** in Tool Studio. To look at builds afterwards:
+
+```sh
+caplo tool build list orders --status failed
+caplo tool build get orders <BUILD_ID>
+caplo tool build logs orders <BUILD_ID>
+caplo tool build cancel orders <BUILD_ID>
+```
+
+A build installs dependencies from your lockfile with install scripts disabled, checks them against known malicious packages, bundles the code, rejects unsafe code, and starts the bundle with no network access to read its tool list. Common failures:
+
+| Code                                              | Cause                                                                                                                           |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `lockfile_required`, `lockfile_mismatch`          | No `package-lock.json`, `yarn.lock` or `pnpm-lock.yaml`, or it does not match `package.json`. Run `npm install` and push again. |
+| `install_failed`, `install_timeout`               | Installing failed, or took over 90 seconds.                                                                                     |
+| `malicious_package`                               | A dependency is a known malicious package.                                                                                      |
+| `native_addon`                                    | A dependency needs a native `.node` addon.                                                                                      |
+| `forbidden_import`                                | The code imports `child_process`, `cluster`, `worker_threads` or `inspector`.                                                   |
+| `dynamic_require`                                 | The code requires a path the bundler cannot resolve, or reads package files at run time.                                        |
+| `bundle_too_large`                                | The bundle is over 10 MiB.                                                                                                      |
+| `config_invalid`                                  | `caplo.yaml` fails its schema, or its `name` or `type` differs from the package.                                                |
+| `entry_invalid`, `compile_failed`                 | The entry module is missing, exports the wrong thing, or does not compile.                                                      |
+| `introspection_failed`                            | Loading the bundle or listing its tools failed. Code that calls the network while loading fails here.                           |
+| `tool_policy_missing`, `tool_policy_unknown_tool` | A listed tool has no policy in `caplo.yaml`, or a policy names a tool the code does not list.                                   |
+| `tool_name_invalid`, `schema_invalid`             | A tool name or model name breaks the naming rules, or a schema or presentation is invalid.                                      |
+| `build_timeout`                                   | The build took over 120 seconds.                                                                                                |
+
+Run `caplo tool test` locally first: it applies the same bundling, rejection and policy checks.
+
+## Publish a version
+
+```sh
+caplo tool publish                      # the latest succeeded build
+caplo tool publish orders --build <BUILD_ID>
+```
+
+In Tool Studio, select **Publish** in the **Versions** view. List and inspect versions with `caplo tool version list orders` and `caplo tool version get orders@3`, or see the latest one on the console’s **Tools** page.
+
+A new version does not reach agents by itself. Each agent release pins the version that was current when the agent was published, and keeps it until you publish the agent again. See [Publish an agent](/agents/publishing/).
+
+## Revoke a version
+
+Revoke a version when it must stop running at once, for example because it has a bug that harms customers or leaks data.
+
+```sh
+caplo tool version revoke orders@3 --reason "Refunds the wrong amount for partial orders"
+```
+
+The reason is required and is recorded with the version. In Tool Studio, select **Revoke Version** on the version in the **Versions** view.
+
+Caution
+
+Revoking cannot be undone. Agent releases that pin the version stop calling its tools immediately, so those agents lose the tools until you publish a fixed version and publish the agents again.
+
+## Archive, restore and delete
+
+* `caplo tool archive orders` stops all pushes, builds and publishes. Published versions keep running until you revoke them. `caplo tool list --archived` includes archived packages.
+* `caplo tool restore orders` makes an archived package editable again.
+* `caplo tool delete orders` deletes a package that never published a version, with its draft and builds. A published package can only be archived.
+
+## Pull source
+
+`caplo tool pull` downloads a package into a new or empty directory:
+
+```sh
+caplo tool pull orders                  # the current draft
+caplo tool pull orders@3 --dir ./orders-v3   # the exact source version 3 was built from
+```
+
+Every file is checked against its recorded SHA-256 before anything is written. Use it to debug what a pinned version really runs, or to start working on a package someone else created in Tool Studio. Then run `npm install` and `caplo tool dev --no-inspector` to run it locally.
+
+## Read invocation logs
+
+`caplo tool logs` shows the package’s recent live calls with their outcome, timing, errors, refused hosts and log lines:
+
+```sh
+caplo tool logs orders -n 50
+caplo tool logs orders -f
+```
+
+```txt
+14:02:11 get_order succeeded 182.4 ms cold 7d4c2a9e-...
+  log info {"message":"order found","invocationId":"7d4c2a9e-...","orderId":"SO-1002"}
+14:03:40 get_order failed tool_timeout 5001.2 ms 0b81f6d3-...
+  The tool did not finish before its timeout
+  egress denied api.partner.example: host not in the egress list of a loaded package version
+```
+
+* `-n` sets how many recent invocations come first (default 20, at most 200); `-f` keeps streaming new ones.
+* Logs cover live calls from the last hour only. Test runs show their logs in the test output instead.
+* Each invocation keeps up to 200 log lines, from `log` in the [call context](/tools/define-tool-and-context/#the-call-context); a line over 8 KiB is cut short. `console.log` output is not included.
+* Never log secrets, tokens or customer details you do not need.
