@@ -43,11 +43,11 @@ The new Owner gets the Owner role and you become an Admin immediately. The trans
 
 Select **Remove** on the member’s row and confirm **Remove member**. They lose access to this workspace; their other workspace memberships are not affected. To remove the Owner, transfer ownership first.
 
-Removing a member does not revoke their API keys
+Removing a member revokes their API keys
 
-API clients belong to the workspace, not to the member who created them. Keys a removed member created keep working until you revoke them in **Settings** > **API access**. See [API keys](/admin/api-keys/#revoke-keys).
+Every API key the member created in this workspace is revoked at once, and each revocation is recorded in the [audit log](/operate/audit-log/). Their API clients stay, and so do keys other members added to those clients, so you can add a new key to keep an integration running. See [API keys](/admin/api-keys/#rotate-a-key).
 
-Members provisioned by SCIM are suspended rather than removed when your identity provider deactivates them. See [SCIM provisioning](/admin/sso-and-scim/#scim-provisioning).
+Members provisioned by SCIM are suspended rather than removed when your identity provider deactivates them. Suspension revokes their API keys the same way, and restoring the member does not bring the keys back. See [SCIM provisioning](/admin/sso-and-scim/#scim-provisioning).
 
 ## Related
 

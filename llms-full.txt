@@ -974,7 +974,7 @@ Each key in the console shows its prefix, when it was created and when it was la
 
 Note
 
-Keys belong to the workspace, not to the member who created them. They keep working after that member leaves, so revoke them when you remove someone who had access to them. Keys stop working while the workspace is [paused](/admin/workspace-settings/#pause-a-workspace).
+Clients belong to the workspace, not to the member who created them. When a member is removed, or suspended through SCIM, Caplo revokes the keys that member created; their clients, and keys other members added to them, keep working. Keys stop working while the workspace is [paused](/admin/workspace-settings/#pause-a-workspace).
 
 ## Use a key
 
@@ -1055,11 +1055,11 @@ The new Owner gets the Owner role and you become an Admin immediately. The trans
 
 Select **Remove** on the member’s row and confirm **Remove member**. They lose access to this workspace; their other workspace memberships are not affected. To remove the Owner, transfer ownership first.
 
-Removing a member does not revoke their API keys
+Removing a member revokes their API keys
 
-API clients belong to the workspace, not to the member who created them. Keys a removed member created keep working until you revoke them in **Settings** > **API access**. See [API keys](/admin/api-keys/#revoke-keys).
+Every API key the member created in this workspace is revoked at once, and each revocation is recorded in the [audit log](/operate/audit-log/). Their API clients stay, and so do keys other members added to those clients, so you can add a new key to keep an integration running. See [API keys](/admin/api-keys/#rotate-a-key).
 
-Members provisioned by SCIM are suspended rather than removed when your identity provider deactivates them. See [SCIM provisioning](/admin/sso-and-scim/#scim-provisioning).
+Members provisioned by SCIM are suspended rather than removed when your identity provider deactivates them. Suspension revokes their API keys the same way, and restoring the member does not bring the keys back. See [SCIM provisioning](/admin/sso-and-scim/#scim-provisioning).
 
 ## Related
 
@@ -1296,7 +1296,7 @@ SCIM does not set roles. Provisioned members get the **New member role** when th
 
 * A provisioned user becomes a member the first time they sign in through an active connection with that email address. Provisioning alone sends no email.
 * Provisioned members can enter the workspace only through SSO, even when the policy is **Optional**. Keep the policy at **Optional** or **Required** and at least one connection active.
-* Deactivating or deleting a user in your provider suspends their membership. Changing their email suspends the old membership.
+* Deactivating or deleting a user in your provider suspends their membership. Changing their email suspends the old membership. Suspension revokes the API keys the member created, and restoring them does not bring the keys back.
 * While SCIM is on, SSO onboarding admits only provisioned users. Invitations still work.
 
 ### Existing members

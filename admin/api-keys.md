@@ -85,7 +85,7 @@ Each key in the console shows its prefix, when it was created and when it was la
 
 Note
 
-Keys belong to the workspace, not to the member who created them. They keep working after that member leaves, so revoke them when you remove someone who had access to them. Keys stop working while the workspace is [paused](/admin/workspace-settings/#pause-a-workspace).
+Clients belong to the workspace, not to the member who created them. When a member is removed, or suspended through SCIM, Caplo revokes the keys that member created; their clients, and keys other members added to them, keep working. Keys stop working while the workspace is [paused](/admin/workspace-settings/#pause-a-workspace).
 
 ## Use a key
 
