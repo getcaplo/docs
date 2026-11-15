@@ -62,6 +62,8 @@ These limits apply to every workspace. A call or build that exceeds one fails wi
 | `choices`                       | 10 items                                |
 | `comparison`                    | 4 items                                 |
 | `timeline`                      | 12 steps                                |
+| `map`                           | 20 places                               |
+| Page origins                    | 5 per page result                       |
 | Progress label                  | 3 to 40 characters; spoken line 3 to 90 |
 
 ## Logs

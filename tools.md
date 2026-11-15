@@ -42,7 +42,7 @@ The model sees each tool as `<package>__<tool>` (hyphens in the package name bec
 
 [Secrets and network access](/tools/secrets-and-egress/)Declare secrets, set or bind their values, and allow the hosts a package calls.
 
-[Show results to customers](/tools/present-results/)Cards, choices, details, timelines, receipts, files, progress and forms.
+[Show results to customers](/tools/present-results/)Cards, choices, details, timelines, maps, pages, receipts, files, progress and forms.
 
 [Build customer-aware tools](/tools/customer-aware-tools/)Act for a verified customer and verify customer context tokens in your API.
 

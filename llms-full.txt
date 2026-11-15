@@ -7769,7 +7769,7 @@ The model sees each tool as `<package>__<tool>` (hyphens in the package name bec
 
 [Secrets and network access](/tools/secrets-and-egress/)Declare secrets, set or bind their values, and allow the hosts a package calls.
 
-[Show results to customers](/tools/present-results/)Cards, choices, details, timelines, receipts, files, progress and forms.
+[Show results to customers](/tools/present-results/)Cards, choices, details, timelines, maps, pages, receipts, files, progress and forms.
 
 [Build customer-aware tools](/tools/customer-aware-tools/)Act for a verified customer and verify customer context tokens in your API.
 
@@ -8461,6 +8461,8 @@ These limits apply to every workspace. A call or build that exceeds one fails wi
 | `choices`                       | 10 items                                |
 | `comparison`                    | 4 items                                 |
 | `timeline`                      | 12 steps                                |
+| `map`                           | 20 places                               |
+| Page origins                    | 5 per page result                       |
 | Progress label                  | 3 to 40 characters; spoken line 3 to 90 |
 
 ## Logs
@@ -8475,9 +8477,9 @@ These limits apply to every workspace. A call or build that exceeds one fails wi
 
 # Show results to customers
 
-> Use caplo.yaml presentation to show progress, confirmation cards, receipts, result layouts and files, and let read tools ask the visitor for missing details.
+> Use caplo.yaml presentation to show progress, confirmation cards, receipts, result layouts, maps, pages and files, and let read tools ask the visitor for missing details.
 
-By default a tool’s result goes only to the agent, which answers in text. A `presentation` in the tool’s `caplo.yaml` policy also shows the customer selected parts of it: a confirmation card for a write, a receipt afterwards, a list of products as cards, a delivery timeline, a PDF invoice. The agent’s text reply goes out as usual alongside.
+By default a tool’s result goes only to the agent, which answers in text. A `presentation` in the tool’s `caplo.yaml` policy also shows the customer selected parts of it: a confirmation card for a write, a receipt afterwards, a list of products as cards, a delivery timeline, nearby stores on a map, a checkout page, a PDF invoice. The agent’s text reply goes out as usual alongside.
 
 Presentation is display metadata only. It selects and labels properties of the tool’s schemas; nothing else of the arguments or result is shown, and it grants no permission to run anything. The build checks every path and role against your input and output schemas and fails with a clear message if something does not fit.
 
@@ -8567,16 +8569,18 @@ tools:
 
 [Section titled “Show a result”](#show-a-result)
 
-`result` shows items from the tool’s structured result with the agent’s reply. The tool needs an `outputSchema`, and `path` names a direct array property of it (or, for a detail, an object).
+`result` shows items from the tool’s structured result with the agent’s reply. The tool needs an `outputSchema`, and `path` names a direct array property of it (or, for a detail or a page, an object).
 
-| Layout          | Shows                                                              | Columns                                                             | Item actions      |
-| --------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------- | ----------------- |
-| `list`, `table` | Up to 20 items                                                     | Up to 6, no roles                                                   | None              |
-| `cards`         | Up to 20 items as cards                                            | Up to 6; `title` role required                                      | Up to 2           |
-| `choices`       | Up to 10 items the customer taps to reply                          | Up to 6; `title` role required                                      | Exactly 1 `reply` |
-| `detail`        | One object: the result itself, or the object property `path` names | Up to 12; `title` role required                                     | Up to 2           |
-| `comparison`    | Up to 4 items side by side                                         | Up to 12; `title` role required; columns without a role become rows | Up to 2           |
-| `timeline`      | Up to 12 steps                                                     | Up to 4, every column needs a role; `title` and `status` required   | None              |
+| Layout          | Shows                                                                  | Columns                                                                          | Item actions      |
+| --------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ----------------- |
+| `list`, `table` | Up to 20 items                                                         | Up to 6, no roles                                                                | None              |
+| `cards`         | Up to 20 items as cards                                                | Up to 6; `title` role required                                                   | Up to 2           |
+| `choices`       | Up to 10 items the customer taps to reply                              | Up to 6; `title` role required                                                   | Exactly 1 `reply` |
+| `detail`        | One object: the result itself, or the object property `path` names     | Up to 12; `title` role required                                                  | Up to 2           |
+| `comparison`    | Up to 4 items side by side                                             | Up to 12; `title` role required; columns without a role become rows              | Up to 2           |
+| `timeline`      | Up to 12 steps                                                         | Up to 4, every column needs a role; `title` and `status` required                | None              |
+| `map`           | Up to 20 places on a map, with a numbered list                         | Up to 12, at most 6 without a role; `title`, `latitude` and `longitude` required | Up to 2           |
+| `page`          | One object as a page the customer opens over the chat; read tools only | Up to 3, every column needs a role; `title` and `link` required                  | None              |
 
 Columns are direct primitive properties of an item. A result that does not fit the layout’s bounds, for example 25 items for `cards`, shows no component; the agent’s reply still goes out. Return at most as many items as the layout shows.
 
@@ -8632,16 +8636,18 @@ Here the output schema has a `products` array whose items have `imageUrl`, `name
 
 [Section titled “Column roles”](#column-roles)
 
-| Role                      | Property type                             | Layouts                                                            | Shows                                                                                                                        |
-| ------------------------- | ----------------------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
-| `title`                   | string                                    | all with roles                                                     | The item’s heading.                                                                                                          |
-| `subtitle`, `description` | string                                    | cards, detail, comparison; `description` also choices and timeline | Secondary text.                                                                                                              |
-| `image`                   | string                                    | cards, detail, comparison                                          | An image. The value must be an `https` URL.                                                                                  |
-| `link`                    | string                                    | cards, detail, comparison                                          | A link. The value must be an `https` URL.                                                                                    |
-| `money`                   | number or integer                         | cards, detail, comparison                                          | An amount, with `currency` set to a fixed `code` such as `USD` or the `path` of a string property holding the ISO 4217 code. |
-| `badge`                   | string, number or integer                 | cards, detail, comparison                                          | A short highlighted value, such as a status.                                                                                 |
-| `status`                  | string with an `enum`                     | timeline                                                           | The step’s state. `statuses` maps every enum value to `done`, `current` or `upcoming`.                                       |
-| `time`                    | string with `format: date` or `date-time` | timeline                                                           | When the step happened or is due.                                                                                            |
+| Role                      | Property type                             | Layouts                                                                       | Shows                                                                                                                        |
+| ------------------------- | ----------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `title`                   | string                                    | all with roles                                                                | The item’s heading.                                                                                                          |
+| `subtitle`, `description` | string                                    | cards, detail, comparison, map; `description` also choices, timeline and page | Secondary text.                                                                                                              |
+| `image`                   | string                                    | cards, detail, comparison, map                                                | An image. The value must be an `https` URL.                                                                                  |
+| `link`                    | string                                    | cards, detail, comparison, map, page                                          | A link. The value must be an `https` URL; for a page, on one of its origins.                                                 |
+| `money`                   | number or integer                         | cards, detail, comparison, map                                                | An amount, with `currency` set to a fixed `code` such as `USD` or the `path` of a string property holding the ISO 4217 code. |
+| `badge`                   | string, number or integer                 | cards, detail, comparison, map                                                | A short highlighted value, such as a status.                                                                                 |
+| `status`                  | string with an `enum`                     | timeline                                                                      | The step’s state. `statuses` maps every enum value to `done`, `current` or `upcoming`.                                       |
+| `time`                    | string with `format: date` or `date-time` | timeline                                                                      | When the step happened or is due.                                                                                            |
+| `latitude`, `longitude`   | number                                    | map                                                                           | Where the place is, in degrees.                                                                                              |
+| `address`                 | string                                    | map                                                                           | The place’s address, under its title.                                                                                        |
 
 Each role can be used by one column only, and a column with a role uses `display: plain`. Values that are not `https` URLs are left off the card.
 
@@ -8649,7 +8655,7 @@ Each role can be used by one column only, and a column with a role uses `display
 
 [Section titled “Actions”](#actions)
 
-* `reply` sends a message as the customer, built from `template`. `{name}` inserts the item’s value of the listed column `name`; image, link, status and time columns cannot be inserted.
+* `reply` sends a message as the customer, built from `template`. `{name}` inserts the item’s value of the listed column `name`; image, link, status, time, latitude and longitude columns cannot be inserted.
 * `link` opens the URL in the listed string column `path`.
 * Labels are up to 20 characters. Neither kind calls a tool; the agent handles the reply like any message.
 
@@ -8771,6 +8777,100 @@ Without `path`, a detail shows the result object itself.
 The `state` property’s schema is `{ "type": "string", "enum": ["complete", "in_progress", "not_started"] }`, and `at` is a string with `format: date-time`.
 
 ![A timeline result in the website widget: the delivery progress of an order](/_astro/widget-timeline.D_vEPE6B_2po6Wf.webp)
+
+### Map
+
+[Section titled “Map”](#map)
+
+```plaintext
+      result:
+        path: /stores
+        layout: map
+        title: Stores with stock
+        columns:
+          - path: /name
+            label: Store
+            display: plain
+            role: title
+          - path: /address
+            label: Address
+            display: plain
+            role: address
+          - path: /lat
+            label: Latitude
+            display: plain
+            role: latitude
+          - path: /lng
+            label: Longitude
+            display: plain
+            role: longitude
+          - path: /inStock
+            label: In stock
+            display: plain
+          - path: /pickup
+            label: Pickup
+            display: plain
+        actions:
+          - kind: reply
+            label: Pick up here
+            template: I'll pick it up at {name}
+```
+
+`lat` and `lng` are numbers in degrees. Each place is numbered on the map and in the list under it, and gets a **View on map** link that opens OpenStreetMap at its coordinates. The list is always shown. If the map cannot be drawn, for example because the host page’s [Content Security Policy](/channels/website-widget/install/) has no `worker-src blob:`, the list appears on its own.
+
+![A map result in the website widget: two stores numbered on a map, with a list of their stock and a reply action](/_astro/widget-map.ndUGWBYm_SOVAM.webp)
+
+### Page
+
+[Section titled “Page”](#page)
+
+A page links the customer to a page of your own, such as a checkout, a booking calendar or a signing page, and opens it over the chat. Only read tools can return one.
+
+```plaintext
+      result:
+        layout: page
+        title: Privacy notice
+        columns:
+          - path: /title
+            label: Notice
+            display: plain
+            role: title
+          - path: /summary
+            label: About
+            display: plain
+            role: description
+          - path: /url
+            label: Privacy notice
+            display: plain
+            role: link
+        page:
+          label: Read it here
+          display: panel
+          origins:
+            - https://caplo.si
+```
+
+* Without `path`, the page comes from the result object itself; with `path`, from that object property.
+* `page.label` is the button text, up to 20 characters.
+* `display: panel` opens the page in a sandboxed panel over the chat. `display: tab` opens a new browser tab; use it for pages that refuse to be framed. If the host site’s Content Security Policy blocks the frame, the widget offers a new tab instead.
+* `origins` lists 1 to 5 `https` origins without a path. `https://*.example.com` allows any subdomain. A link outside them shows no page.
+* The page opens only when the customer taps the button.
+
+When the customer closes the panel, or taps **I’ve finished** after using a tab, the agent receives the message “I closed the *title* page.” or “I finished on the *title* page.”, with the item’s title. The page can close the panel itself:
+
+```plaintext
+window.parent.postMessage({ type: "caplo.page", event: "done" }, "*");
+```
+
+`event` is `done` or `close`. Only messages from the panel’s own frame, at one of the declared origins, are accepted.
+
+Note
+
+A page never decides an outcome. After it closes, have the agent check the result with a read tool, for example whether the payment went through.
+
+![A page result in the website widget: a card with the notice’s title, description, host and button](/_astro/widget-page.9t6xIp6Q_1Ku4wp.webp)
+
+![The page open in a panel over the chat, with buttons to open it in a new tab or close it](/_astro/widget-page-open.DJ_4N6-F_xxaYK.webp)
 
 ## Return files
 
