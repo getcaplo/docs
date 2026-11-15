@@ -129,7 +129,7 @@ SCIM does not set roles. Provisioned members get the **New member role** when th
 
 - A provisioned user becomes a member the first time they sign in through an active connection with that email address. Provisioning alone sends no email.
 - Provisioned members can enter the workspace only through SSO, even when the policy is **Optional**. Keep the policy at **Optional** or **Required** and at least one connection active.
-- Deactivating or deleting a user in your provider suspends their membership. Changing their email suspends the old membership.
+- Deactivating or deleting a user in your provider suspends their membership. Changing their email suspends the old membership. Suspension revokes the API keys the member created, and restoring them does not bring the keys back.
 - While SCIM is on, SSO onboarding admits only provisioned users. Invitations still work.
 
 ### Existing members
