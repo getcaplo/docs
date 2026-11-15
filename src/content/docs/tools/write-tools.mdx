@@ -30,6 +30,7 @@ tools:
 
 - In the website widget, the customer sees a review card. Add a [`presentation`](/tools/present-results/#confirmation-and-receipt) to choose which arguments it shows, how they are labelled, and which ones the customer may change before confirming.
 - In WhatsApp, Messenger and Instagram, the customer gets a message with **Confirm** and **Cancel** buttons. Fields cannot be edited there.
+- On a voice call, in the website widget or by phone, Caplo reads the `presentation`'s title and fields aloud and the caller says yes or no. Without a `presentation`, the caller hears only a request to confirm, so the agent has to say what will change. Fields cannot be edited by voice.
 - If the customer declines, or a different customer verifies in the same conversation, the write does not run.
 - While an earlier write in the conversation still waits for a decision, or its outcome is unknown, the agent cannot start another write.
 

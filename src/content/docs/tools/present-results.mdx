@@ -82,6 +82,7 @@ tools:
 - `display: last4` shows only the last four characters of a string, for example a card or account number. A masked field cannot be editable.
 - `editable: true` lets the customer change a string argument before confirming. With `input: text`, the property needs a `maxLength` of 1 to 1000. With `input: select`, the property needs a string `enum` of 1 to 20 values, and `options` must label every value exactly once.
 - `writeOnly` properties, `format: password` properties, names that match a declared secret and the [subject selector](/tools/customer-aware-tools/) cannot be shown. `readOnly` properties can be shown but not edited.
+- On a voice call, the title and each field are read aloud as "Label: value". A `last4` value is read as "ending in" its last four characters, and an absent value as "not provided".
 - `receipt.fields` (up to 12) come from the structured result, so the tool needs an `outputSchema`. A receipt only displays values; it never decides whether the write succeeded.
 
 ## Show a result
