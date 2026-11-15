@@ -35,6 +35,8 @@ tools:
 
 `confirmation: none` runs the write as soon as the agent calls it. Use it only for low-risk actions where a confirmation step adds nothing, such as adding a note to a support ticket.
 
+![A confirmation card in the website widget with Confirm request, Edit details and Decline request](~/assets/screenshots/widget/widget-confirm.webp)
+
 ## Use the idempotency key
 
 Every write call carries `idempotencyKey` in its context. The key is the same for every attempt and status check of one confirmed action, and different for every other action. Send it to your API so that a repeated request applies the change only once:

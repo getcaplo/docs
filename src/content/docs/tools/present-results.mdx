@@ -84,6 +84,10 @@ tools:
 - `writeOnly` properties, `format: password` properties, names that match a declared secret and the [subject selector](/tools/customer-aware-tools/) cannot be shown. `readOnly` properties can be shown but not edited.
 - `receipt.fields` (up to 12) come from the structured result, so the tool needs an `outputSchema`. A receipt only displays values; it never decides whether the write succeeded.
 
+![A confirmation card for a booking tool in the website widget](~/assets/screenshots/widget/widget-confirm.webp)
+
+![The receipt the widget shows after the booking succeeded](~/assets/screenshots/widget/widget-receipt.webp)
+
 ## Show a result
 
 `result` shows items from the tool's structured result with the agent's reply. The tool needs an `outputSchema`, and `path` names a direct array property of it (or, for a detail, an object).
@@ -143,6 +147,8 @@ Columns are direct primitive properties of an item. A result that does not fit t
 
 Here the output schema has a `products` array whose items have `imageUrl`, `name`, `price`, `currency` and `url`.
 
+![A cards result in the website widget: two products with image, status, price and actions](~/assets/screenshots/widget/widget-cards.webp)
+
 ### Column roles
 
 | Role | Property type | Layouts | Shows |
@@ -184,6 +190,8 @@ Each role can be used by one column only, and a column with a role uses `display
 
 Each choice sends its filled-in reply. Columns without a role must appear in the template.
 
+![A choices result in the website widget: delivery windows the customer taps to reply](~/assets/screenshots/widget/widget-choices.webp)
+
 ### Detail
 
 ```yaml
@@ -213,6 +221,8 @@ Each choice sends its filled-in reply. Columns without a role must appear in the
 
 Without `path`, a detail shows the result object itself.
 
+![A detail result in the website widget: one product with its specification rows](~/assets/screenshots/widget/widget-detail.webp)
+
 ### Comparison
 
 ```yaml
@@ -238,6 +248,8 @@ Without `path`, a detail shows the result object itself.
             label: Contract
             display: plain
 ```
+
+![A comparison result in the website widget: two products side by side](~/assets/screenshots/widget/widget-comparison.webp)
 
 ### Timeline
 
@@ -266,6 +278,8 @@ Without `path`, a detail shows the result object itself.
 ```
 
 The `state` property's schema is `{ "type": "string", "enum": ["complete", "in_progress", "not_started"] }`, and `at` is a string with `format: date-time`.
+
+![A timeline result in the website widget: the delivery progress of an order](~/assets/screenshots/widget/widget-timeline.webp)
 
 ## Return files
 
@@ -303,6 +317,8 @@ return {
 ```
 
 Embedded resources are written with the MCP SDK, so files need an MCP package. Caplo takes the files out of the result before the model sees it, checks that each file's content matches its type, scans it, and shows it with the reply as a download where the channel can. A file of an undeclared type, over `maxBytes`, or a fourth file fails the call. Where the channel cannot deliver files, such as a phone call, the agent is told the file was not delivered, so also return the essentials as text.
+
+![A PDF invoice the visitor can download from the website widget](~/assets/screenshots/widget/widget-file.webp)
 
 ## Ask for missing details
 
@@ -347,3 +363,5 @@ In an MCP package, check `server.server.getClientCapabilities()?.elicitation` an
 <Aside type="caution">
 Never ask for a password, card number, one-time code or other credential. Caplo refuses fields and forms whose names, titles or options name one, and the build rejects such field names.
 </Aside>
+
+![A form in the website widget asking for a delivery address and window](~/assets/screenshots/widget/widget-form.webp)

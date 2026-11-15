@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightLinksValidator from 'starlight-links-validator';
 import starlightLlmsTxt from 'starlight-llms-txt';
+import starlightImageZoom from 'starlight-image-zoom';
 
 /** @param {string} label @param {string} directory */
 const section = (label, directory, collapsed = false) => ({ label, collapsed, items: [{ autogenerate: { directory } }] });
@@ -53,6 +54,7 @@ export default defineConfig({
 			],
 			plugins: [
 				starlightLinksValidator({ errorOnLocalLinks: true }),
+				starlightImageZoom(),
 				starlightLlmsTxt({
 					projectName: 'Caplo',
 					description:

@@ -65,6 +65,7 @@ import AgentPrompt from '~/components/AgentPrompt.astro';
 - Shell examples use ` ```sh `. Every `caplo` command in a code block, an inline code span or a prompt is checked against the released CLI; unknown commands or flags fail the build.
 - A complete agent file (`apiVersion: v2.0.0`) or tool package `caplo.yaml` in a ` ```yaml ` block is validated against the published schema. Partial snippets are not.
 - Plain, direct sentences. No marketing language, no double hyphens as dashes, no arrows; write "then" or use a list.
+- Screenshots live in `src/assets/screenshots/` as lossless WebP and are linked with `![alt](~/assets/screenshots/...)`. Console shots come from the production console's caplo.si workspace at 1280 px wide and 2x, cropped to the card the step talks about; widget shots come from sample-data agents and are named `widget-*` so they render at phone width. Never show member emails, API keys, visitor messages or other personal data. Retake a screenshot when the UI it shows changes.
 
 ## AI prompts
 
