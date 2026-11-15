@@ -3267,12 +3267,12 @@ Shorter silence timings, a lower maximum call duration and short spoken replies 
 | Numbers per channel | One. A number can serve only one channel, and the provider and number cannot be changed after the channel is created.                                                                                                                                  |
 | Simultaneous calls  | Currently one call at a time per workspace, counting phone and website voice calls together; platform capacity is also limited. A call that arrives when no capacity is free is disconnected. Contact [support](/resources/support/) if you need more. |
 | Call length         | 5 to 240 minutes, set per workspace; 60 by default.                                                                                                                                                                                                    |
-| Write tools         | Do not run on phone calls. Read tools work as usual.                                                                                                                                                                                                   |
+| Write tools         | The caller confirms each change by saying yes or no. Writes that need a verified customer cannot run, because callers are anonymous.                                                                                                                   |
 | Caller identity     | Callers are anonymous. The caller’s number is not treated as a verified customer.                                                                                                                                                                      |
 | Transfer target     | One per channel. Warm transfers need a phone number; at most two warm transfer attempts per call.                                                                                                                                                      |
 | Deleting            | Phone channels can be paused but not deleted.                                                                                                                                                                                                          |
 
-Because write tools do not run on calls, tell the agent in its instructions how to help callers who want to change something, for example by transferring them or pointing them to your website. See [Write tools](/tools/write-tools/).
+Before a write tool runs, the caller hears the change and says yes or no. For a tool with a [`presentation`](/tools/present-results/#confirmation-and-receipt), Caplo reads its title and each field aloud, then asks the caller to say yes to continue or no to cancel. Without one, the caller hears only “Before I go ahead, please confirm this request. Say yes to continue or no to cancel.”, so the agent has to say what will change. See [Write tools](/tools/write-tools/).
 
 ## Pause or stop answering a number
 
@@ -8482,6 +8482,7 @@ tools:
 * `display: last4` shows only the last four characters of a string, for example a card or account number. A masked field cannot be editable.
 * `editable: true` lets the customer change a string argument before confirming. With `input: text`, the property needs a `maxLength` of 1 to 1000. With `input: select`, the property needs a string `enum` of 1 to 20 values, and `options` must label every value exactly once.
 * `writeOnly` properties, `format: password` properties, names that match a declared secret and the [subject selector](/tools/customer-aware-tools/) cannot be shown. `readOnly` properties can be shown but not edited.
+* On a voice call, the title and each field are read aloud as “Label: value”. A `last4` value is read as “ending in” its last four characters, and an absent value as “not provided”.
 * `receipt.fields` (up to 12) come from the structured result, so the tool needs an `outputSchema`. A receipt only displays values; it never decides whether the write succeeded.
 
 ## Show a result
@@ -9422,6 +9423,7 @@ tools:
 
 * In the website widget, the customer sees a review card. Add a [`presentation`](/tools/present-results/#confirmation-and-receipt) to choose which arguments it shows, how they are labelled, and which ones the customer may change before confirming.
 * In WhatsApp, Messenger and Instagram, the customer gets a message with **Confirm** and **Cancel** buttons. Fields cannot be edited there.
+* On a voice call, in the website widget or by phone, Caplo reads the `presentation`’s title and fields aloud and the caller says yes or no. Without a `presentation`, the caller hears only a request to confirm, so the agent has to say what will change. Fields cannot be edited by voice.
 * If the customer declines, or a different customer verifies in the same conversation, the write does not run.
 * While an earlier write in the conversation still waits for a decision, or its outcome is unknown, the agent cannot start another write.
 
