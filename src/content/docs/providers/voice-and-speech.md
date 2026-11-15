@@ -19,6 +19,8 @@ On a voice call, whether by phone or in the website widget, an agent needs to tu
 
 ## Providers
 
+![Speech providers on the Service providers page](~/assets/screenshots/console/speech-providers.webp)
+
 - Speech recognition and voice models come from **Deepgram** and **ElevenLabs**, set under **Speech providers**.
 - Realtime models belong to a language model provider (OpenAI for OpenAI Realtime, Google for Gemini Live) and use its **Language models** key source.
 

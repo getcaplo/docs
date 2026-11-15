@@ -16,6 +16,8 @@ Both need a role that can view financial data: Owner, Admin, Billing or Auditor.
 
 The **Usage** page answers "how much did our agents use, and where?".
 
+![The Usage page with totals, filters and usage by channel](~/assets/screenshots/console/usage.webp)
+
 **Filters** at the top apply to everything on the page:
 
 | Filter | Options |
@@ -40,6 +42,8 @@ If a provider has not reported full usage for some requests yet, a note under th
 ## Billing page
 
 The **Billing** page answers "what will Caplo charge us?".
+
+![The Billing page with the estimated amount due and charges over time](~/assets/screenshots/console/billing.webp)
 
 **Filters**: **Charges** (**All charges**, **Voice**, **Text** or **Language models**), **Agent**, **Channel** and **Billing dates** (**This month**, **Last month**, **Last 30 days** or a custom range).
 
