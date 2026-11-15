@@ -4,6 +4,8 @@
 
 Caplo is a platform for building AI agents that talk to your customers. An agent answers from documents you approve, looks things up and takes actions through tools you connect, and serves customers on your website, in WhatsApp, Messenger and Instagram, and over the phone. You build and test agents in a private draft, publish them as fixed releases, and decide which release each channel serves.
 
+![The Caplo Guide agent answering a visitor in the website widget on caplo.si](/_astro/widget-caplo-si.BjZq3ZOi_Yred2.webp)
+
 ## Building blocks
 
 | Block          | What it is                                                                                                                                                          |
@@ -39,6 +41,8 @@ You can do most work in more than one place. Pick the one that suits the job.
 | Tool Studio | [studio.caplo.si](https://studio.caplo.si) | Write, build, test and publish tool packages in a browser-based code editor, without installing anything.                                                                                        |
 
 The three share one workspace. An agent pushed from the CLI shows up in the console, and a tool published from Tool Studio can be attached to an agent in either.
+
+![The Overview page of the Caplo console](/_astro/overview.B9V7l1gG_Z1aGj0l.webp)
 
 ## Where to go next
 

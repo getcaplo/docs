@@ -17,7 +17,7 @@ The effect is yours to set; Caplo does not infer it from the code or from MCP an
 
 `confirmation: required` is the default for write tools. The agent proposes the call with exact arguments, the customer reviews it, and the tool runs only after the customer confirms, with exactly those arguments.
 
-```yaml
+```plaintext
 tools:
   - name: cancel_order
     effect: write
@@ -33,11 +33,13 @@ tools:
 
 `confirmation: none` runs the write as soon as the agent calls it. Use it only for low-risk actions where a confirmation step adds nothing, such as adding a note to a support ticket.
 
+![A confirmation card in the website widget with Confirm request, Edit details and Decline request](/_astro/widget-confirm.Bm7Gk4UV_Z1dIOgl.webp)
+
 ## Use the idempotency key
 
 Every write call carries `idempotencyKey` in its context. The key is the same for every attempt and status check of one confirmed action, and different for every other action. Send it to your API so that a repeated request applies the change only once:
 
-```ts
+```plaintext
 async handler({ orderId }, { secrets, signal, idempotencyKey }) {
   const response = await fetch(`https://api.shop.example/orders/${encodeURIComponent(orderId)}/cancel`, {
     method: "POST",
@@ -66,7 +68,7 @@ When a write ends, Caplo records one of these outcomes and the agent and custome
 
 Return `rejected` only when you are certain nothing changed. When in doubt, throw: an unknown outcome is safer than a false “not applied”, which could lead the customer to try again and, for example, pay twice.
 
-```ts
+```plaintext
 import { defineTool, pending, rejected } from "@caplo/tools";
 
 
@@ -96,7 +98,7 @@ Typed outcomes need `@caplo/tools` 0.1.6 or later, which the templates already u
 
 An MCP package reports the same outcomes in the result metadata. Advertise the capability when you create the server, and add `_meta` to each write result:
 
-```ts
+```plaintext
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { EFFECT_META_KEY, EFFECT_OUTCOME_CAPABILITY } from "@caplo/tools";
 
@@ -121,7 +123,7 @@ Without the capability or the metadata, an error result from a write counts as u
 
 When a write’s outcome is unknown or pending, Caplo can ask your package what happened. Add a `status` handler to the `defineTool`:
 
-```ts
+```plaintext
 import { applied, defineTool, pending, rejected } from "@caplo/tools";
 
 
@@ -154,7 +156,7 @@ An MCP package answers the `caplo/status` request (`STATUS_METHOD`) with params 
 
 For tools that act for a [verified customer](/tools/customer-aware-tools/), your API may need a stronger or more recent sign-in before it allows an operation. Return `stepUpRequired` instead of a result:
 
-```ts
+```plaintext
 import { stepUpRequired, stepUpFromChallenge } from "@caplo/tools";
 
 

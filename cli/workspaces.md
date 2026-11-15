@@ -6,7 +6,7 @@ Every command that reads or changes agents, tools, channels or knowledge acts on
 
 ## List and inspect
 
-```sh
+```plaintext
 caplo workspace list
 caplo workspace get
 caplo workspace get "Acme Support"
@@ -16,7 +16,7 @@ caplo workspace get "Acme Support"
 
 ## Select a workspace
 
-```sh
+```plaintext
 caplo workspace use "Acme Support"
 ```
 
@@ -26,7 +26,7 @@ You rarely need to select one by hand: `caplo auth login` keeps your previous se
 
 ## Create a workspace
 
-```sh
+```plaintext
 caplo workspace create "Acme Staging"
 ```
 

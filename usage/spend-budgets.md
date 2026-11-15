@@ -58,6 +58,8 @@ Pausing affects your customers. Charges are checked about once a minute, so the 
 
 The tiles at the top show **Charges this month** (production only), **Forecast at month end** at the month’s pace so far (shown once 10% of the month has passed), **Budgets at risk** and **Alerts this month**.
 
+![The Spend controls page](/_astro/spend-controls.DFzsnlJB_Z1Brw0G.webp)
+
 Each budget’s row shows what it has spent this month, its forecast, its thresholds, what happens at the limit and its status:
 
 | Status              | Meaning                                                               |

@@ -8,7 +8,7 @@ Generated from the schema in `caplo` v0.4.1. Guides: [Tools](/tools/).
 
 For validation and completion in your editor, add this first line to the file (YAML language server, used by VS Code and others):
 
-```yaml
+```plaintext
 # yaml-language-server: $schema=https://docs.caplo.si/schemas/caplo.schema.json
 ```
 

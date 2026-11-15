@@ -18,6 +18,8 @@ The website widget is one script tag. It loads the widget from Caplo, shows the 
 
 3. Open the **Install** tab and select **Copy embed code**.
 
+   ![The Install tab of a website entry point with the embed code](/_astro/entry-embed.Dt2VK7nq_NALOk.webp)
+
 If **Copy embed code** is disabled, the hint next to it says why: no design is applied, there are unsaved edits, the entry point is disabled, or the channel is paused.
 
 The **Widget ID** on the Install tab is a public identifier. The snippet contains no credentials, and you never need to add any.
@@ -26,7 +28,7 @@ The **Widget ID** on the Install tab is a public identifier. The snippet contain
 
 A popup design (a launcher button in a corner of the page):
 
-```html
+```plaintext
 <script
   src="https://api.caplo.si/v1/messaging/widget/loader.js"
   data-widget-id="<WIDGET_ID>"
@@ -36,7 +38,7 @@ A popup design (a launcher button in a corner of the page):
 
 An inline design (the conversation sits inside an element on your page) adds a container and points the script at it:
 
-```html
+```plaintext
 <div id="caplo-<WIDGET_ID>"></div>
 <script
   src="https://api.caplo.si/v1/messaging/widget/loader.js"
@@ -76,7 +78,7 @@ On any other site, including a staging host you have not listed, the widget show
 
 Paste the code just before the closing `</body>` tag on every page that should show the widget. For an inline design, place the `<div>` where the conversation should appear and keep the script after it.
 
-```html
+```plaintext
     <!-- your page content -->
     <script
       src="https://api.caplo.si/v1/messaging/widget/loader.js"
@@ -93,7 +95,7 @@ For a popup design, load the script once in the root layout with `next/script`. 
 
 app/layout.tsx
 
-```tsx
+```plaintext
 import Script from 'next/script';
 
 
@@ -123,7 +125,7 @@ For a popup design, add the embed code to your `index.html`, before `</body>`. T
 
 For an inline design, render the container and add the loader from an effect:
 
-```tsx
+```plaintext
 import { useEffect } from 'react';
 
 
@@ -151,7 +153,7 @@ When the container leaves the page, the widget unmounts itself. Mounting the com
 
 If your site sends a `Content-Security-Policy` header, add these sources to the matching directives and keep your existing sources:
 
-```text
+```plaintext
 script-src https://api.caplo.si;
 connect-src https://api.caplo.si;
 font-src https://api.caplo.si;
@@ -163,7 +165,7 @@ The console shows the same list under **Content Security Policy additions** on t
 
 If the channel allows voice, the browser also connects to Caplo’s media server for the call. Add it to `connect-src`:
 
-```text
+```plaintext
 connect-src https://api.caplo.si wss://livekit.caplo.si;
 ```
 

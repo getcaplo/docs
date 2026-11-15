@@ -18,13 +18,15 @@ Both appear in the same list on the agent. A tool must be published before an ag
 3. Select **Details** on a tool to see its description, input and output schemas, whether it reads or writes, and how it appears to customers.
 4. Select **Save draft**.
 
+![The Tools & actions tab of an agent, with conversation actions and tool package groups](/_astro/agent-tools.C2rCb86E_Z2jDHdJ.webp)
+
 Each group shows how many of its tools are selected, its latest version, and the version the agent’s latest release pins. A tool marked **Blocks publishing if selected** (for example **Build pending**) has no usable published version yet; the agent cannot publish while it is selected.
 
 **CLI**
 
 List the tools under `tools` in the agent file, then push it:
 
-```yaml
+```plaintext
 tools:
   - order-desk/lookup_order
   - order-desk/track_shipment

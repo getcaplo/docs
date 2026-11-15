@@ -16,6 +16,8 @@ Reading outcomes and conversations needs a role that can read conversations: Own
 
 Open **Overview**. The **Operational outcomes** card covers production conversations started in the selected range, by their current status. Filter it by **Agent**, **Channel** and **Date range**; days follow the workspace time zone set in [General settings](/admin/workspace-settings/).
 
+![The Operational outcomes card on the Overview page](/_astro/operational-outcomes.BdA274zq_z3eLt.webp)
+
 | Figure             | Meaning                                                                                                                                 |
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
 | **Resolved**       | Completed conversations as a share of the closed ones.                                                                                  |

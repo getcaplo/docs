@@ -43,7 +43,7 @@ Visitors must enter phone numbers in international format, such as `+15551234567
 
 Caplo sends one `POST` to the webhook URL for each code:
 
-```http
+```plaintext
 POST /caplo/verification-codes HTTP/1.1
 Host: hooks.example.com
 Content-Type: application/json
@@ -85,7 +85,7 @@ Answer `200` with JSON within 5 seconds:
 | `sub`      | Required when matched. The customer’s stable ID in your system, up to 255 characters. It becomes the verified customer’s `sub`, so use the same ID your other connections use. |
 | `delivery` | Optional. How you sent the code, such as `email` or `sms`: lowercase letters, digits and `_`. `sms` is recorded as an SMS one-time code.                                       |
 
-```json
+```plaintext
 { "matched": true, "sub": "cus_1234", "delivery": "email" }
 ```
 
@@ -95,7 +95,7 @@ Caplo calls the webhook once, after it has already answered the visitor, and nev
 
 ### Example
 
-```js
+```plaintext
 // Express, Node.js 20 or later
 import express from "express";
 import { createHash } from "node:crypto";

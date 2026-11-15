@@ -62,7 +62,7 @@ Open the channel in **Channels** and select **Update to** the newest release, or
 
 Phone channels are named `twilio/<name>` or `telnyx/<name>`:
 
-```sh
+```plaintext
 caplo channel list
 caplo channel deploy "twilio/Support line"
 caplo channel deploy "telnyx/Support line" --agent "Support Desk@1.4.0"

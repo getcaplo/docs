@@ -15,11 +15,11 @@ When a [customer-aware tool](/tools/customer-aware-tools/) calls your API, the A
 
 `verifyCustomerContext` is part of the `@caplo/tools` package on npm. It has no runtime dependencies: it uses only `fetch` and WebCrypto. The package targets Node.js 24.
 
-```sh
+```plaintext
 npm install @caplo/tools
 ```
 
-```ts
+```plaintext
 import { CustomerContextError, verifyCustomerContext } from "@caplo/tools/verify";
 
 
@@ -105,7 +105,7 @@ Every refusal throws `CustomerContextError` with a `reason`:
 
 `MemoryReplayStore` remembers token IDs in one process. When your API runs on more than one instance, give it a shared store: an object whose `use(jti, expiresAt)` returns `true` the first time it sees an ID and `false` after that. With Redis:
 
-```ts
+```plaintext
 import { createClient } from "redis";
 import type { ReplayStore } from "@caplo/tools/verify";
 
@@ -130,7 +130,7 @@ Any JWT library works. Accept the token only when the header has `typ` `at+jwt` 
 
 When an operation needs a higher level or a more recent sign-in than the token shows, refuse it with an RFC 9470 challenge, using Caplo’s level names in `acr_values` and seconds in `max_age`:
 
-```ts
+```plaintext
 const fresh = claims.auth_time !== undefined && Date.now() / 1000 - claims.auth_time <= 300;
 if (claims.acr !== "high" || !fresh) {
   return new Response(null, {
@@ -142,7 +142,7 @@ if (claims.acr !== "high" || !fresh) {
 
 In the tool, turn the challenge into a step-up with `stepUpFromChallenge`, or ask for one directly with `stepUpRequired`:
 
-```ts
+```plaintext
 import { stepUpFromChallenge, stepUpRequired } from "@caplo/tools";
 
 

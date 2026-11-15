@@ -26,6 +26,8 @@ Note
 
 The check only proves the key authenticates. A key restricted so that it cannot list models or read account details is still accepted. Make sure the key’s project or account can use the models and voices your agents need, and has enough quota.
 
+![The Service providers page with Your key and Add key on each provider](/_astro/service-providers.C1HhurgE_Z1RAbkt.webp)
+
 ## How keys are stored and shown
 
 * Caplo stores the key encrypted and never shows it again, in the console or through any API.

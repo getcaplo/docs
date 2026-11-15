@@ -42,6 +42,8 @@ When an operation needs a higher level or a more recent sign-in than the custome
 
 The **Verification policy** panel on the same page decides whether visitors can verify at all and what a verification grants:
 
+![The Verification policy card in Settings, Customer identity](/_astro/verification-policy.BkRtHs3s_Z2amgTI.webp)
+
 * **Verify customers in support conversations** must be on.
 * **Connections, in order**: up to 8 connections customers may use. A connection must be listed here and on the channel to be offered.
 * **Allowed scopes**: what a verification may grant. `identity:bind` is required.

@@ -16,7 +16,7 @@ Owners, Admins and Developers manage API clients in **Settings** > **API access*
 
 **CLI**
 
-```sh
+```plaintext
 caplo workspace api-client create github-deploy \
   --scope agents:write,agents:publish,tools:write,tools:publish
 ```
@@ -73,7 +73,7 @@ The client’s other keys keep working until you revoke them, so nothing breaks 
 
 In the console, select **Revoke** next to a key. With the CLI:
 
-```sh
+```plaintext
 caplo workspace api-client revoke github-deploy --key <KEY_ID_OR_PREFIX>
 caplo workspace api-client revoke github-deploy --except <NEW_KEY_ID_OR_PREFIX>
 caplo workspace api-client revoke github-deploy
@@ -91,7 +91,7 @@ Clients belong to the workspace, not to the member who created them. When a memb
 
 Set the key and the workspace ID in the environment, and `caplo` commands run as the client:
 
-```sh
+```plaintext
 export CAPLO_API_KEY=<API_KEY>
 export CAPLO_WORKSPACE=<WORKSPACE_ID>
 caplo auth status

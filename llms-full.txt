@@ -6,6 +6,8 @@
 
 Once an agent has a published release, three things put it on your website: a published widget design, a website channel that serves the release, and the channel’s embed code on your pages. This page is the short version; [Install the widget](/channels/website-widget/install/) covers every option.
 
+![The Caplo website widget open on caplo.si, showing its welcome screen](/_astro/widget-caplo-si-welcome.BtUdm0fU_5VYxL.webp)
+
 ## Before you start
 
 [Section titled “Before you start”](#before-you-start)
@@ -28,7 +30,7 @@ Once an agent has a published release, three things put it on your website: a pu
 
 5. **Copy the embed code.** On the **Install** tab, select **Copy embed code**. It looks like this:
 
-   ```html
+   ```plaintext
    <script
      src="https://api.caplo.si/v1/messaging/widget/loader.js"
      data-widget-id="<WIDGET_ID>"
@@ -81,13 +83,13 @@ If you only want a single agent without tools or fast routing, run `caplo init m
 
 1. **Install the CLI.** On macOS or Linux:
 
-   ```sh
+   ```plaintext
    brew install getcaplo/tap/caplo
    ```
 
    Or install it to `~/.local/bin` without Homebrew:
 
-   ```sh
+   ```plaintext
    curl -fsSL https://cli.caplo.si/install.sh | sh
    ```
 
@@ -95,13 +97,13 @@ If you only want a single agent without tools or fast routing, run `caplo init m
 
 2. **Sign in.**
 
-   ```sh
+   ```plaintext
    caplo auth login
    ```
 
    Your browser opens to sign in; on a machine without a browser, use `caplo auth login --device`. If you belong to one workspace, the CLI selects it. Otherwise pick one:
 
-   ```sh
+   ```plaintext
    caplo workspace list
    caplo workspace use "<WORKSPACE_NAME>"
    ```
@@ -110,7 +112,7 @@ If you only want a single agent without tools or fast routing, run `caplo init m
 
 3. **Scaffold the project.**
 
-   ```sh
+   ```plaintext
    caplo init shop --template summit
    cd shop
    ```
@@ -131,14 +133,14 @@ If you only want a single agent without tools or fast routing, run `caplo init m
 
 4. **Install the tool dependencies.** Each package needs its dependencies and a lockfile before Caplo can build it.
 
-   ```sh
+   ```plaintext
    (cd tools/order-desk && npm install)
    (cd tools/store-stock && npm install)
    ```
 
 5. **Validate the project.** This runs offline and checks the files against the schemas, every tool and sub-agent reference, and the sub-agent links.
 
-   ```sh
+   ```plaintext
    caplo validate
    ```
 
@@ -146,7 +148,7 @@ If you only want a single agent without tools or fast routing, run `caplo init m
 
 6. **Push the drafts.**
 
-   ```sh
+   ```plaintext
    caplo push
    ```
 
@@ -154,7 +156,7 @@ If you only want a single agent without tools or fast routing, run `caplo init m
 
 7. **Chat with the draft.**
 
-   ```sh
+   ```plaintext
    caplo agent chat "Shop Concierge"
    ```
 
@@ -164,7 +166,7 @@ If you only want a single agent without tools or fast routing, run `caplo init m
 
 8. **Preview the publish.**
 
-   ```sh
+   ```plaintext
    caplo publish --dry-run
    ```
 
@@ -172,7 +174,7 @@ If you only want a single agent without tools or fast routing, run `caplo init m
 
 9. **Publish.** A project’s first publish to a workspace needs `--yes`, after you have reviewed the plan:
 
-   ```sh
+   ```plaintext
    caplo publish --yes
    ```
 
@@ -270,12 +272,16 @@ This walkthrough takes you from a new account to an agent answering on your webs
 
 2. **Create an agent.** In the sidebar, open **Agents** (under **Build**) and select **Create agent**. Enter an **Agent name**, such as `Customer support`, and optionally a **Description**, then select **Create draft**. The agent opens on its **Setup** tab.
 
+   ![The Agents page in the Caplo console, with Create agent at the top right](/_astro/agents.MAl6A_DA_Z11MVwv.webp)
+
 3. **Write the instructions and greeting.** Under **Instructions**:
 
    * In **Agent instructions**, describe who the agent is, what it helps with, its tone, and what it must not do. For example: “You are the support assistant for Example Outfitters. Answer questions about our products, shipping and returns. Keep answers short. If you do not know something, say so and offer to connect the customer with our team.”
    * In **Greeting message**, write the first message customers see, such as “Hi, I’m the Example Outfitters assistant. How can I help?” A greeting is required before you can test or publish.
 
    Open **Advanced settings** to check the **Model**. A new agent starts with a model your workspace can use; see [Instructions and model](/agents/instructions-and-model/) to change it.
+
+   ![The Instructions section of an agent, with the agent instructions and greeting message](/_astro/agent-instructions.CASLaqy5_2blT4u.webp)
 
 4. **Save the draft.** Select **Save draft** at the top of the page. Testing works on unsaved edits, but publishing uses the saved draft.
 
@@ -329,6 +335,8 @@ A website channel needs a published widget design, a channel that serves your re
 
 5. **Copy the embed code.** On the **Install** tab, select **Copy embed code**. If the button is unavailable, the tab tells you what to do first, such as applying a design or saving your edits with **Save entry point**. Paste the code into your site’s HTML, just before the closing `</body>` tag, on every page where the widget should appear.
 
+   ![The Install tab of a website entry point, with the embed code and Copy embed code](/_astro/entry-embed.Dt2VK7nq_NALOk.webp)
+
 6. **Check it.** Open your site. The chat launcher appears; open it and the agent greets you.
 
 If the widget does not appear, see [Troubleshoot the widget](/channels/website-widget/troubleshooting/). For layouts, Content Security Policy and single-page apps, see [Install the widget](/channels/website-widget/install/).
@@ -347,6 +355,8 @@ If the widget does not appear, see [Troubleshoot the widget](/channels/website-w
 > What Caplo is for, the building blocks you work with, and which tool to use for each job.
 
 Caplo is a platform for building AI agents that talk to your customers. An agent answers from documents you approve, looks things up and takes actions through tools you connect, and serves customers on your website, in WhatsApp, Messenger and Instagram, and over the phone. You build and test agents in a private draft, publish them as fixed releases, and decide which release each channel serves.
+
+![The Caplo Guide agent answering a visitor in the website widget on caplo.si](/_astro/widget-caplo-si.BjZq3ZOi_Yred2.webp)
 
 ## Building blocks
 
@@ -389,6 +399,8 @@ You can do most work in more than one place. Pick the one that suits the job.
 | Tool Studio | [studio.caplo.si](https://studio.caplo.si) | Write, build, test and publish tool packages in a browser-based code editor, without installing anything.                                                                                        |
 
 The three share one workspace. An agent pushed from the CLI shows up in the console, and a tool published from Tool Studio can be attached to an agent in either.
+
+![The Overview page of the Caplo console](/_astro/overview.B9V7l1gG_Z1aGj0l.webp)
 
 ## Where to go next
 
@@ -897,7 +909,7 @@ Owners, Admins and Developers manage API clients in **Settings** > **API access*
 
 * CLI
 
-  ```sh
+  ```plaintext
   caplo workspace api-client create github-deploy \
     --scope agents:write,agents:publish,tools:write,tools:publish
   ```
@@ -962,7 +974,7 @@ The client’s other keys keep working until you revoke them, so nothing breaks 
 
 In the console, select **Revoke** next to a key. With the CLI:
 
-```sh
+```plaintext
 caplo workspace api-client revoke github-deploy --key <KEY_ID_OR_PREFIX>
 caplo workspace api-client revoke github-deploy --except <NEW_KEY_ID_OR_PREFIX>
 caplo workspace api-client revoke github-deploy
@@ -982,7 +994,7 @@ Clients belong to the workspace, not to the member who created them. When a memb
 
 Set the key and the workspace ID in the environment, and `caplo` commands run as the client:
 
-```sh
+```plaintext
 export CAPLO_API_KEY=<API_KEY>
 export CAPLO_WORKSPACE=<WORKSPACE_ID>
 caplo auth status
@@ -1103,7 +1115,7 @@ API keys can list secrets with `tools:read` but cannot create, rotate, delete or
 
   The value is read from a hidden prompt, or from standard input when it is not a terminal, so it never appears in your shell history:
 
-  ```sh
+  ```plaintext
   caplo secret set shop-prod --description "Shop API production key"
   ```
 
@@ -1123,7 +1135,7 @@ A new secret is **Not bound** until you bind it to a package from **Tools**, in 
 
   Run `caplo secret set` with the existing name. Without `--description`, it keeps the current description.
 
-  ```sh
+  ```plaintext
   caplo secret set shop-prod
   ```
 
@@ -1135,7 +1147,7 @@ Every bound package uses the new value in live calls within a minute. There is n
 
 The list shows each secret with **Bound** and the number of package secrets that use it, or **Not bound**, and when it was last updated. For the packages and names behind the count:
 
-```sh
+```plaintext
 caplo secret list
 caplo secret usage shop-prod
 ```
@@ -1261,6 +1273,8 @@ Plan for an identity provider outage
 
 If your provider is down or misconfigured while SSO is required, nobody can enter the workspace through it. The Owner can lift the requirement: open `https://app.caplo.si/login?workspace=<WORKSPACE_ID>&recovery=1` and sign in with the email and password of their Caplo account, not through SSO. Caplo sets the policy back to **Optional** with **Invitation only** onboarding and records an owner recovery in the [audit log](/operate/audit-log/). This works only while **Recovery path confirmed** is on.
 
+![The Sign-in policy card in Settings, Identity & SSO](/_astro/settings-sso.ByhUM-T2_1amwLG.webp)
+
 ## SCIM provisioning
 
 [Section titled “SCIM provisioning”](#scim-provisioning)
@@ -1324,6 +1338,8 @@ Workspace-wide settings live under **Settings**. Every member can read **General
 [Section titled “General”](#general)
 
 **Settings** > **General** has three panels.
+
+![Workspace details in Settings, General](/_astro/settings-general.BlLkjf05_VLahS.webp)
 
 **Workspace details**
 
@@ -1405,7 +1421,7 @@ Everything on an agent’s **Setup**, **Tools & actions**, **Knowledge** and **S
 
 An agent file is one YAML document with `apiVersion: "v2.0.0"` (`v2` and `v2.0` also work; `v1` files are refused), `kind: Agent`, and the agent’s fields. This file defines a support agent with two tools, a knowledge base, a returns sub-agent and human handoff:
 
-```yaml
+```plaintext
 apiVersion: "v2.0.0"
 kind: Agent
 name: Support Desk
@@ -1459,7 +1475,7 @@ Voice settings are set in the console and are not part of the file; applying or 
 
 For validation and completion in your editor, add this first line to the file:
 
-```yaml
+```plaintext
 # yaml-language-server: $schema=https://docs.caplo.si/schemas/agent-2.0.0.json
 ```
 
@@ -1480,7 +1496,7 @@ The console’s YAML includes the agent’s eval cases as `evals: {cases: [...]}
 
 [Section titled “Work with agent files in the CLI”](#work-with-agent-files-in-the-cli)
 
-```sh
+```plaintext
 caplo agent init -f support.yaml --name "Support Desk"
 caplo agent validate -f support.yaml
 caplo agent push -f support.yaml --dry-run
@@ -1518,7 +1534,7 @@ The CLI accepts both forms. A console export keeps its case IDs when you push it
 
 `caplo pull` writes a workspace agent, every sub-agent it links, their eval cases, and the tool packages they use into a project:
 
-```sh
+```plaintext
 caplo pull "agent/Support Desk" ./support
 cd support
 caplo validate
@@ -1631,11 +1647,13 @@ When the grader cannot reach a verdict, the case ends as an error with **The des
   2. Select **Add case**, fill in the fields, and select **Save case**. Cases save immediately; they are not part of the draft.
   3. Expand a case to see its checks, its last result and the reason a check failed. **Edit** and **Remove** change it.
 
+  ![The Test tab of an agent listing its eval cases and their last results](/_astro/agent-evals.Cv7lHaBB_2sGKnm.webp)
+
 * CLI
 
   In a project, list cases under `evals` in the agent file:
 
-  ```yaml
+  ```plaintext
   evals:
     - name: Reports a shipped order
       input: What's the status of order SO-1002?
@@ -1658,7 +1676,7 @@ When the grader cannot reach a verdict, the case ends as an error with **The des
 
 An agent with [fast routing](/agents/sub-agents-and-routing/#routing) publishes only when the run proves routing works. Add cases that set `routedBy` and name a direct sub-agent in `subAgent`:
 
-```yaml
+```plaintext
 evals:
   - name: Routes an order question
     input: Where is my order SO-1002?
@@ -1687,7 +1705,7 @@ While the workspace requires evals, each direct sub-agent needs a set number of 
 
 * CLI
 
-  ```sh
+  ```plaintext
   caplo agent eval run "Support Desk"
   caplo agent eval list "Support Desk"
   caplo agent eval get "Support Desk" <run-id>
@@ -1695,7 +1713,7 @@ While the workspace requires evals, each direct sub-agent needs a set number of 
 
   In a project, `caplo eval` pushes the selected agents first, then runs their cases:
 
-  ```sh
+  ```plaintext
   caplo eval agent/support
   ```
 
@@ -1794,7 +1812,7 @@ An action needs permission in two places: on the agent, and on the channel entry
 
 1. **On the agent.** In the console, open the agent’s **Tools & actions** tab and check the actions under **Conversation actions**, then select **Save draft**. In an agent file, list them under `actions`:
 
-   ```yaml
+   ```plaintext
    actions:
      - transfer
      - end
@@ -1802,7 +1820,11 @@ An action needs permission in two places: on the agent, and on the channel entry
 
 2. **Publish** a release with the action. Adding an action suggests a minor version bump, removing one a major bump. See [Publish an agent](/agents/publishing/).
 
+   ![Conversation actions on the agent Tools & actions tab, with Transfer to a human checked](/_astro/agent-actions.DlhXtSFD_ZN3HOs.webp)
+
 3. **On the channel.** For a website widget, open the entry point’s **Conversation** tab and allow the action under **Conversation actions**; for a transfer, choose a Chatwoot handoff destination as the **Transfer destination**. An action the published agent does not allow shows **Unavailable: enable this action in the agent and publish a version.** For a phone channel, set **Transfer calls to** (a phone number or SIP address) and **Transfer type** in the channel’s **Conversation** step; see [Phone](/channels/phone/). For WhatsApp, Messenger and Instagram, see [Handoff to Chatwoot](/channels/handoff-to-chatwoot/).
+
+   ![Conversation actions on a website entry point, with a Chatwoot transfer destination](/_astro/entry-actions.CgwxwGl-_Z1O5FDX.webp)
 
 Tell the agent in its [instructions](/agents/instructions-and-model/) when to hand off, for example “Offer to connect the customer with a person when they ask for a refund over 100 euros, or when you cannot resolve the issue after two tries.” Without guidance, the model decides on its own.
 
@@ -1843,13 +1865,15 @@ Every agent starts with the same core: a name, instructions that define its beha
   4. Expand **Advanced settings** and choose a **Model**. Adjust **Temperature** and **Response limit** if you need to.
   5. Select **Save draft**.
 
+  ![The agent editor: the Setup tab with the Live test panel beside it](/_astro/agent-editor.DyjJ5xJN_cRmx2.webp)
+
   You need a role that can build agents (Owner, Admin or Builder) to edit a draft. Only Owners and Admins can publish it.
 
 * CLI
 
   Write a starter agent file, edit it, then save it as the agent’s draft:
 
-  ```sh
+  ```plaintext
   caplo agent init -f support.yaml --name "Support Desk"
   caplo agent validate -f support.yaml
   caplo agent push -f support.yaml
@@ -1857,7 +1881,7 @@ Every agent starts with the same core: a name, instructions that define its beha
 
   `caplo agent push` creates the agent when the workspace has no agent with that name, and otherwise replaces its draft. The basics look like this in the file:
 
-  ```yaml
+  ```plaintext
   name: Support Desk
   description: Answers order and returns questions.
   instructions: |-
@@ -1942,7 +1966,7 @@ Some models can reason before they reply. Reasoning can improve answers to multi
 | **Reasoning effort** | `policy.reasoning.effort`               | `low`, `medium`, `high` (console: **Off**, **Low**, **Medium**, **High**) | Models that take a reasoning effort. Other models ignore it.                    |
 | **Thinking budget**  | `policy.reasoning.thinkingBudgetTokens` | 1,024 to 32,000 tokens                                                    | Extended thinking on Anthropic models. Must be smaller than the response limit. |
 
-```yaml
+```plaintext
 policy:
   reasoning:
     thinkingBudgetTokens: 2048
@@ -1994,11 +2018,13 @@ Each file can be up to 25 MiB. A knowledge base names documents by file name, so
   5. Select **Approve** on each file that is correct. A file that shows **Failed** could not be extracted; upload a corrected copy.
   6. Under **Approval & availability**, select **Publish version**. Caplo indexes the approved files; the base shows **Ready** when the version can be used.
 
+  ![A knowledge base with its approved files, document review and Approval & availability](/_astro/knowledge-base.BfS2Wt_S_Z1dnpL.webp)
+
   Owners, Admins and Builders can create bases and upload files. Approving files and publishing versions need an Owner or Admin.
 
 * CLI
 
-  ```sh
+  ```plaintext
   caplo knowledge create "Returns policy" --owner "Support operations" --description "Returns, exchanges and refunds"
   caplo knowledge sync "Returns policy" ./docs/returns --dry-run
   caplo knowledge sync "Returns policy" ./docs/returns
@@ -2007,7 +2033,7 @@ Each file can be up to 25 MiB. A knowledge base names documents by file name, so
 
   `caplo knowledge get` lists each document with its extraction and review state. Review the extracted text in the console, then approve and publish:
 
-  ```sh
+  ```plaintext
   caplo knowledge approve "Returns policy"
   caplo knowledge publish "Returns policy"
   ```
@@ -2022,7 +2048,7 @@ Each file can be up to 25 MiB. A knowledge base names documents by file name, so
 
 `caplo knowledge sync` makes a knowledge base’s documents match a directory tree, so you can keep the source files in a repository and publish from CI:
 
-```sh
+```plaintext
 caplo knowledge sync "Returns policy" ./docs/returns --approve --publish --yes
 ```
 
@@ -2079,6 +2105,8 @@ Rules:
 
 [Section titled “Attach a knowledge base to an agent”](#attach-a-knowledge-base-to-an-agent)
 
+![The Knowledge tab of an agent with a ready knowledge base attached](/_astro/agent-knowledge.fCCTNhVU_ZVThjG.webp)
+
 * Console
 
   Open the agent, select the **Knowledge** tab, check each knowledge base the agent should use, and select **Save draft**. Only bases that show **Ready** can be selected.
@@ -2087,7 +2115,7 @@ Rules:
 
   List knowledge bases by name or ID under `knowledgeBases` in the agent file, then push it:
 
-  ```yaml
+  ```plaintext
   knowledgeBases:
     - Returns policy
   ```
@@ -2130,7 +2158,7 @@ An agent’s `policy` controls how its loop runs on each turn: how many model ca
 
 In the console, these settings are under **Setup > Advanced settings > Agent loop**. In an agent file they are the `policy` block:
 
-```yaml
+```plaintext
 policy:
   maxModelCalls: 12
   maxReads: 6
@@ -2229,20 +2257,22 @@ Publishing needs an Owner or Admin, or an API key with the `agents:publish` and 
   4. Under **Agent evals**, select **Run tests** and wait for the cases to pass. For a fast-routing agent, the **Fast routing** section lists what it still needs.
   5. Select **Publish version**.
 
+  ![The Releases tab with Release readiness and the published releases](/_astro/agent-releases.BYRy7G2F_ZExWsE.webp)
+
   **Publish agent** is available when the saved draft has unpublished changes and the YAML editor has no unapplied edits.
 
 * CLI
 
   Publish one agent’s saved draft:
 
-  ```sh
+  ```plaintext
   caplo agent push -f support.yaml
   caplo agent publish "Support Desk"
   ```
 
   Or publish a whole project, packages and agents together:
 
-  ```sh
+  ```plaintext
   caplo publish --dry-run
   caplo publish
   ```
@@ -2295,7 +2325,7 @@ Publishing does not change what channels serve. Each channel keeps its release u
 
 * CLI
 
-  ```sh
+  ```plaintext
   caplo channel deploy Website
   caplo channel deploy whatsapp/Support --agent "Support Desk@1.2.0"
   ```
@@ -2312,7 +2342,7 @@ A deploy affects new conversations only. Conversations already open keep the rel
 
 To return channels to the release before the one they serve:
 
-```sh
+```plaintext
 caplo channel rollback Website
 ```
 
@@ -2324,7 +2354,7 @@ It points each channel at its agent’s newest release that is older than the cu
 
 Revoking marks a release as unusable, for example one that gives wrong refund advice:
 
-```sh
+```plaintext
 caplo agent release revoke "Support Desk" 1.2.0 --reason "wrong refund policy"
 ```
 
@@ -2353,11 +2383,13 @@ Two optional agent settings shape what visitors see under the agent’s replies:
 
 Suggested replies are short next messages, such as “Track my order” or “Talk to a person”, offered under a reply the agent writes. A visitor taps one to send it.
 
+![An agent reply in the website widget followed by three suggested replies](/_astro/widget-suggestions.Bce5GyCd_2wj5Gf.webp)
+
 **Console:** open the agent, go to **Setup > Advanced settings > Suggested replies**, turn on **Offer suggested replies**, and set **Most suggestions** (1 to 4). Select **Save draft**.
 
 **Agent YAML:**
 
-```yaml
+```plaintext
 suggestedReplies:
   maxCount: 3
 ```
@@ -2382,7 +2414,7 @@ With ratings on, the website widget shows a thumbs up and a thumbs down under th
 
 **Agent YAML:**
 
-```yaml
+```plaintext
 visitorFeedback: true
 ```
 
@@ -2424,13 +2456,15 @@ An agent can call other agents in the workspace. Each sub-agent is an ordinary a
   5. Choose how the sub-agent **Works as** (see [Modes](#modes)), then select **Add agent**.
   6. Select **Save draft**.
 
+  ![The Sub-agents tab of a parent agent with fast routing and four linked agents](/_astro/sub-agents.CsV8GDWX_7Hso8.webp)
+
   A link shows **Needs release** while its child has no release. When the child publishes a newer release, the link shows it and offers a **Use** button with that version **in draft**; the parent keeps its fixed release until you adopt the new one and publish the parent. **View agent graph** shows the whole tree.
 
 * CLI
 
   Add `subAgents` to the parent’s agent file. In a project, link another project agent by its file key with `local`; link any workspace agent by ID with `agentId`:
 
-  ```yaml
+  ```plaintext
   subAgents:
     - local: orders
       release: latest
@@ -2502,7 +2536,7 @@ Routing decides how a parent picks a sub-agent for each customer message.
 | `model` (default) | **The model decides** | The parent’s model reads the conversation and calls a sub-agent or answers itself. Takes about 2 seconds.                                 |
 | `fast`            | **Fast routing**      | A separate decision call picks a sub-agent in about 0.3 seconds. When its confidence is below `minConfidence`, the model decides instead. |
 
-```yaml
+```plaintext
 routing:
   mode: fast
   minConfidence: 0.85
@@ -2549,20 +2583,22 @@ The **Live test** panel sits beside the agent editor.
 
 A live test follows the confirmation rules of the agent’s tools, and the agent may treat a plain “yes” typed in the chat as confirmation of a write it asked about. Use the buttons when you want an explicit decision.
 
+![The Live test panel before live testing is enabled](/_astro/agent-live-test.BxSfDutx_Z2rYcEB.webp)
+
 ## Test with the CLI
 
 [Section titled “Test with the CLI”](#test-with-the-cli)
 
 `caplo agent chat` starts a private test conversation with the agent’s saved draft and reads one message per line:
 
-```sh
+```plaintext
 caplo agent push -f support.yaml
 caplo agent chat "Support Desk"
 ```
 
 It tests the draft as last saved, so push or save your edits first. To test a release instead:
 
-```sh
+```plaintext
 caplo agent chat "Support Desk" --release 2.1.0
 ```
 
@@ -2584,7 +2620,7 @@ Some writes can only be declined here: one that has no review in the CLI, or one
 
 You can script a test by piping input:
 
-```sh
+```plaintext
 printf 'Return the boots from order 1042\n/confirm\n' | caplo agent chat "Support Desk"
 ```
 
@@ -2596,7 +2632,7 @@ The command exits with status 1 if a message or decision could not be sent, and,
 
 Each test chat holds a test session, and a workspace has limited test capacity. A chat closes its session when it ends. If a chat stops abruptly or capacity runs out, `caplo agent chat` reports that no test session is free. List and close your open sessions:
 
-```sh
+```plaintext
 caplo agent test list
 caplo agent test close 4d2f8b1e-6c3a-4f7e-9d05-1a2b3c4d5e6f
 ```
@@ -2637,13 +2673,15 @@ Both appear in the same list on the agent. A tool must be published before an ag
   3. Select **Details** on a tool to see its description, input and output schemas, whether it reads or writes, and how it appears to customers.
   4. Select **Save draft**.
 
+  ![The Tools & actions tab of an agent, with conversation actions and tool package groups](/_astro/agent-tools.C2rCb86E_Z2jDHdJ.webp)
+
   Each group shows how many of its tools are selected, its latest version, and the version the agent’s latest release pins. A tool marked **Blocks publishing if selected** (for example **Build pending**) has no usable published version yet; the agent cannot publish while it is selected.
 
 * CLI
 
   List the tools under `tools` in the agent file, then push it:
 
-  ```yaml
+  ```plaintext
   tools:
     - order-desk/lookup_order
     - order-desk/track_shipment
@@ -2729,6 +2767,8 @@ For WhatsApp, Messenger, Instagram and phone, you first connect the provider acc
 
 [Section titled “Create a channel”](#create-a-channel)
 
+![The channel types offered by Create channel](/_astro/create-channel.BaxZzUD__yIqxJ.webp)
+
 1. In the console, open **Channels** under **Deploy**.
 
 2. Select **Create channel** and choose the channel type.
@@ -2740,6 +2780,8 @@ For WhatsApp, Messenger, Instagram and phone, you first connect the provider acc
 5. Select **Create channel**. For a website widget, the console opens the entry point editor, where you configure the conversation and copy the embed code. See [Install the website widget](/channels/website-widget/install/).
 
 The channel page shows **What customers get**: the agent release, each entry point and its state, and **Launch checks**. Select **Review checks** to see which release, tool, knowledge or entry point settings still need attention.
+
+![A channel page showing the agent release, the website entry point and launch checks](/_astro/channel-capabilities.Y9R8VBoN_ZFKS4N.webp)
 
 ## Deploy a new release
 
@@ -2761,20 +2803,20 @@ When the agent has a newer release than the one a channel serves, the channel sh
 
   List your channels and the release each one serves:
 
-  ```sh
+  ```plaintext
   caplo channel list
   caplo channel get "Website"
   ```
 
   Point a channel at its agent’s newest release that is not revoked:
 
-  ```sh
+  ```plaintext
   caplo channel deploy "Website"
   ```
 
   Pick a release with `@` and a version or release number, or point the channel at another agent:
 
-  ```sh
+  ```plaintext
   caplo channel deploy "Website" --agent "Shop Concierge@1.4.0"
   ```
 
@@ -2792,7 +2834,7 @@ When the agent has a newer release than the one a channel serves, the channel sh
 
   Point a channel back at the newest release of its agent that is older than the one it serves and not revoked:
 
-  ```sh
+  ```plaintext
   caplo channel rollback "Website"
   ```
 
@@ -2872,6 +2914,8 @@ In Caplo, you need a role that can manage integrations: Owner, Admin or Develope
 Verification uses the token to confirm the inbox is an API inbox, creates or updates a Chatwoot account webhook named “Caplo handoff”, points the inbox’s webhook at Caplo, and stores the signing secrets Chatwoot reports. Caplo accepts only callbacks signed with those secrets. When it succeeds, the destination shows **Ready**. The **Edit** dialog then shows the **Account webhook** and **API inbox webhook** addresses.
 
 If the token cannot read the webhook secrets, the destination shows **Needs attention** with “Chatwoot did not reveal the webhook secrets to this token; enter them from Chatwoot.” Copy the secrets from the account webhook and the API inbox settings in Chatwoot into **Account webhook secret** and **API inbox webhook secret**, then save again. Any later edit returns the destination to unverified until it is verified again; use **Verify** to check it at any time.
+
+![A Chatwoot handoff destination on the Handoff destinations page](/_astro/handoff-destinations.C4oCtRt1_Z1SyYkw.webp)
 
 ## Use it for agent handoffs
 
@@ -3161,7 +3205,7 @@ The provider and the number are fixed once the channel exists. To have a differe
 
   Phone channels are named `twilio/<name>` or `telnyx/<name>`:
 
-  ```sh
+  ```plaintext
   caplo channel list
   caplo channel deploy "twilio/Support line"
   caplo channel deploy "telnyx/Support line" --agent "Support Desk@1.4.0"
@@ -3633,11 +3677,15 @@ Who answers, which modes are offered and how visitors verify are not part of the
 
 You can also create a design while creating a website channel, with **Create a design here**.
 
+![The Widget designs page](/_astro/designs.BqQtj2Vw_ZW4xEk.webp)
+
 ## Design sections
 
 [Section titled “Design sections”](#design-sections)
 
 The editor groups settings into sections. The preview beside them updates as you edit. Select **Save draft** to keep your changes; **Discard** returns to the last saved draft.
+
+![The design editor with its sections and the live preview](/_astro/design-editor.CdnTLsy2_ZOqvk1.webp)
 
 ### Brand and colours
 
@@ -3710,6 +3758,8 @@ A published revision is immutable. Publishing does not change any website.
 
 You can apply from the design or from the channel. Either way, the change takes effect right away; you do not need to save anything else.
 
+![The Appearance card of a website entry point with the live design revision](/_astro/entry-appearance.CIEPBGVD_1rvsOP.webp)
+
 From the design:
 
 1. Open **Publish and install**. **Live on websites** lists the channels that use this design and the revision each shows.
@@ -3762,6 +3812,8 @@ The website widget is one script tag. It loads the widget from Caplo, shows the 
 
 3. Open the **Install** tab and select **Copy embed code**.
 
+   ![The Install tab of a website entry point with the embed code](/_astro/entry-embed.Dt2VK7nq_NALOk.webp)
+
 If **Copy embed code** is disabled, the hint next to it says why: no design is applied, there are unsaved edits, the entry point is disabled, or the channel is paused.
 
 The **Widget ID** on the Install tab is a public identifier. The snippet contains no credentials, and you never need to add any.
@@ -3772,7 +3824,7 @@ The **Widget ID** on the Install tab is a public identifier. The snippet contain
 
 A popup design (a launcher button in a corner of the page):
 
-```html
+```plaintext
 <script
   src="https://api.caplo.si/v1/messaging/widget/loader.js"
   data-widget-id="<WIDGET_ID>"
@@ -3782,7 +3834,7 @@ A popup design (a launcher button in a corner of the page):
 
 An inline design (the conversation sits inside an element on your page) adds a container and points the script at it:
 
-```html
+```plaintext
 <div id="caplo-<WIDGET_ID>"></div>
 <script
   src="https://api.caplo.si/v1/messaging/widget/loader.js"
@@ -3826,7 +3878,7 @@ On any other site, including a staging host you have not listed, the widget show
 
   Paste the code just before the closing `</body>` tag on every page that should show the widget. For an inline design, place the `<div>` where the conversation should appear and keep the script after it.
 
-  ```html
+  ```plaintext
       <!-- your page content -->
       <script
         src="https://api.caplo.si/v1/messaging/widget/loader.js"
@@ -3843,7 +3895,7 @@ On any other site, including a staging host you have not listed, the widget show
 
   app/layout.tsx
 
-  ```tsx
+  ```plaintext
   import Script from 'next/script';
 
 
@@ -3873,7 +3925,7 @@ On any other site, including a staging host you have not listed, the widget show
 
   For an inline design, render the container and add the loader from an effect:
 
-  ```tsx
+  ```plaintext
   import { useEffect } from 'react';
 
 
@@ -3903,7 +3955,7 @@ On any other site, including a staging host you have not listed, the widget show
 
 If your site sends a `Content-Security-Policy` header, add these sources to the matching directives and keep your existing sources:
 
-```text
+```plaintext
 script-src https://api.caplo.si;
 connect-src https://api.caplo.si;
 font-src https://api.caplo.si;
@@ -3915,7 +3967,7 @@ The console shows the same list under **Content Security Policy additions** on t
 
 If the channel allows voice, the browser also connects to Caplo’s media server for the call. Add it to `connect-src`:
 
-```text
+```plaintext
 connect-src https://api.caplo.si wss://livekit.caplo.si;
 ```
 
@@ -4044,7 +4096,7 @@ The widget loader adds a small API to your page so your own code can open the wi
 
 [Section titled “Get the widget control”](#get-the-widget-control)
 
-```js
+```plaintext
 const chat = window.CaploWidget.get('<WIDGET_ID>');
 ```
 
@@ -4054,7 +4106,7 @@ The control is available as soon as the loader runs, before the widget has finis
 
 Because the loader script is `async`, run your code after it loads:
 
-```js
+```plaintext
 function withCaplo(widgetId, callback) {
   const chat = window.CaploWidget?.get(widgetId);
   if (chat) return callback(chat);
@@ -4082,7 +4134,7 @@ function withCaplo(widgetId, callback) {
 
 [Section titled “Open the widget from your own button”](#open-the-widget-from-your-own-button)
 
-```js
+```plaintext
 withCaplo('<WIDGET_ID>', (chat) => {
   document.querySelector('#help-button').addEventListener('click', () => chat.open());
 });
@@ -4094,7 +4146,7 @@ withCaplo('<WIDGET_ID>', (chat) => {
 
 Hints give the agent context it would otherwise have to ask for. They are never treated as identity: a visitor’s name in a hint does not let tools act on that person’s account.
 
-```js
+```plaintext
 chat.setVisitorHints({
   name: 'Ada',
   locale: 'en-GB',
@@ -4121,7 +4173,7 @@ If visitors are already signed in to your site, your page can sign them in to th
 
 Your backend signs a short-lived assertion for the signed-in user; the browser never holds your signing key. See [Website widget settings](/channels/website-widget/settings/#customer-verification).
 
-```js
+```plaintext
 chat.identity.configure({
   when: 'open',
   getToken: async ({ nonce, requirement }) => {
@@ -4178,7 +4230,7 @@ Listen to identity events on the control:
 
 `state` is `anonymous`, `verified`, `reauthenticate` (the visitor must verify again) or `ended` (the verified conversation ended). `level` is present when `state` is `verified`. `reason` explains the change when there is one, for example `signed_in`, `stepped_up`, `signed_out` or `host_signed_out`.
 
-```js
+```plaintext
 document.addEventListener('caplo:error', (event) => {
   console.warn('Caplo widget unavailable', event.detail);
 });
@@ -4249,6 +4301,8 @@ You need the Owner, Admin or Builder role to change these settings.
 
 [Section titled “General”](#general)
 
+![The General tab of a website entry point, with Appearance, Settings and the live preview](/_astro/entry-general.Bk1L5BqX_1qyyMt.webp)
+
 | Setting                             | What it does                                                                                                                                                                                                                           |
 | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Entry point name**                | Shown in the console only.                                                                                                                                                                                                             |
@@ -4263,6 +4317,8 @@ The **Appearance** card on the same tab is where you apply a published design re
 [Section titled “Text and voice”](#text-and-voice)
 
 The widget supports text chat and, optionally, voice conversations in the browser.
+
+![The Conversation tab of a website entry point](/_astro/entry-conversation.DPTUBfTv_1zXjpR.webp)
 
 Voice is off for a new website channel unless you selected **Allow voice conversations** when creating it. To turn it on later:
 
@@ -4349,7 +4405,7 @@ Start with the browser’s developer tools on the page that should show the widg
 
 When the widget cannot load, the loader replaces it with a **Chat unavailable · Try again** button in the bottom right corner and dispatches a `caplo:error` event. Log it to confirm which widget failed:
 
-```js
+```plaintext
 document.addEventListener('caplo:error', (event) => {
   console.warn('Caplo widget unavailable', event.detail);
 });
@@ -4396,7 +4452,7 @@ A staging, preview or test site is a different origin. Either add it as an allow
 
 If your site sends a `Content-Security-Policy`, the browser console shows messages such as “Refused to load the script” or “Refused to connect”. Add the sources the widget needs and keep your existing ones:
 
-```text
+```plaintext
 script-src https://api.caplo.si;
 connect-src https://api.caplo.si;
 font-src https://api.caplo.si;
@@ -4623,7 +4679,7 @@ The CLI authenticates in one of two ways:
 
 [Section titled “Log in”](#log-in)
 
-```sh
+```plaintext
 caplo auth login
 ```
 
@@ -4641,7 +4697,7 @@ The browser returns to a short-lived listener on `127.0.0.1` on your machine, so
 
 On a remote server, in a container, or over SSH, use the device flow:
 
-```sh
+```plaintext
 caplo auth login --device
 ```
 
@@ -4653,7 +4709,7 @@ The CLI prints a URL and a code. Open the URL on any device, sign in, and confir
 
 [Section titled “Check and end the session”](#check-and-end-the-session)
 
-```sh
+```plaintext
 caplo auth status
 caplo auth logout
 ```
@@ -4687,7 +4743,7 @@ The configuration directory is `CAPLO_CONFIG_DIR` if set, otherwise `$XDG_CONFIG
 
 `caplo config` shows and changes the settings in `config.yaml`:
 
-```sh
+```plaintext
 caplo config list
 caplo config get api-url
 caplo config set credential-storage file
@@ -4730,7 +4786,7 @@ Workspace Owners, Admins and Developers can manage API clients. You can only giv
 
   Log in as yourself, select the workspace, then:
 
-  ```sh
+  ```plaintext
   caplo workspace api-client create github-deploy \
     --scope agents:write,agents:publish,tools:write,tools:publish
   ```
@@ -4764,7 +4820,7 @@ The workspace also accepts `conversations:read`, `usage:read`, `endpoints:read` 
 
 Set two environment variables. The CLI then authenticates as the client for every command, instead of any login on the machine:
 
-```sh
+```plaintext
 export CAPLO_API_KEY=<API_KEY>
 export CAPLO_WORKSPACE=<WORKSPACE_ID>
 caplo auth status
@@ -4805,7 +4861,7 @@ If the API refuses a key, the CLI says that an API key cannot do this or that it
 
 Add a new key, switch your CI secret to it, then revoke the old ones:
 
-```sh
+```plaintext
 caplo workspace api-client rotate github-deploy
 caplo workspace api-client revoke github-deploy --except <NEW_KEY_ID_OR_PREFIX>
 ```
@@ -4816,7 +4872,7 @@ caplo workspace api-client revoke github-deploy --except <NEW_KEY_ID_OR_PREFIX>
 
 [Section titled “Revoke keys”](#revoke-keys)
 
-```sh
+```plaintext
 caplo workspace api-client revoke github-deploy
 caplo workspace api-client revoke github-deploy --key <KEY_ID_OR_PREFIX>
 ```
@@ -4839,7 +4895,7 @@ In CI there is nobody to log in, so the CLI authenticates with an **API key** in
 
 2. Create an API client with the scopes a publish needs, and send its key straight into your repository’s secrets without printing it. With the [GitHub CLI](https://cli.github.com):
 
-   ```sh
+   ```plaintext
    caplo workspace api-client create github-deploy \
      --scope agents:write,agents:publish,tools:write,tools:publish \
      | gh secret set CAPLO_API_KEY
@@ -4849,7 +4905,7 @@ In CI there is nobody to log in, so the CLI authenticates with an **API key** in
 
 3. Store the workspace ID as `CAPLO_WORKSPACE`. It is not secret, but keeping it next to the key keeps them in step:
 
-   ```sh
+   ```plaintext
    caplo workspace get -o json
    gh secret set CAPLO_WORKSPACE --body <WORKSPACE_ID>
    ```
@@ -4862,7 +4918,7 @@ With an API key, the workspace must be given by ID, never by name.
 
 Save this as `.github/workflows/caplo.yml`. It pins the CLI version, so a new CLI release never changes your pipeline until you update the pin.
 
-```yaml
+```plaintext
 name: Caplo
 
 
@@ -4939,7 +4995,7 @@ Do not run `caplo push`, `caplo eval` or `caplo publish` on pull requests agains
 
 To see what a merge would change, add a step to `check` with a key that has only `agents:read` and `tools:read`:
 
-```yaml
+```plaintext
       - run: caplo diff
         env:
           CAPLO_API_KEY: ${{ secrets.CAPLO_READ_KEY }}
@@ -4954,7 +5010,7 @@ To see what a merge would change, add a step to `check` with a key that has only
 
 With [environments](/cli/environments/) in `caplo.yaml`, give each its own API client and secret, and select the environment per job:
 
-```yaml
+```plaintext
       - run: caplo publish --env staging --yes
         env:
           CAPLO_STAGING_KEY: ${{ secrets.CAPLO_STAGING_KEY }}
@@ -4962,7 +5018,7 @@ With [environments](/cli/environments/) in `caplo.yaml`, give each its own API c
 
 For production, run a separate job, for example on `workflow_dispatch` or a tag, that sets both keys. With `promoteFrom: staging`, the CLI reads staging with `CAPLO_STAGING_KEY` and refuses any agent staging has not released from the same source:
 
-```yaml
+```plaintext
       - run: caplo publish --env prod --yes
         env:
           CAPLO_PROD_KEY: ${{ secrets.CAPLO_PROD_KEY }}
@@ -5021,7 +5077,7 @@ Rules:
 
 Add `CAPLO_API_KEY` and `CAPLO_WORKSPACE` under **Settings**, **CI/CD**, **Variables** in GitLab, masked and protected so only protected branches can read them. Then in `.gitlab-ci.yml`:
 
-```yaml
+```plaintext
 stages: [check, publish]
 
 
@@ -5082,7 +5138,7 @@ An environment is a named workspace that a project publishes to, such as `stagin
 
 Add an `environments` map to the project’s `caplo.yaml`:
 
-```yaml
+```plaintext
 apiVersion: v1
 kind: Project
 name: shop
@@ -5122,7 +5178,7 @@ Environment names start with a lowercase letter and use only lowercase letters, 
 
 Pass `--env` (`-e`), or set `CAPLO_ENV`, on `caplo validate`, `diff`, `push`, `eval` and `publish`:
 
-```sh
+```plaintext
 caplo diff --env staging
 caplo publish --env prod
 ```
@@ -5155,7 +5211,7 @@ Use this for settings that should really differ, such as model, temperature, gre
 
 An environment’s `channels` lists, for each agent key, the channels that should serve that agent:
 
-```yaml
+```plaintext
 channels:
   concierge: [Website, twilio/Support line, <CHANNEL_ID>]
 ```
@@ -5182,13 +5238,13 @@ When you publish to an environment with `promoteFrom`, every agent the publish w
 
 1. Publish to staging and test there:
 
-   ```sh
+   ```plaintext
    caplo publish --env staging
    ```
 
 2. When staging is good, publish the same commit to production:
 
-   ```sh
+   ```plaintext
    caplo publish --env prod
    ```
 
@@ -5198,7 +5254,7 @@ When you publish to an environment with `promoteFrom`, every agent the publish w
 
 To read the `promoteFrom` environment, the CLI uses that environment’s own `apiKeyEnv` key when its variable is set, and otherwise your login. A key for one workspace cannot read another, so when you publish with an API key, the `promoteFrom` environment needs `apiKeyEnv` and that variable must hold a key of its workspace with at least `agents:read`:
 
-```sh
+```plaintext
 CAPLO_STAGING_KEY=<STAGING_KEY> CAPLO_PROD_KEY=<PROD_KEY> caplo publish --env prod --yes
 ```
 
@@ -5276,13 +5332,13 @@ Running tool package fixtures on your machine (`caplo test` and `caplo tool test
 
   With [Homebrew](https://brew.sh):
 
-  ```sh
+  ```plaintext
   brew install getcaplo/tap/caplo
   ```
 
   Or with the install script, which needs no Homebrew and no `sudo`:
 
-  ```sh
+  ```plaintext
   curl -fsSL https://cli.caplo.si/install.sh | sh
   export PATH="$HOME/.local/bin:$PATH"
   ```
@@ -5293,13 +5349,13 @@ Running tool package fixtures on your machine (`caplo test` and `caplo tool test
 
   With [Homebrew](https://brew.sh):
 
-  ```sh
+  ```plaintext
   brew install getcaplo/tap/caplo
   ```
 
   Or with the install script. It needs `curl`, `tar` and `sha256sum`; on Ubuntu or Debian install them first with `sudo apt-get install curl ca-certificates tar coreutils`.
 
-  ```sh
+  ```plaintext
   curl -fsSL https://cli.caplo.si/install.sh | sh
   export PATH="$HOME/.local/bin:$PATH"
   ```
@@ -5316,7 +5372,7 @@ Running tool package fixtures on your machine (`caplo test` and `caplo tool test
 
   3. Extract `caplo.exe` to a folder of your own and add that folder to your user `PATH`. In PowerShell, from the download folder:
 
-     ```powershell
+     ```plaintext
      $dir = "$env:LOCALAPPDATA\Programs\caplo"
      Expand-Archive .\caplo_<VERSION>_windows_amd64.zip -DestinationPath $dir
      $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
@@ -5331,7 +5387,7 @@ Use one installation method. If you install with both Homebrew and the script, t
 
 [Section titled “Check the installation”](#check-the-installation)
 
-```sh
+```plaintext
 caplo version
 ```
 
@@ -5350,7 +5406,7 @@ The script detects your operating system and architecture, downloads the matchin
 
 To pin both the script and the CLI to one release, fetch the script from that release’s tag:
 
-```sh
+```plaintext
 curl -fsSL https://raw.githubusercontent.com/getcaplo/homebrew-tap/v0.4.0/install.sh \
   | CAPLO_VERSION=v0.4.0 CAPLO_INSTALL_DIR="$HOME/bin" sh
 ```
@@ -5365,19 +5421,19 @@ The install script and Homebrew check the SHA-256 hash for you. When you downloa
 
 * macOS
 
-  ```sh
+  ```plaintext
   shasum -a 256 --ignore-missing -c checksums.txt
   ```
 
 * Linux
 
-  ```sh
+  ```plaintext
   sha256sum --ignore-missing -c checksums.txt
   ```
 
 * Windows
 
-  ```powershell
+  ```plaintext
   (Get-FileHash .\caplo_<VERSION>_windows_amd64.zip -Algorithm SHA256).Hash.ToLower()
   Select-String "windows_amd64.zip" .\checksums.txt
   ```
@@ -5392,7 +5448,7 @@ A matching line ends in `OK`. If the hash does not match, delete the archive and
 
 Each release also signs `checksums.txt` with a keyless [Sigstore](https://www.sigstore.dev) signature, so you can confirm that Caplo published the checksums and not someone else. Download `checksums.txt.sigstore.json` from the release and verify it with [cosign](https://docs.sigstore.dev/cosign/system_config/installation/):
 
-```sh
+```plaintext
 cosign verify-blob checksums.txt \
   --bundle checksums.txt.sigstore.json \
   --certificate-identity-regexp '@getcaplo\.com$' \
@@ -5407,7 +5463,7 @@ It prints `Verified OK`. A verified `checksums.txt` plus a matching hash means t
 
 * macOS
 
-  ```sh
+  ```plaintext
   brew update && brew upgrade getcaplo/tap/caplo
   ```
 
@@ -5415,7 +5471,7 @@ It prints `Verified OK`. A verified `checksums.txt` plus a matching hash means t
 
 * Linux
 
-  ```sh
+  ```plaintext
   brew update && brew upgrade getcaplo/tap/caplo
   ```
 
@@ -5433,7 +5489,7 @@ Your login, settings and selected workspace are kept across updates.
 
 1. End your session so it stops working on the server too:
 
-   ```sh
+   ```plaintext
    caplo auth logout
    ```
 
@@ -5451,7 +5507,7 @@ A project is a folder, usually a Git repository, that holds a set of agents and 
 
 [Section titled “Create a project”](#create-a-project)
 
-```sh
+```plaintext
 caplo init support
 caplo init shop --template summit
 ```
@@ -5465,7 +5521,7 @@ caplo init shop --template summit
 
 The `summit` template creates this layout:
 
-```text
+```plaintext
 shop/
   caplo.yaml                  the project file
   agents/
@@ -5492,7 +5548,7 @@ Each tool package gets `package.json` and `tsconfig.json` from the current tool 
 
 The project’s `caplo.yaml` sits at the root of the folder:
 
-```yaml
+```plaintext
 apiVersion: v1
 kind: Project
 name: shop
@@ -5551,7 +5607,7 @@ Agent names must be unique in the project, ignoring case.
 
 Without arguments, `diff`, `push`, `test`, `eval` and `publish` act on the whole project. Pass selectors to act on part of it:
 
-```sh
+```plaintext
 caplo push agent/orders
 caplo test tool/order-desk
 caplo publish "agent/Shop Concierge" tool/store-stock
@@ -5570,7 +5626,7 @@ caplo publish "agent/Shop Concierge" tool/store-stock
 
 Project commands look for the project file in the current directory, then in each parent directory, skipping tool packages’ own `caplo.yaml` files. So you can run them from inside `agents/` or a package folder. To point at a project elsewhere, pass `-C` (`--dir`):
 
-```sh
+```plaintext
 caplo validate -C ~/src/shop
 ```
 
@@ -5578,7 +5634,7 @@ caplo validate -C ~/src/shop
 
 [Section titled “Check a project offline”](#check-a-project-offline)
 
-```sh
+```plaintext
 caplo validate
 ```
 
@@ -5599,7 +5655,7 @@ Problems are printed with their file and the command exits with code 3. Tools of
 
 To bring an agent you built in the console under version control:
 
-```sh
+```plaintext
 caplo pull "agent/Shop Concierge"
 caplo pull agent/concierge ./shop
 ```
@@ -5626,7 +5682,7 @@ Everything you need to call `caplo` from scripts, Makefiles and pipelines. For a
 
 Commands that show data take `--output` (`-o`) with `table` (the default), `json` or `yaml`:
 
-```sh
+```plaintext
 caplo agent list -o json
 caplo workspace get -o yaml
 caplo version -o json
@@ -5634,7 +5690,7 @@ caplo version -o json
 
 This covers the `list` and `get` commands, `caplo auth status`, `caplo config list`, `caplo version`, and `caplo workspace api-client` `list`, `create` and `rotate`. With `json` or `yaml`, standard output holds only that document, so you can pipe it straight into `jq`; prompts, warnings and errors go to standard error. Other commands print plain text meant for people. `caplo config get <key>` prints just the value:
 
-```sh
+```plaintext
 API_URL=$(caplo config get api-url)
 ```
 
@@ -5668,7 +5724,7 @@ Each entry in `resources` has:
 
 For example, to run a step only when a publish would change something:
 
-```sh
+```plaintext
 if caplo publish --dry-run -o json | jq -e '.changes' > /dev/null; then
   echo "Publishing"
 fi
@@ -5719,7 +5775,7 @@ When standard input is not a terminal, these commands do not read an answer from
 
 Commands that take a secret never accept it as an argument, so it does not end up in your shell history or process list. They read it from a hidden prompt in a terminal, or from standard input otherwise:
 
-```sh
+```plaintext
 printf %s "$ORDERS_API_KEY" | caplo secret set orders-api-key
 printf %s "$ORDERS_API_KEY" | caplo tool secret set ORDERS_API_KEY -p order-desk
 ```
@@ -5734,13 +5790,13 @@ API keys work the other way round: `caplo workspace api-client create` and `rota
 
 `caplo completion` prints a completion script for `bash`, `zsh`, `fish` or `powershell`. To try it in the current shell:
 
-```sh
+```plaintext
 source <(caplo completion zsh)
 ```
 
 To load it in every new zsh session, add that line to `~/.zshrc`. For bash, install the `bash-completion` package and save the script once:
 
-```sh
+```plaintext
 # macOS with Homebrew
 dir="$(brew --prefix)/etc/bash_completion.d"
 caplo completion bash > "$dir/caplo"
@@ -5777,7 +5833,7 @@ Steps 2 to 4 change nothing in the workspace. Steps 5 and 6 change only drafts, 
 
 [Section titled “Validate”](#validate)
 
-```sh
+```plaintext
 caplo validate
 ```
 
@@ -5787,7 +5843,7 @@ Checks schemas, references, link cycles, the sub-agent depth limit, fast routing
 
 [Section titled “Test tool packages”](#test-tool-packages)
 
-```sh
+```plaintext
 caplo test
 caplo test tool/order-desk -v
 ```
@@ -5798,7 +5854,7 @@ Runs each selected package’s fixtures on your machine, the same way as `caplo 
 
 [Section titled “Review the difference”](#review-the-difference)
 
-```sh
+```plaintext
 caplo diff
 caplo diff agent/concierge -o json
 ```
@@ -5809,7 +5865,7 @@ Compares each package’s files with its workspace draft, and each agent file an
 
 [Section titled “Push drafts”](#push-drafts)
 
-```sh
+```plaintext
 caplo push
 caplo push --dry-run
 ```
@@ -5830,7 +5886,7 @@ A push replaces the workspace draft with your file. Edits someone made to that d
 
 [Section titled “Try it in a test chat”](#try-it-in-a-test-chat)
 
-```sh
+```plaintext
 caplo agent chat "Shop Concierge"
 ```
 
@@ -5840,7 +5896,7 @@ This opens a private test conversation with the agent’s draft in your terminal
 
 [Section titled “Evaluate”](#evaluate)
 
-```sh
+```plaintext
 caplo eval
 caplo eval agent/concierge
 ```
@@ -5853,7 +5909,7 @@ It exits with code 3 when any case fails or a selected agent has no eval cases. 
 
 [Section titled “Publish”](#publish)
 
-```sh
+```plaintext
 caplo publish
 caplo publish agent/orders --dry-run
 caplo publish --yes
@@ -5899,7 +5955,7 @@ The plan shows each new version. A first release is 1.0.0. After that, changing 
 
 [Section titled “Clean up removed agents”](#clean-up-removed-agents)
 
-```sh
+```plaintext
 caplo publish --prune
 ```
 
@@ -5909,7 +5965,7 @@ Agents are never deleted when you remove their file. `--prune` adds an `archive`
 
 [Section titled “Pull console changes”](#pull-console-changes)
 
-```sh
+```plaintext
 caplo pull "agent/Shop Concierge"
 ```
 
@@ -5933,7 +5989,7 @@ Every command that reads or changes agents, tools, channels or knowledge acts on
 
 [Section titled “List and inspect”](#list-and-inspect)
 
-```sh
+```plaintext
 caplo workspace list
 caplo workspace get
 caplo workspace get "Acme Support"
@@ -5945,7 +6001,7 @@ caplo workspace get "Acme Support"
 
 [Section titled “Select a workspace”](#select-a-workspace)
 
-```sh
+```plaintext
 caplo workspace use "Acme Support"
 ```
 
@@ -5957,7 +6013,7 @@ You rarely need to select one by hand: `caplo auth login` keeps your previous se
 
 [Section titled “Create a workspace”](#create-a-workspace)
 
-```sh
+```plaintext
 caplo workspace create "Acme Staging"
 ```
 
@@ -6034,6 +6090,8 @@ When an operation needs a higher level or a more recent sign-in than the custome
 [Section titled “The verification policy”](#the-verification-policy)
 
 The **Verification policy** panel on the same page decides whether visitors can verify at all and what a verification grants:
+
+![The Verification policy card in Settings, Customer identity](/_astro/verification-policy.BkRtHs3s_Z2amgTI.webp)
 
 * **Verify customers in support conversations** must be on.
 * **Connections, in order**: up to 8 connections customers may use. A connection must be listed here and on the channel to be offered.
@@ -6321,7 +6379,7 @@ In order:
 
 1. **Generate a signing key.** Run this where your backend’s secrets live:
 
-   ```sh
+   ```plaintext
    caplo identity keygen --alg ES256 --kid 2026-11 --out ./caplo-keys
    ```
 
@@ -6348,7 +6406,7 @@ In order:
 
 5. **Register a token provider on your page** with the widget’s JavaScript API:
 
-   ```js
+   ```plaintext
    window.CaploWidget.get('<WIDGET_ID>').identity.configure({
      when: 'open',
      getToken: async ({ nonce, requirement }) => {
@@ -6383,7 +6441,7 @@ The endpoint is yours, on your own domain. It must:
 * Sign only the `nonce` and `requirement` it is given.
 * Answer `Cache-Control: no-store`, and `401` when nobody is signed in.
 
-```js
+```plaintext
 // npm install jose
 import { SignJWT, importPKCS8 } from "jose";
 
@@ -6466,7 +6524,7 @@ Before you put it on a live site, test your assertions with the CLI and in the c
 
 1. Sign an assertion locally, as your backend would:
 
-   ```sh
+   ```plaintext
    caplo identity sign-assertion --key ./caplo-keys/2026-11.private.pem --kid 2026-11 \
      --iss https://www.example.com --aud urn:caplo:customer-identity:<CONNECTION_ID> \
      --sub cus_1234 --nonce test-nonce-0123456789 --acr mfa --auth-time now --ttl 60
@@ -6474,7 +6532,7 @@ Before you put it on a live site, test your assertions with the CLI and in the c
 
 2. Check an assertion, from the CLI or from your own endpoint, against your public key:
 
-   ```sh
+   ```plaintext
    caplo identity verify-assertion - --jwks ./caplo-keys/2026-11.public.jwk.json \
      --iss https://www.example.com --aud urn:caplo:customer-identity:<CONNECTION_ID> \
      --nonce test-nonce-0123456789 < assertion.txt
@@ -6604,7 +6662,7 @@ Visitors must enter phone numbers in international format, such as `+15551234567
 
 Caplo sends one `POST` to the webhook URL for each code:
 
-```http
+```plaintext
 POST /caplo/verification-codes HTTP/1.1
 Host: hooks.example.com
 Content-Type: application/json
@@ -6650,7 +6708,7 @@ Answer `200` with JSON within 5 seconds:
 | `sub`      | Required when matched. The customer’s stable ID in your system, up to 255 characters. It becomes the verified customer’s `sub`, so use the same ID your other connections use. |
 | `delivery` | Optional. How you sent the code, such as `email` or `sms`: lowercase letters, digits and `_`. `sms` is recorded as an SMS one-time code.                                       |
 
-```json
+```plaintext
 { "matched": true, "sub": "cus_1234", "delivery": "email" }
 ```
 
@@ -6664,7 +6722,7 @@ Caplo calls the webhook once, after it has already answered the visitor, and nev
 
 [Section titled “Example”](#example)
 
-```js
+```plaintext
 // Express, Node.js 20 or later
 import express from "express";
 import { createHash } from "node:crypto";
@@ -6797,11 +6855,11 @@ When a [customer-aware tool](/tools/customer-aware-tools/) calls your API, the A
 
 `verifyCustomerContext` is part of the `@caplo/tools` package on npm. It has no runtime dependencies: it uses only `fetch` and WebCrypto. The package targets Node.js 24.
 
-```sh
+```plaintext
 npm install @caplo/tools
 ```
 
-```ts
+```plaintext
 import { CustomerContextError, verifyCustomerContext } from "@caplo/tools/verify";
 
 
@@ -6897,7 +6955,7 @@ Every refusal throws `CustomerContextError` with a `reason`:
 
 `MemoryReplayStore` remembers token IDs in one process. When your API runs on more than one instance, give it a shared store: an object whose `use(jti, expiresAt)` returns `true` the first time it sees an ID and `false` after that. With Redis:
 
-```ts
+```plaintext
 import { createClient } from "redis";
 import type { ReplayStore } from "@caplo/tools/verify";
 
@@ -6926,7 +6984,7 @@ Any JWT library works. Accept the token only when the header has `typ` `at+jwt` 
 
 When an operation needs a higher level or a more recent sign-in than the token shows, refuse it with an RFC 9470 challenge, using Caplo’s level names in `acr_values` and seconds in `max_age`:
 
-```ts
+```plaintext
 const fresh = claims.auth_time !== undefined && Date.now() / 1000 - claims.auth_time <= 300;
 if (claims.acr !== "high" || !fresh) {
   return new Response(null, {
@@ -6938,7 +6996,7 @@ if (claims.acr !== "high" || !fresh) {
 
 In the tool, turn the challenge into a step-up with `stepUpFromChallenge`, or ask for one directly with `stepUpRequired`:
 
-```ts
+```plaintext
 import { stepUpFromChallenge, stepUpRequired } from "@caplo/tools";
 
 
@@ -7121,6 +7179,8 @@ The search box filters only the rows on the current page. To open any conversati
 
 Each row shows who is handling the conversation: **AI agent**, **Your team** (taken over in the console) or **External inbox** (handed off to a destination such as Chatwoot), plus signals for errors, handoffs and the estimated model cost.
 
+![The Conversations page with its counts, views and filters](/_astro/conversations.DZ37gNqJ_ZjtfFh.webp)
+
 ## Read a conversation
 
 [Section titled “Read a conversation”](#read-a-conversation)
@@ -7225,6 +7285,8 @@ Open **Settings**, then **Data & privacy**, to choose how long Caplo keeps conve
 
 [Section titled “Retention”](#retention)
 
+![Retention & content in Settings, Data & privacy](/_astro/settings-data.BCwSAEwe_25InQw.webp)
+
 | Setting                  | Choices                          | Default | Applies to                                                                       |
 | ------------------------ | -------------------------------- | ------- | -------------------------------------------------------------------------------- |
 | **Transcript retention** | 7 days, 30 days, 90 days, 1 year | 30 days | Channel conversations, counted from their last message or from when they closed. |
@@ -7287,6 +7349,8 @@ Reading outcomes and conversations needs a role that can read conversations: Own
 [Section titled “Operational outcomes”](#operational-outcomes)
 
 Open **Overview**. The **Operational outcomes** card covers production conversations started in the selected range, by their current status. Filter it by **Agent**, **Channel** and **Date range**; days follow the workspace time zone set in [General settings](/admin/workspace-settings/).
+
+![The Operational outcomes card on the Overview page](/_astro/operational-outcomes.BdA274zq_z3eLt.webp)
 
 | Figure             | Meaning                                                                                                                                 |
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
@@ -7393,6 +7457,8 @@ Each provider has one of three settings, called its key source:
 
 **Caplo Managed** is offered only for providers Caplo runs an account for. When it is not, the option is disabled and shows “Not available in this environment”.
 
+![Language model providers on the Service providers page, each with Off, Caplo Managed and Your key](/_astro/service-providers.C1HhurgE_Z1RAbkt.webp)
+
 ### Defaults
 
 [Section titled “Defaults”](#defaults)
@@ -7469,6 +7535,8 @@ To save a key without switching to it yet, select **Add key** on the row instead
 Note
 
 The check only proves the key authenticates. A key restricted so that it cannot list models or read account details is still accepted. Make sure the key’s project or account can use the models and voices your agents need, and has enough quota.
+
+![The Service providers page with Your key and Add key on each provider](/_astro/service-providers.C1HhurgE_Z1RAbkt.webp)
 
 ## How keys are stored and shown
 
@@ -7598,6 +7666,8 @@ On a voice call, whether by phone or in the website widget, an agent needs to tu
 
 [Section titled “Providers”](#providers)
 
+![Speech providers on the Service providers page](/_astro/speech-providers.OARBIWDb_z8t8k.webp)
+
 * Speech recognition and voice models come from **Deepgram** and **ElevenLabs**, set under **Speech providers**.
 * Realtime models belong to a language model provider (OpenAI for OpenAI Realtime, Google for Gemini Live) and use its **Language models** key source.
 
@@ -7685,6 +7755,8 @@ Publishing a new tool version does not change running agents. They keep calling 
 
 The model sees each tool as `<package>__<tool>` (hyphens in the package name become underscores), so tools from different packages never collide.
 
+![The Tools page of the Caplo console with the workspace tool packages](/_astro/tools.Ctd_J_ds_ZRAkaT.webp)
+
 ## Guides
 
 [Section titled “Guides”](#guides)
@@ -7728,7 +7800,7 @@ Some tools must act for one specific customer: “show my orders”, “change m
 
 Add `subject` to the tool’s policy in `caplo.yaml`:
 
-```yaml
+```plaintext
 tools:
   - name: list_my_orders
     effect: read
@@ -7749,7 +7821,7 @@ For a function package, put `subject` at the top level beside `effect`.
 
 `ctx.subject` holds the verified customer. Call `ctx.requireSubject()` to get it or fail: it throws when the call has none, so the tool can never run unscoped.
 
-```ts
+```plaintext
 import { defineTool } from "@caplo/tools";
 
 
@@ -7780,7 +7852,7 @@ export default defineTool({
 
 Function packages announce support for the subject automatically. An MCP package must add the capability when it creates the server, or Caplo refuses to send it subject calls:
 
-```ts
+```plaintext
 import { SUBJECT_CONTEXT_CAPABILITY } from "@caplo/tools";
 
 
@@ -7808,11 +7880,13 @@ Passing the customer ID to your API with a shared API key means your API trusts 
 
 2. On the same page, under **Customer context tokens**, copy the **Issuer** (and the **JWKS URL**, if your API needs it). Give them to whoever runs the API.
 
+   ![The Customer context tokens card with the Issuer and JWKS URL](/_astro/customer-context-tokens.D1gznfiw_Z62Tlq.webp)
+
 3. In the website channel’s settings, under **Customer verification**, find the tool’s operation in **Verified tool operations** and choose your API in its **customer token audience**. Adding an operation to a channel is not yet available in the console or the CLI: [contact support](/resources/support/) with the channel and the tools, then set the audience here. See [Customer identity](/identity/).
 
 4. In the tool, send the token as a bearer token. It is not an enumerable property, so spreading or logging the subject does not leak it, but never log it yourself:
 
-   ```ts
+   ```plaintext
    const customer = ctx.requireSubject();
    if (!customer.customerToken) throw new Error("no customer context token is configured for this tool");
    const response = await fetch("https://api.shop.example/me/orders", {
@@ -7827,7 +7901,7 @@ Passing the customer ID to your API with a shared API key means your API trusts 
 
 Install `@caplo/tools` in your API and use `verifyCustomerContext` from `@caplo/tools/verify`. It has no runtime dependencies; it uses `fetch` and WebCrypto.
 
-```ts
+```plaintext
 import { CustomerContextError, MemoryReplayStore, verifyCustomerContext } from "@caplo/tools/verify";
 
 
@@ -7884,7 +7958,7 @@ A tool package has two halves. The **code** defines each tool’s name, descript
 
 A function package has exactly one tool. Its entry file (`entry` in `caplo.yaml`, `src/tool.ts` by default) default-exports a `defineTool`:
 
-```ts
+```plaintext
 import { defineTool } from "@caplo/tools";
 
 
@@ -7943,7 +8017,7 @@ Write schemas for the model as much as for validation: describe each property, u
 
 An MCP package is an MCP server with one or more tools. Its entry file (`src/server.ts` by default) exports `createServer()`, which returns a server from the official MCP TypeScript SDK:
 
-```ts
+```plaintext
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { context } from "@caplo/tools";
 import { z } from "zod";
@@ -7988,7 +8062,7 @@ Create the server with `capabilities: { logging: {} }`. Without it, log lines ar
 
 `caplo tool init` also writes `src/stdio.ts`, which runs the package over standard input and output with `serveStdio`. The same code then works in MCP Inspector, Claude Desktop or any other local MCP client:
 
-```ts
+```plaintext
 import { serveStdio } from "@caplo/tools";
 import { createServer } from "./server.ts";
 
@@ -8056,7 +8130,7 @@ Each `tools` entry, or for a function package the same fields at the top level:
 
 A complete MCP package with a read tool and a write tool:
 
-```yaml
+```plaintext
 apiVersion: v1
 kind: ToolPackage
 name: orders
@@ -8084,7 +8158,7 @@ tests: tests/*.json
 
 For a function package, leave out `tools` and put the policy beside `name`:
 
-```yaml
+```plaintext
 apiVersion: v1
 kind: ToolPackage
 name: order-lookup
@@ -8129,7 +8203,7 @@ This page takes a one-tool function package from nothing to a published version 
 
   1. **Create the package.** `caplo tool init` writes a package from the SDK template into a new or empty directory and names it after the directory:
 
-     ```sh
+     ```plaintext
      caplo tool init double-value --type function
      cd double-value
      ```
@@ -8138,7 +8212,7 @@ This page takes a one-tool function package from nothing to a published version 
 
   2. **Install dependencies.**
 
-     ```sh
+     ```plaintext
      npm install
      ```
 
@@ -8146,7 +8220,7 @@ This page takes a one-tool function package from nothing to a published version 
 
   3. **Look at the tool.** `src/tool.ts` exports one `defineTool`:
 
-     ```ts
+     ```plaintext
      import { defineTool } from "@caplo/tools";
 
 
@@ -8166,7 +8240,7 @@ This page takes a one-tool function package from nothing to a published version 
 
   4. **Call it by hand.** `caplo tool dev` opens MCP Inspector (started with `npx`) connected to your package, so you can list and call the tool:
 
-     ```sh
+     ```plaintext
      caplo tool dev
      ```
 
@@ -8174,11 +8248,11 @@ This page takes a one-tool function package from nothing to a published version 
 
   5. **Run the fixtures.** `caplo tool test` bundles the package the way Caplo’s builder does, checks `caplo.yaml` against the tools the code lists, and runs every fixture in `tests/`:
 
-     ```sh
+     ```plaintext
      caplo tool test
      ```
 
-     ```txt
+     ```plaintext
      bundle 7.5 KB (d64251e71094, esbuild 0.28.2)
      tool double_value__double_value (read, 5s)
      capabilities subject-context/1 effect-outcome/1 operation-status/1
@@ -8191,7 +8265,7 @@ This page takes a one-tool function package from nothing to a published version 
 
   6. **Push and build.** `caplo tool push` uploads the folder as the package’s workspace draft (creating the package on the first push), builds it, and streams the build log. `node_modules`, `.git` and anything your `.gitignore` files ignore are left out.
 
-     ```sh
+     ```plaintext
      caplo tool push
      ```
 
@@ -8199,11 +8273,11 @@ This page takes a one-tool function package from nothing to a published version 
 
   7. **Publish.** `caplo tool publish` turns the latest succeeded build into the next version:
 
-     ```sh
+     ```plaintext
      caplo tool publish
      ```
 
-     ```txt
+     ```plaintext
      Published double-value version 1 from build <BUILD_ID>
        double_value__double_value (read, 5s)
      ```
@@ -8232,7 +8306,7 @@ This page takes a one-tool function package from nothing to a published version 
 
 A published tool appears on every agent’s **Tools & actions** tab, grouped under its package. Select it there, or list it in agent YAML by package and tool name:
 
-```yaml
+```plaintext
 tools:
   - double-value/double_value
 ```
@@ -8419,7 +8493,7 @@ Paths are JSON pointers to one direct property: `/orderId`, `/products`. Labels 
 
 `progress` shows a status line while the tool runs. It is fixed text: it cannot include values from the call.
 
-```yaml
+```plaintext
 tools:
   - name: search_products
     effect: read
@@ -8438,7 +8512,7 @@ tools:
 
 For a [write tool](/tools/write-tools/), `fields` chooses which input arguments the review card shows, and `receipt` chooses which properties of the result to show once the write succeeds.
 
-```yaml
+```plaintext
 tools:
   - name: cancel_order
     effect: write
@@ -8485,6 +8559,10 @@ tools:
 * On a voice call, the title and each field are read aloud as “Label: value”. A `last4` value is read as “ending in” its last four characters, and an absent value as “not provided”.
 * `receipt.fields` (up to 12) come from the structured result, so the tool needs an `outputSchema`. A receipt only displays values; it never decides whether the write succeeded.
 
+![A confirmation card for a booking tool in the website widget](/_astro/widget-confirm.Bm7Gk4UV_Z1dIOgl.webp)
+
+![The receipt the widget shows after the booking succeeded](/_astro/widget-receipt.BT2d0xh0_1P4Fqz.webp)
+
 ## Show a result
 
 [Section titled “Show a result”](#show-a-result)
@@ -8506,7 +8584,7 @@ Columns are direct primitive properties of an item. A result that does not fit t
 
 [Section titled “Cards”](#cards)
 
-```yaml
+```plaintext
     presentation:
       schemaVersion: 1
       title: Product search
@@ -8548,6 +8626,8 @@ Columns are direct primitive properties of an item. A result that does not fit t
 
 Here the output schema has a `products` array whose items have `imageUrl`, `name`, `price`, `currency` and `url`.
 
+![A cards result in the website widget: two products with image, status, price and actions](/_astro/widget-cards.JIqOSjeC_1jNFij.webp)
+
 ### Column roles
 
 [Section titled “Column roles”](#column-roles)
@@ -8577,7 +8657,7 @@ Each role can be used by one column only, and a column with a role uses `display
 
 [Section titled “Choices”](#choices)
 
-```yaml
+```plaintext
       result:
         path: /slots
         layout: choices
@@ -8595,11 +8675,13 @@ Each role can be used by one column only, and a column with a role uses `display
 
 Each choice sends its filled-in reply. Columns without a role must appear in the template.
 
+![A choices result in the website widget: delivery windows the customer taps to reply](/_astro/widget-choices.BKbyZL30_Z13FGYe.webp)
+
 ### Detail
 
 [Section titled “Detail”](#detail)
 
-```yaml
+```plaintext
       result:
         layout: detail
         title: Your order
@@ -8626,11 +8708,13 @@ Each choice sends its filled-in reply. Columns without a role must appear in the
 
 Without `path`, a detail shows the result object itself.
 
+![A detail result in the website widget: one product with its specification rows](/_astro/widget-detail.BT92E4bY_21Ns5v.webp)
+
 ### Comparison
 
 [Section titled “Comparison”](#comparison)
 
-```yaml
+```plaintext
       result:
         path: /plans
         layout: comparison
@@ -8654,11 +8738,13 @@ Without `path`, a detail shows the result object itself.
             display: plain
 ```
 
+![A comparison result in the website widget: two products side by side](/_astro/widget-comparison.CxW_VEfP_2ttxR3.webp)
+
 ### Timeline
 
 [Section titled “Timeline”](#timeline)
 
-```yaml
+```plaintext
       result:
         path: /steps
         layout: timeline
@@ -8684,13 +8770,15 @@ Without `path`, a detail shows the result object itself.
 
 The `state` property’s schema is `{ "type": "string", "enum": ["complete", "in_progress", "not_started"] }`, and `at` is a string with `format: date-time`.
 
+![A timeline result in the website widget: the delivery progress of an order](/_astro/widget-timeline.D_vEPE6B_2po6Wf.webp)
+
 ## Return files
 
 [Section titled “Return files”](#return-files)
 
 A read tool can hand the customer up to three files per call, such as an invoice PDF or a floor plan. Declare the types and the largest size:
 
-```yaml
+```plaintext
 tools:
   - name: get_invoice
     effect: read
@@ -8712,7 +8800,7 @@ tools:
 
 Return each file as an MCP embedded resource with base64 content. The last part of `uri` is the file name the customer sees:
 
-```ts
+```plaintext
 return {
   content: [
     { type: "text", text: `Invoice ${invoice.number} for order ${orderId}` },
@@ -8723,13 +8811,15 @@ return {
 
 Embedded resources are written with the MCP SDK, so files need an MCP package. Caplo takes the files out of the result before the model sees it, checks that each file’s content matches its type, scans it, and shows it with the reply as a download where the channel can. A file of an undeclared type, over `maxBytes`, or a fourth file fails the call. Where the channel cannot deliver files, such as a phone call, the agent is told the file was not delivered, so also return the essentials as text.
 
+![A PDF invoice the visitor can download from the website widget](/_astro/widget-file.bJQwGIN5_29tq3k.webp)
+
 ## Ask for missing details
 
 [Section titled “Ask for missing details”](#ask-for-missing-details)
 
 A read tool can ask the visitor for details it needs while it runs, with an MCP form. Declare every field the tool may ask for:
 
-```yaml
+```plaintext
 tools:
   - name: find_store
     effect: read
@@ -8741,7 +8831,7 @@ tools:
 
 Then ask from the code. In a function package, use `ctx.canElicit` and `ctx.elicit`:
 
-```ts
+```plaintext
 async handler(args, ctx) {
   let city = args.city;
   if (!city) {
@@ -8768,6 +8858,8 @@ In an MCP package, check `server.server.getClientCapabilities()?.elicitation` an
 Caution
 
 Never ask for a password, card number, one-time code or other credential. Caplo refuses fields and forms whose names, titles or options name one, and the build rejects such field names.
+
+![A form in the website widget asking for a delivery address and window](/_astro/widget-form.Bd9RWIXH_1CHdww.webp)
 
 # Connect a remote MCP server
 
@@ -8831,13 +8923,13 @@ Tokens, header values and client secrets are write-only. Caplo stores them encry
 
   1. **Check the server.** Nothing is saved. Add `--bearer-stdin`, or `--header X-API-Key --value-stdin`, to check with a credential.
 
-     ```sh
+     ```plaintext
      caplo mcp check https://mcp.example.com/mcp
      ```
 
   2. **Add it.** Give it a name and the authentication method. Secrets are read from standard input (a hidden prompt on a terminal) or from an environment variable, never from a flag value.
 
-     ```sh
+     ```plaintext
      # OAuth, a user signs in; Caplo registers itself where the server allows it
      caplo mcp add crm --url https://mcp.example.com/mcp --auth oauth --display-name "Customer CRM"
 
@@ -8859,13 +8951,13 @@ Tokens, header values and client secrets are write-only. Caplo stores them encry
 
   3. **Authorize (OAuth).** Open the printed URL in a browser signed in to the Caplo console; the console completes the authorization. `--open` opens it for you. The client credentials grant completes at once.
 
-     ```sh
+     ```plaintext
      caplo mcp connect crm --open
      ```
 
   4. **Review the tools.** List them, then enable and classify the ones agents may use, by their remote name:
 
-     ```sh
+     ```plaintext
      caplo mcp tools crm
      caplo mcp review crm \
        --enable search_contacts=read \
@@ -8878,11 +8970,11 @@ Tokens, header values and client secrets are write-only. Caplo stores them encry
 
   5. **Publish.**
 
-     ```sh
+     ```plaintext
      caplo mcp publish crm
      ```
 
-     ```txt
+     ```plaintext
      Published crm version 1 with 2 tools
      ...
      Agent files use them as crm/<tool>
@@ -8991,7 +9083,7 @@ A tool package gets nothing it does not declare. It reads only the secrets named
 
 List each secret by name in `caplo.yaml`. Names are upper case: a letter, then letters, digits or underscores, up to 64 characters, and at most 50 per package.
 
-```yaml
+```plaintext
 secrets:
   - SHOP_API_KEY
   - SHOP_WEBHOOK_SECRET
@@ -8999,7 +9091,7 @@ secrets:
 
 Read a value from the [call context](/tools/define-tool-and-context/#the-call-context):
 
-```ts
+```plaintext
 const apiKey = secrets.get("SHOP_API_KEY");
 ```
 
@@ -9040,7 +9132,7 @@ Values are write-only: once saved, neither the console nor the CLI shows them ag
 
   Run these in the package folder, or pass `-p <package>`. Values are read from a hidden prompt, or from standard input when it is not a terminal, so they never appear in your shell history.
 
-  ```sh
+  ```plaintext
   # A value for this package only
   caplo tool secret set SHOP_API_KEY
 
@@ -9083,7 +9175,7 @@ Values are write-only: once saved, neither the console nor the CLI shows them ag
 
 A package can make outbound requests only to the hosts in its `egress` list. Without the list, or with an empty one, it has no network access at all.
 
-```yaml
+```plaintext
 egress:
   - api.shop.example
   - "*.payments.example"
@@ -9113,7 +9205,7 @@ A fixture is one tool call and what you expect back. Fixtures live in your packa
 
 Each file in `tests/` (or the glob `tests` sets in `caplo.yaml`) holds one fixture:
 
-```json
+```plaintext
 {
   "name": "looks up a shipped order",
   "tool": "get_order",
@@ -9157,13 +9249,13 @@ Tips:
 
 [Section titled “Run fixtures locally”](#run-fixtures-locally)
 
-```sh
+```plaintext
 caplo tool test
 ```
 
 `caplo tool test` bundles the package with the builder’s exact settings, loads it from an empty directory with no environment variables, checks `caplo.yaml` against the tools the code lists, and runs each fixture in Node 24 with the tool’s timeout. Run `npm install` first.
 
-```txt
+```plaintext
 bundle 8.1 KB (5be0c2d41a7e, esbuild 0.28.2)
 tool order_lookup__get_order (read, 5s)
 capabilities subject-context/1 effect-outcome/1 operation-status/1
@@ -9184,7 +9276,7 @@ FAIL tests/unknown-order.json (refuses an unknown order)
 
 [Section titled “Run fixtures on Caplo”](#run-fixtures-on-caplo)
 
-```sh
+```plaintext
 caplo tool test --remote
 ```
 
@@ -9205,7 +9297,7 @@ In Tool Studio, **Run Fixture Tests** in the **Tools** view does the same for th
 
 In a [project](/cli/projects/), `caplo test` runs the selected packages’ fixtures locally, like `caplo tool test`. `caplo publish` goes further: for each package it publishes, it pushes, builds and runs the fixtures on Caplo, and stops the publish if any fixture fails. Agents that use the package are not published either.
 
-```sh
+```plaintext
 caplo test tool/orders
 caplo publish tool/orders
 ```
@@ -9289,7 +9381,9 @@ A tool package moves through three stages:
 
 `caplo tool push` starts a build and streams its log; so does **Build** in Tool Studio. To look at builds afterwards:
 
-```sh
+![Tool packages with their published version and build status](/_astro/tool-packages.CrRiszlt_Z2juLkE.webp)
+
+```plaintext
 caplo tool build list orders --status failed
 caplo tool build get orders <BUILD_ID>
 caplo tool build logs orders <BUILD_ID>
@@ -9320,7 +9414,7 @@ Run `caplo tool test` locally first: it applies the same bundling, rejection and
 
 [Section titled “Publish a version”](#publish-a-version)
 
-```sh
+```plaintext
 caplo tool publish                      # the latest succeeded build
 caplo tool publish orders --build <BUILD_ID>
 ```
@@ -9335,7 +9429,7 @@ A new version does not reach agents by itself. Each agent release pins the versi
 
 Revoke a version when it must stop running at once, for example because it has a bug that harms customers or leaks data.
 
-```sh
+```plaintext
 caplo tool version revoke orders@3 --reason "Refunds the wrong amount for partial orders"
 ```
 
@@ -9359,7 +9453,7 @@ Revoking cannot be undone. Agent releases that pin the version stop calling its 
 
 `caplo tool pull` downloads a package into a new or empty directory:
 
-```sh
+```plaintext
 caplo tool pull orders                  # the current draft
 caplo tool pull orders@3 --dir ./orders-v3   # the exact source version 3 was built from
 ```
@@ -9372,12 +9466,12 @@ Every file is checked against its recorded SHA-256 before anything is written. U
 
 `caplo tool logs` shows the package’s recent live calls with their outcome, timing, errors, refused hosts and log lines:
 
-```sh
+```plaintext
 caplo tool logs orders -n 50
 caplo tool logs orders -f
 ```
 
-```txt
+```plaintext
 14:02:11 get_order succeeded 182.4 ms cold 7d4c2a9e-...
   log info {"message":"order found","invocationId":"7d4c2a9e-...","orderId":"SO-1002"}
 14:03:40 get_order failed tool_timeout 5001.2 ms 0b81f6d3-...
@@ -9413,7 +9507,7 @@ The effect is yours to set; Caplo does not infer it from the code or from MCP an
 
 `confirmation: required` is the default for write tools. The agent proposes the call with exact arguments, the customer reviews it, and the tool runs only after the customer confirms, with exactly those arguments.
 
-```yaml
+```plaintext
 tools:
   - name: cancel_order
     effect: write
@@ -9429,13 +9523,15 @@ tools:
 
 `confirmation: none` runs the write as soon as the agent calls it. Use it only for low-risk actions where a confirmation step adds nothing, such as adding a note to a support ticket.
 
+![A confirmation card in the website widget with Confirm request, Edit details and Decline request](/_astro/widget-confirm.Bm7Gk4UV_Z1dIOgl.webp)
+
 ## Use the idempotency key
 
 [Section titled “Use the idempotency key”](#use-the-idempotency-key)
 
 Every write call carries `idempotencyKey` in its context. The key is the same for every attempt and status check of one confirmed action, and different for every other action. Send it to your API so that a repeated request applies the change only once:
 
-```ts
+```plaintext
 async handler({ orderId }, { secrets, signal, idempotencyKey }) {
   const response = await fetch(`https://api.shop.example/orders/${encodeURIComponent(orderId)}/cancel`, {
     method: "POST",
@@ -9466,7 +9562,7 @@ When a write ends, Caplo records one of these outcomes and the agent and custome
 
 Return `rejected` only when you are certain nothing changed. When in doubt, throw: an unknown outcome is safer than a false “not applied”, which could lead the customer to try again and, for example, pay twice.
 
-```ts
+```plaintext
 import { defineTool, pending, rejected } from "@caplo/tools";
 
 
@@ -9498,7 +9594,7 @@ Typed outcomes need `@caplo/tools` 0.1.6 or later, which the templates already u
 
 An MCP package reports the same outcomes in the result metadata. Advertise the capability when you create the server, and add `_meta` to each write result:
 
-```ts
+```plaintext
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { EFFECT_META_KEY, EFFECT_OUTCOME_CAPABILITY } from "@caplo/tools";
 
@@ -9525,7 +9621,7 @@ Without the capability or the metadata, an error result from a write counts as u
 
 When a write’s outcome is unknown or pending, Caplo can ask your package what happened. Add a `status` handler to the `defineTool`:
 
-```ts
+```plaintext
 import { applied, defineTool, pending, rejected } from "@caplo/tools";
 
 
@@ -9560,7 +9656,7 @@ An MCP package answers the `caplo/status` request (`STATUS_METHOD`) with params 
 
 For tools that act for a [verified customer](/tools/customer-aware-tools/), your API may need a stronger or more recent sign-in before it allows an operation. Return `stepUpRequired` instead of a result:
 
-```ts
+```plaintext
 import { stepUpRequired, stepUpFromChallenge } from "@caplo/tools";
 
 
@@ -9825,6 +9921,8 @@ Pausing affects your customers. Charges are checked about once a minute, so the 
 
 The tiles at the top show **Charges this month** (production only), **Forecast at month end** at the month’s pace so far (shown once 10% of the month has passed), **Budgets at risk** and **Alerts this month**.
 
+![The Spend controls page](/_astro/spend-controls.DFzsnlJB_Z1Brw0G.webp)
+
 Each budget’s row shows what it has spent this month, its forecast, its thresholds, what happens at the limit and its status:
 
 | Status              | Meaning                                                               |
@@ -9864,6 +9962,8 @@ Both need a role that can view financial data: Owner, Admin, Billing or Auditor.
 
 The **Usage** page answers “how much did our agents use, and where?”.
 
+![The Usage page with totals, filters and usage by channel](/_astro/usage.B4y1xVp4_22kqBl.webp)
+
 **Filters** at the top apply to everything on the page:
 
 | Filter                    | Options                                                                                                    |
@@ -9890,6 +9990,8 @@ If a provider has not reported full usage for some requests yet, a note under th
 [Section titled “Billing page”](#billing-page)
 
 The **Billing** page answers “what will Caplo charge us?”.
+
+![The Billing page with the estimated amount due and charges over time](/_astro/billing.E0-1i4UH_3Tih2.webp)
 
 **Filters**: **Charges** (**All charges**, **Voice**, **Text** or **Language models**), **Agent**, **Channel** and **Billing dates** (**This month**, **Last month**, **Last 30 days** or a custom range).
 
@@ -9950,7 +10052,7 @@ Generated from the schema in `caplo` v0.4.1. Guide: [Agent YAML](/agents/agent-y
 
 For validation and completion in your editor, add this first line to the file (YAML language server, used by VS Code and others):
 
-```yaml
+```plaintext
 # yaml-language-server: $schema=https://docs.caplo.si/schemas/agent-2.0.0.json
 ```
 
@@ -10295,7 +10397,7 @@ Generated from the schema in `caplo` v0.4.1. Guides: [Tools](/tools/).
 
 For validation and completion in your editor, add this first line to the file (YAML language server, used by VS Code and others):
 
-```yaml
+```plaintext
 # yaml-language-server: $schema=https://docs.caplo.si/schemas/caplo.schema.json
 ```
 
@@ -10757,7 +10859,7 @@ Generated from `caplo` v0.4.1, the latest release. `caplo --help` prints the sam
 
 Install the CLI with the [installation guide](/cli/install/). Task guides are under [CLI](/cli/workflow/).
 
-```sh
+```plaintext
 caplo [flags]
 ```
 
@@ -10856,7 +10958,7 @@ These flags work with every command.
 
 Generate the autocompletion script for the specified shell.
 
-```sh
+```plaintext
 caplo completion
 ```
 
@@ -10875,7 +10977,7 @@ Generate the autocompletion script for caplo for the specified shell. See each s
 
 Generate the autocompletion script for bash.
 
-```sh
+```plaintext
 caplo completion bash
 ```
 
@@ -10885,7 +10987,7 @@ This script depends on the ‘bash-completion’ package. If it is not installed
 
 To load completions in your current shell session:
 
-```sh
+```plaintext
 source <(caplo completion bash)
 ```
 
@@ -10895,7 +10997,7 @@ To load completions for every new session, execute once:
 
 [Section titled “Linux:”](#linux)
 
-```sh
+```plaintext
 caplo completion bash > /etc/bash_completion.d/caplo
 ```
 
@@ -10903,7 +11005,7 @@ caplo completion bash > /etc/bash_completion.d/caplo
 
 [Section titled “macOS:”](#macos)
 
-```sh
+```plaintext
 caplo completion bash > $(brew --prefix)/etc/bash_completion.d/caplo
 ```
 
@@ -10921,7 +11023,7 @@ You will need to start a new shell for this setup to take effect.
 
 Generate the autocompletion script for fish.
 
-```sh
+```plaintext
 caplo completion fish [flags]
 ```
 
@@ -10929,13 +11031,13 @@ Generate the autocompletion script for the fish shell.
 
 To load completions in your current shell session:
 
-```sh
+```plaintext
 caplo completion fish | source
 ```
 
 To load completions for every new session, execute once:
 
-```sh
+```plaintext
 caplo completion fish > ~/.config/fish/completions/caplo.fish
 ```
 
@@ -10953,7 +11055,7 @@ You will need to start a new shell for this setup to take effect.
 
 Generate the autocompletion script for powershell.
 
-```sh
+```plaintext
 caplo completion powershell [flags]
 ```
 
@@ -10961,7 +11063,7 @@ Generate the autocompletion script for powershell.
 
 To load completions in your current shell session:
 
-```sh
+```plaintext
 caplo completion powershell | Out-String | Invoke-Expression
 ```
 
@@ -10979,7 +11081,7 @@ To load completions for every new session, add the output of the above command t
 
 Generate the autocompletion script for zsh.
 
-```sh
+```plaintext
 caplo completion zsh [flags]
 ```
 
@@ -10987,13 +11089,13 @@ Generate the autocompletion script for the zsh shell.
 
 If shell completion is not already enabled in your environment you will need to enable it. You can execute the following once:
 
-```sh
+```plaintext
 echo "autoload -U compinit; compinit" >> ~/.zshrc
 ```
 
 To load completions in your current shell session:
 
-```sh
+```plaintext
 source <(caplo completion zsh)
 ```
 
@@ -11003,7 +11105,7 @@ To load completions for every new session, execute once:
 
 [Section titled “Linux:”](#linux-1)
 
-```sh
+```plaintext
 caplo completion zsh > "${fpath[1]}/_caplo"
 ```
 
@@ -11011,7 +11113,7 @@ caplo completion zsh > "${fpath[1]}/_caplo"
 
 [Section titled “macOS:”](#macos-1)
 
-```sh
+```plaintext
 caplo completion zsh > $(brew --prefix)/share/zsh/site-functions/_caplo
 ```
 
@@ -11029,7 +11131,7 @@ You will need to start a new shell for this setup to take effect.
 
 Show the caplo version.
 
-```sh
+```plaintext
 caplo version [flags]
 ```
 
@@ -11037,7 +11139,7 @@ Shows the CLI version, the commit it was built from, and the Go version and plat
 
 **Examples**
 
-```sh
+```plaintext
 caplo version
 caplo version -o json
 ```
@@ -11058,7 +11160,7 @@ Generated from `caplo` v0.4.1, the latest release. `caplo agent --help` prints t
 
 Build, test, evaluate, and publish one agent.
 
-```sh
+```plaintext
 caplo agent
 ```
 
@@ -11066,7 +11168,7 @@ Commands for a single agent file or workspace agent. A workspace agent is named 
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent init -f support.yaml
 caplo agent push -f support.yaml
 caplo agent chat "Support"
@@ -11093,7 +11195,7 @@ caplo agent publish "Support"
 
 Chat with the agent’s saved draft, or a release, in a private test conversation.
 
-```sh
+```plaintext
 caplo agent chat <agent> [flags]
 ```
 
@@ -11105,7 +11207,7 @@ Replies arrive on the agent-test event stream. It resumes after the last event w
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent chat "Shop Concierge"
 caplo agent chat "Shop Concierge" --release 2.1.0
 printf 'Where is order 1042?\n/confirm\n' | caplo agent chat "Shop Concierge"
@@ -11123,13 +11225,13 @@ printf 'Where is order 1042?\n/confirm\n' | caplo agent chat "Shop Concierge"
 
 Run and inspect an agent’s evaluations.
 
-```sh
+```plaintext
 caplo agent eval
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent eval run "Shop Concierge"
 caplo agent eval list "Shop Concierge"
 ```
@@ -11146,13 +11248,13 @@ caplo agent eval list "Shop Concierge"
 
 Show an evaluation run and its cases.
 
-```sh
+```plaintext
 caplo agent eval get <agent> <run> [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent eval get "Shop Concierge" 0c9e7a52-1d4b-4e8f-a3c6-5b2d9f0e1a47
 ```
 
@@ -11168,13 +11270,13 @@ caplo agent eval get "Shop Concierge" 0c9e7a52-1d4b-4e8f-a3c6-5b2d9f0e1a47
 
 List the agent’s evaluation runs, newest first.
 
-```sh
+```plaintext
 caplo agent eval list <agent> [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent eval list "Shop Concierge"
 caplo agent eval list "Shop Concierge" -n 5 -o json
 ```
@@ -11192,7 +11294,7 @@ caplo agent eval list "Shop Concierge" -n 5 -o json
 
 Run the agent’s eval cases against its saved draft.
 
-```sh
+```plaintext
 caplo agent eval run <agent>
 ```
 
@@ -11200,7 +11302,7 @@ Runs every case of the agent’s eval suite against its saved draft in isolated 
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent eval run "Shop Concierge"
 ```
 
@@ -11210,13 +11312,13 @@ caplo agent eval run "Shop Concierge"
 
 Show an agent: draft, model, tools, sub-agents, and latest release.
 
-```sh
+```plaintext
 caplo agent get <agent> [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent get "Shop Concierge"
 caplo agent get 6f1d2c3b-8a4e-4f0a-9b7c-2d1e0f3a4b5c -o yaml
 ```
@@ -11233,7 +11335,7 @@ caplo agent get 6f1d2c3b-8a4e-4f0a-9b7c-2d1e0f3a4b5c -o yaml
 
 Write a new agent file to edit, validate, and push.
 
-```sh
+```plaintext
 caplo agent init [flags]
 ```
 
@@ -11241,7 +11343,7 @@ Writes a starter agent file with one eval case. The file must not exist. Without
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent init
 caplo agent init -f agents/help-desk.yaml
 caplo agent init -f support.yaml --name "Support Desk"
@@ -11260,7 +11362,7 @@ caplo agent init -f support.yaml --name "Support Desk"
 
 List the workspace’s agents.
 
-```sh
+```plaintext
 caplo agent list [flags]
 ```
 
@@ -11268,7 +11370,7 @@ Lists the workspace’s agents with their latest release, draft revision, and st
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent list
 caplo agent list --archived -o json
 ```
@@ -11286,7 +11388,7 @@ caplo agent list --archived -o json
 
 Pin tools, run the evals, and publish the agent’s saved draft as a release.
 
-```sh
+```plaintext
 caplo agent publish <agent> [flags]
 ```
 
@@ -11298,7 +11400,7 @@ Without –bump the version follows the console: a first release, or a change of
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent publish "Shop Concierge"
 caplo agent publish "Shop Concierge" --bump minor --yes
 ```
@@ -11316,7 +11418,7 @@ caplo agent publish "Shop Concierge" --bump minor --yes
 
 Write an agent’s draft as the console’s Export YAML, to –file or standard output.
 
-```sh
+```plaintext
 caplo agent pull <agent> [flags]
 ```
 
@@ -11324,7 +11426,7 @@ Writes the agent’s draft byte for byte as the console’s Export YAML. Sub-age
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent pull "Shop Concierge"
 caplo agent pull "Shop Concierge" -f concierge.yaml
 ```
@@ -11341,7 +11443,7 @@ caplo agent pull "Shop Concierge" -f concierge.yaml
 
 Save an agent file as the agent’s draft, creating the agent if needed, and its evals as the eval suite.
 
-```sh
+```plaintext
 caplo agent push [flags]
 ```
 
@@ -11349,7 +11451,7 @@ Saves the file as the draft of the workspace agent with its name, creating the a
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent push -f agent.yaml
 caplo agent push -f agent.yaml --dry-run
 ```
@@ -11367,7 +11469,7 @@ caplo agent push -f agent.yaml --dry-run
 
 List, show, and revoke an agent’s releases.
 
-```sh
+```plaintext
 caplo agent release
 ```
 
@@ -11375,7 +11477,7 @@ A release is a published draft revision with its tool versions and sub-agent rel
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent release list "Shop Concierge"
 caplo agent release revoke "Shop Concierge" 2.1.0 --reason "wrong refund policy"
 ```
@@ -11392,13 +11494,13 @@ caplo agent release revoke "Shop Concierge" 2.1.0 --reason "wrong refund policy"
 
 Show a release: version, tools, sub-agent releases, and eval gate.
 
-```sh
+```plaintext
 caplo agent release get <agent> <release> [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent release get "Shop Concierge" 2.1.0
 caplo agent release get "Shop Concierge" 7 -o json
 ```
@@ -11415,13 +11517,13 @@ caplo agent release get "Shop Concierge" 7 -o json
 
 List the agent’s releases, newest first.
 
-```sh
+```plaintext
 caplo agent release list <agent> [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent release list "Shop Concierge"
 ```
 
@@ -11437,7 +11539,7 @@ caplo agent release list "Shop Concierge"
 
 Permanently revoke a release, so channels and parents can no longer run it.
 
-```sh
+```plaintext
 caplo agent release revoke <agent> <release> [flags]
 ```
 
@@ -11445,7 +11547,7 @@ Revokes a release permanently; it cannot be undone. Channels that serve it and p
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent release revoke "Shop Concierge" 2.1.0 --reason "wrong refund policy"
 ```
 
@@ -11462,7 +11564,7 @@ caplo agent release revoke "Shop Concierge" 2.1.0 --reason "wrong refund policy"
 
 Manage your private test sessions.
 
-```sh
+```plaintext
 caplo agent test
 ```
 
@@ -11470,7 +11572,7 @@ Each caplo agent chat runs in a private test session, which holds test capacity 
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent test list
 caplo agent test close 4d2f8b1e-6c3a-4f7e-9d05-1a2b3c4d5e6f
 ```
@@ -11486,13 +11588,13 @@ caplo agent test close 4d2f8b1e-6c3a-4f7e-9d05-1a2b3c4d5e6f
 
 Close one of your private test sessions and release its capacity.
 
-```sh
+```plaintext
 caplo agent test close <session-id>
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent test close 4d2f8b1e-6c3a-4f7e-9d05-1a2b3c4d5e6f
 ```
 
@@ -11502,13 +11604,13 @@ caplo agent test close 4d2f8b1e-6c3a-4f7e-9d05-1a2b3c4d5e6f
 
 List your open test sessions across agents in this workspace.
 
-```sh
+```plaintext
 caplo agent test list
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent test list
 ```
 
@@ -11518,7 +11620,7 @@ caplo agent test list
 
 Check an agent file offline: schema, references, and link policies.
 
-```sh
+```plaintext
 caplo agent validate [flags]
 ```
 
@@ -11526,7 +11628,7 @@ Checks the file against the agent schema and its references without calling the 
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent validate -f agent.yaml
 caplo agent validate -f agents/orders.yaml
 ```
@@ -11547,7 +11649,7 @@ Generated from `caplo` v0.4.1, the latest release. `caplo auth --help` prints th
 
 Log in, log out, and show the session.
 
-```sh
+```plaintext
 caplo auth
 ```
 
@@ -11555,7 +11657,7 @@ A login session authenticates a person. CI and automation use an API client’s 
 
 **Examples**
 
-```sh
+```plaintext
 caplo auth login
 caplo auth status
 ```
@@ -11572,7 +11674,7 @@ caplo auth status
 
 Log in through the browser, or with –device on a machine without one.
 
-```sh
+```plaintext
 caplo auth login [flags]
 ```
 
@@ -11582,7 +11684,7 @@ The API and issuer are –api-url and –issuer, else CAPLO_API_URL and CAPLO_IS
 
 **Examples**
 
-```sh
+```plaintext
 caplo auth login
 caplo auth login --device
 caplo auth login --api-url https://api.staging.example.com --issuer https://auth.staging.example.com/realms/caplo
@@ -11604,7 +11706,7 @@ caplo auth login --api-url https://api.staging.example.com --issuer https://auth
 
 Revoke the session and delete the stored refresh token.
 
-```sh
+```plaintext
 caplo auth logout
 ```
 
@@ -11612,7 +11714,7 @@ Deletes the stored refresh token, then revokes the session at the issuer. When t
 
 **Examples**
 
-```sh
+```plaintext
 caplo auth logout
 ```
 
@@ -11622,7 +11724,7 @@ caplo auth logout
 
 Show the logged-in user, API, and selected workspace.
 
-```sh
+```plaintext
 caplo auth status [flags]
 ```
 
@@ -11630,7 +11732,7 @@ Shows the logged-in user, the API and issuer, where the credentials are stored, 
 
 **Examples**
 
-```sh
+```plaintext
 caplo auth status
 caplo auth status -o json
 ```
@@ -11651,7 +11753,7 @@ Generated from `caplo` v0.4.1, the latest release. `caplo channel --help` prints
 
 List channels and deploy agent releases to them.
 
-```sh
+```plaintext
 caplo channel
 ```
 
@@ -11659,7 +11761,7 @@ A channel is a website widget, WhatsApp number, Messenger or Instagram account, 
 
 **Examples**
 
-```sh
+```plaintext
 caplo channel list
 caplo channel deploy Website --agent "Shop Concierge"
 ```
@@ -11677,7 +11779,7 @@ caplo channel deploy Website --agent "Shop Concierge"
 
 Point channels at an agent release, by default their agent’s newest release.
 
-```sh
+```plaintext
 caplo channel deploy <channel>... [--agent <agent>[@<version>]] [flags]
 ```
 
@@ -11685,7 +11787,7 @@ Points each channel at the release: –agent names the agent and, after @, its v
 
 **Examples**
 
-```sh
+```plaintext
 caplo channel deploy Website
 caplo channel deploy Website "twilio/Support line" --agent "Shop Concierge@2.1.0" --yes
 ```
@@ -11703,13 +11805,13 @@ caplo channel deploy Website "twilio/Support line" --agent "Shop Concierge@2.1.0
 
 Show a channel and the release it serves.
 
-```sh
+```plaintext
 caplo channel get <channel> [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo channel get Website
 caplo channel get "twilio/Support line"
 ```
@@ -11726,13 +11828,13 @@ caplo channel get "twilio/Support line"
 
 List the workspace’s channels and the release each serves.
 
-```sh
+```plaintext
 caplo channel list [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo channel list
 caplo channel list --agent "Shop Concierge" -o json
 ```
@@ -11750,7 +11852,7 @@ caplo channel list --agent "Shop Concierge" -o json
 
 Point channels back at their agent’s release before the one they serve.
 
-```sh
+```plaintext
 caplo channel rollback <channel>... [flags]
 ```
 
@@ -11758,7 +11860,7 @@ Points each channel at the newest release of its agent, older than the one it se
 
 **Examples**
 
-```sh
+```plaintext
 caplo channel rollback Website --yes
 ```
 
@@ -11778,7 +11880,7 @@ Generated from `caplo` v0.4.1, the latest release. `caplo config --help` prints 
 
 Show and change CLI settings.
 
-```sh
+```plaintext
 caplo config
 ```
 
@@ -11786,7 +11888,7 @@ Settings are saved in config.yaml in the configuration directory: CAPLO_CONFIG_D
 
 **Examples**
 
-```sh
+```plaintext
 caplo config list
 caplo config set credential-storage file
 ```
@@ -11803,13 +11905,13 @@ caplo config set credential-storage file
 
 Show one setting.
 
-```sh
+```plaintext
 caplo config get <key>
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo config get api-url
 ```
 
@@ -11819,7 +11921,7 @@ caplo config get api-url
 
 Show every setting.
 
-```sh
+```plaintext
 caplo config list [flags]
 ```
 
@@ -11827,7 +11929,7 @@ Shows the saved settings, the production defaults for those not saved, and the s
 
 **Examples**
 
-```sh
+```plaintext
 caplo config list
 caplo config list -o json
 ```
@@ -11844,7 +11946,7 @@ caplo config list -o json
 
 Change one setting: api-url, issuer, client-id, credential-storage.
 
-```sh
+```plaintext
 caplo config set <key> <value>
 ```
 
@@ -11852,7 +11954,7 @@ Changes a saved setting: api-url, issuer, client-id (the OAuth client, caplo-cli
 
 **Examples**
 
-```sh
+```plaintext
 caplo config set credential-storage file
 caplo config set api-url https://api.staging.example.com
 ```
@@ -11867,7 +11969,7 @@ Generated from `caplo` v0.4.1, the latest release. `caplo identity --help` print
 
 Generate keys and sign or check host sign-in assertions locally.
 
-```sh
+```plaintext
 caplo identity
 ```
 
@@ -11875,7 +11977,7 @@ Local helpers for a host that signs its customers in to Caplo with signed assert
 
 **Examples**
 
-```sh
+```plaintext
 caplo identity keygen --out keys
 caplo identity sign-assertion --key keys/<kid>.private.jwk.json --iss https://shop.example.com \
   --aud urn:caplo:customer-identity:<id> --sub cust-1042 --nonce <nonce> > assertion.jwt
@@ -11895,7 +11997,7 @@ caplo identity verify-assertion --jwks keys/<kid>.public.jwk.json --iss https://
 
 Write a new signing key: private JWK and PEM, and the public JWK to give the connection; nothing is sent.
 
-```sh
+```plaintext
 caplo identity keygen [flags]
 ```
 
@@ -11903,7 +12005,7 @@ Writes \<kid>.private.jwk.json and \<kid>.private.pem, readable only by you, and
 
 **Examples**
 
-```sh
+```plaintext
 caplo identity keygen
 caplo identity keygen --alg EdDSA --kid shop-2026 --out keys
 ```
@@ -11922,7 +12024,7 @@ caplo identity keygen --alg EdDSA --kid shop-2026 --out keys
 
 Print a signed caplo-customer+jwt assertion, as a host backend would make one, for local tests.
 
-```sh
+```plaintext
 caplo identity sign-assertion [flags]
 ```
 
@@ -11930,7 +12032,7 @@ Signs a caplo-customer+jwt assertion with a private JWK or PEM key and prints it
 
 **Examples**
 
-```sh
+```plaintext
 caplo identity sign-assertion --key keys/shop-2026.private.jwk.json --iss https://shop.example.com \
   --aud urn:caplo:customer-identity:<id> --sub cust-1042 --nonce <nonce>
 caplo identity sign-assertion --key key.pem --alg PS256 --kid shop-rsa --iss https://shop.example.com \
@@ -11964,7 +12066,7 @@ caplo identity sign-assertion --key key.pem --alg PS256 --kid shop-rsa --iss htt
 
 Run Identity’s assertion checks locally and print each; challenge state and connection policy are skipped.
 
-```sh
+```plaintext
 caplo identity verify-assertion <token|-> [flags]
 ```
 
@@ -11972,7 +12074,7 @@ Runs Identity’s checks on an assertion, given as an argument or read from stan
 
 **Examples**
 
-```sh
+```plaintext
 caplo identity verify-assertion --jwks keys/shop-2026.public.jwk.json --iss https://shop.example.com \
   --aud urn:caplo:customer-identity:<id> "$ASSERTION"
 caplo identity sign-assertion ... | caplo identity verify-assertion --jwks https://shop.example.com/jwks.json \
@@ -12000,7 +12102,7 @@ Generated from `caplo` v0.4.1, the latest release. `caplo knowledge --help` prin
 
 Manage knowledge bases and sync their documents from a directory.
 
-```sh
+```plaintext
 caplo knowledge
 ```
 
@@ -12010,7 +12112,7 @@ A knowledge base holds documents an agent answers from. Each upload is extracted
 
 **Examples**
 
-```sh
+```plaintext
 caplo knowledge create "Returns policy" --owner support
 caplo knowledge sync "Returns policy" ./docs/returns --approve --publish --yes
 ```
@@ -12030,7 +12132,7 @@ caplo knowledge sync "Returns policy" ./docs/returns --approve --publish --yes
 
 Wait for extraction and approve documents for the next version, by default every one awaiting review.
 
-```sh
+```plaintext
 caplo knowledge approve <kb> [document]... [flags]
 ```
 
@@ -12038,7 +12140,7 @@ Approving a document skips reviewing its extracted text in the console. It waits
 
 **Examples**
 
-```sh
+```plaintext
 caplo knowledge approve "Returns policy"
 caplo knowledge approve "Returns policy" refunds.md exchanges.pdf
 ```
@@ -12055,7 +12157,7 @@ caplo knowledge approve "Returns policy" refunds.md exchanges.pdf
 
 Create a knowledge base.
 
-```sh
+```plaintext
 caplo knowledge create <name> --owner <team> [flags]
 ```
 
@@ -12063,7 +12165,7 @@ Creates a knowledge base. –owner names the team that owns its content. –audi
 
 **Examples**
 
-```sh
+```plaintext
 caplo knowledge create "Returns policy" --owner support --description "Return and refund rules"
 caplo knowledge create "Account help" --owner support --audience verified_customer
 ```
@@ -12082,7 +12184,7 @@ caplo knowledge create "Account help" --owner support --audience verified_custom
 
 Show a knowledge base, its documents, and its versions.
 
-```sh
+```plaintext
 caplo knowledge get <kb> [flags]
 ```
 
@@ -12090,7 +12192,7 @@ Shows the knowledge base, its newest version, and its documents with their extra
 
 **Examples**
 
-```sh
+```plaintext
 caplo knowledge get "Returns policy"
 ```
 
@@ -12106,13 +12208,13 @@ caplo knowledge get "Returns policy"
 
 List the workspace’s knowledge bases.
 
-```sh
+```plaintext
 caplo knowledge list [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo kb list
 ```
 
@@ -12128,7 +12230,7 @@ caplo kb list
 
 Publish a version from the approved documents and wait for it to index.
 
-```sh
+```plaintext
 caplo knowledge publish <kb> [flags]
 ```
 
@@ -12136,7 +12238,7 @@ Publishes a version from the approved documents, unless the newest version holds
 
 **Examples**
 
-```sh
+```plaintext
 caplo knowledge publish "Returns policy"
 caplo knowledge publish "Returns policy" --timeout 30m
 ```
@@ -12153,7 +12255,7 @@ caplo knowledge publish "Returns policy" --timeout 30m
 
 Make a knowledge base’s documents match a directory, and optionally approve and publish them.
 
-```sh
+```plaintext
 caplo knowledge sync <kb> <dir> [flags]
 ```
 
@@ -12163,7 +12265,7 @@ Uploads the directory’s new and changed documents and removes the ones whose f
 
 **Examples**
 
-```sh
+```plaintext
 caplo knowledge sync "Returns policy" ./docs/returns --dry-run
 caplo knowledge sync "Returns policy" ./docs/returns --approve --publish --yes
 ```
@@ -12188,7 +12290,7 @@ Generated from `caplo` v0.4.1, the latest release. `caplo mcp --help` prints the
 
 Connect remote MCP servers and publish their reviewed tools.
 
-```sh
+```plaintext
 caplo mcp
 ```
 
@@ -12196,7 +12298,7 @@ A remote MCP server is an MCP server reachable over HTTPS whose tools agents can
 
 **Examples**
 
-```sh
+```plaintext
 caplo mcp check https://mcp.example.com/mcp
 caplo mcp add crm --url https://mcp.example.com/mcp --auth oauth
 caplo mcp connect crm --open
@@ -12223,7 +12325,7 @@ caplo mcp review crm --enable search_contacts=read && caplo mcp publish crm
 
 Add a remote MCP server; its name prefixes every tool’s model name.
 
-```sh
+```plaintext
 caplo mcp add <name> [flags]
 ```
 
@@ -12233,7 +12335,7 @@ With –auth oauth the client is registered through a Client ID Metadata Documen
 
 **Examples**
 
-```sh
+```plaintext
 caplo mcp add crm --url https://mcp.example.com/mcp --auth oauth
 CRM_TOKEN=... caplo mcp add crm --url https://mcp.example.com/mcp --auth bearer --secret-env CRM_TOKEN
 caplo mcp add erp --url https://erp.example.com/mcp --auth header --header-name X-Api-Key --secret-stdin
@@ -12264,7 +12366,7 @@ caplo mcp add erp --url https://erp.example.com/mcp --auth header --header-name 
 
 Check a remote MCP server without saving it: transport, protocol, tools, and OAuth discovery.
 
-```sh
+```plaintext
 caplo mcp check <url> [flags]
 ```
 
@@ -12272,7 +12374,7 @@ Has Caplo probe a server URL without saving anything: whether it is reachable, i
 
 **Examples**
 
-```sh
+```plaintext
 caplo mcp check https://mcp.example.com/mcp
 printf %s "$CRM_TOKEN" | caplo mcp check https://mcp.example.com/mcp --bearer-stdin
 ```
@@ -12293,7 +12395,7 @@ printf %s "$CRM_TOKEN" | caplo mcp check https://mcp.example.com/mcp --bearer-st
 
 Authorize a remote MCP server that uses OAuth.
 
-```sh
+```plaintext
 caplo mcp connect <name|id> [flags]
 ```
 
@@ -12301,7 +12403,7 @@ Authorize a remote MCP server that uses OAuth. For the authorization code grant,
 
 **Examples**
 
-```sh
+```plaintext
 caplo mcp connect crm --open
 caplo mcp connect crm --wait 0
 ```
@@ -12319,7 +12421,7 @@ caplo mcp connect crm --wait 0
 
 Show a remote MCP server: status, authentication, last error, and its discovered tools.
 
-```sh
+```plaintext
 caplo mcp get <name|id> [flags]
 ```
 
@@ -12327,7 +12429,7 @@ Shows the server’s status, transport and protocol, authentication without secr
 
 **Examples**
 
-```sh
+```plaintext
 caplo mcp get crm
 caplo mcp get crm -o json
 ```
@@ -12344,13 +12446,13 @@ caplo mcp get crm -o json
 
 List the workspace’s remote MCP servers.
 
-```sh
+```plaintext
 caplo mcp list [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo mcp list
 ```
 
@@ -12366,7 +12468,7 @@ caplo mcp list
 
 Pin the enabled tools of the latest tool list as a new version that agents can use.
 
-```sh
+```plaintext
 caplo mcp publish <name|id>
 ```
 
@@ -12374,7 +12476,7 @@ Pins the enabled tools of the latest tool list, as reviewed, as a new version. I
 
 **Examples**
 
-```sh
+```plaintext
 caplo mcp publish crm
 ```
 
@@ -12384,7 +12486,7 @@ caplo mcp publish crm
 
 Test a remote MCP server and refresh its tool list against the published version.
 
-```sh
+```plaintext
 caplo mcp refresh <name|id>
 ```
 
@@ -12392,7 +12494,7 @@ Connects to the server, lists its tools again, and marks each new, changed, or r
 
 **Examples**
 
-```sh
+```plaintext
 caplo mcp refresh crm
 ```
 
@@ -12402,7 +12504,7 @@ caplo mcp refresh crm
 
 Remove a remote MCP server: its published tools stop working and its credentials are deleted.
 
-```sh
+```plaintext
 caplo mcp remove <name|id> [flags]
 ```
 
@@ -12410,7 +12512,7 @@ Removes a remote MCP server. Its published tools stop working for every agent th
 
 **Examples**
 
-```sh
+```plaintext
 caplo mcp remove crm --yes
 ```
 
@@ -12426,7 +12528,7 @@ caplo mcp remove crm --yes
 
 Enable, classify, and configure discovered tools; nothing reaches agents until caplo mcp publish.
 
-```sh
+```plaintext
 caplo mcp review <name|id> [flags]
 ```
 
@@ -12434,7 +12536,7 @@ Enable, classify, and configure discovered tools by their remote name. –enable
 
 **Examples**
 
-```sh
+```plaintext
 caplo mcp review crm --enable search_contacts=read --enable create_note=write
 caplo mcp review crm --confirmation create_note=none --timeout create_note=20
 caplo mcp review crm --disable delete_contact
@@ -12455,13 +12557,13 @@ caplo mcp review crm --disable delete_contact
 
 List a remote MCP server’s discovered tools with their review and publish state.
 
-```sh
+```plaintext
 caplo mcp tools <name|id> [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo mcp tools crm
 ```
 
@@ -12477,7 +12579,7 @@ caplo mcp tools crm
 
 Change a remote MCP server’s endpoint, transport, or authentication.
 
-```sh
+```plaintext
 caplo mcp update <name|id> [flags]
 ```
 
@@ -12485,7 +12587,7 @@ Change a remote MCP server’s endpoint, transport, or authentication. Authentic
 
 **Examples**
 
-```sh
+```plaintext
 caplo mcp update crm --url https://mcp.example.com/v2/mcp
 caplo mcp update crm --scope contacts.read --scope contacts.write
 printf %s "$NEW_TOKEN" | caplo mcp update erp --secret-stdin
@@ -12526,7 +12628,7 @@ These commands work on the project around the current directory, or the one `-C`
 
 Show how the project differs from the workspace drafts.
 
-```sh
+```plaintext
 caplo diff [agent/<name> | tool/<name>]... [flags]
 ```
 
@@ -12538,7 +12640,7 @@ With -o json or yaml the plan is one document: the project, workspace, environme
 
 **Examples**
 
-```sh
+```plaintext
 caplo diff
 caplo diff agent/concierge tool/order-desk
 caplo diff --env prod -o json
@@ -12558,7 +12660,7 @@ caplo diff --env prod -o json
 
 Push the selection, then run each selected agent’s eval cases against its draft.
 
-```sh
+```plaintext
 caplo eval [agent/<name> | tool/<name>]... [flags]
 ```
 
@@ -12570,7 +12672,7 @@ Selectors are agent/\<file key or name>, where a file key wins over a name, and 
 
 **Examples**
 
-```sh
+```plaintext
 caplo eval
 caplo eval agent/concierge
 caplo eval --env staging
@@ -12589,7 +12691,7 @@ caplo eval --env staging
 
 Create a project: caplo.yaml, agent files, and tool packages.
 
-```sh
+```plaintext
 caplo init [dir] [flags]
 ```
 
@@ -12599,25 +12701,25 @@ A project is a folder with caplo.yaml: apiVersion v1, kind Project, a name, and 
 
 In an agent file:
 
-```sh
+```plaintext
 subAgents link a project agent with local: <file key>, or any workspace agent with agentId. With release:
 latest, or no release, the link pins the child's newest release that is not revoked whenever the parent is
 pushed or published, so a child's new release publishes its parents again. A version pins that release. The
 child runs with its own release's tools and knowledge.
 ```
 
-```sh
+```plaintext
 tools name <package>/<tool> for a project package, <server>/<tool> for a published tool of a workspace remote
 MCP server (caplo mcp), or <package ID>/<tool>; a package alone selects all its tools. A name that is no
 project package is looked up as a remote MCP server when the project is diffed, pushed, or published.
 ```
 
-```sh
+```plaintext
 knowledgeBases name a workspace knowledge base by name or ID. A name resolves in the workspace the command acts
 on, so one file works in every environment.
 ```
 
-```sh
+```plaintext
 evals are the agent's eval cases; see caplo eval.
 ```
 
@@ -12625,7 +12727,7 @@ Workspace agents and packages are matched by name: a missing one is created and 
 
 **Examples**
 
-```sh
+```plaintext
 caplo init shop --template summit
 cd shop && (cd tools/order-desk && npm install) && (cd tools/store-stock && npm install)
 caplo init --name support
@@ -12644,7 +12746,7 @@ caplo init --name support
 
 Validate, push, test, evaluate, and publish bottom up: tools, then child agents, then parents.
 
-```sh
+```plaintext
 caplo publish [agent/<name> | tool/<name>]... [flags]
 ```
 
@@ -12658,7 +12760,7 @@ Selecting an agent also selects the project agents that link it at release: late
 
 Environments. caplo.yaml may define environments, each a workspace the project publishes to:
 
-```sh
+```plaintext
 environments:
   staging:
     workspace: 5b1e9c2a-...        # an ID, or a name when you log in rather than use an API key
@@ -12681,7 +12783,7 @@ With -o json or yaml the plan is one document: the project, workspace, environme
 
 **Examples**
 
-```sh
+```plaintext
 caplo publish
 caplo publish agent/orders --dry-run
 caplo publish --env prod --yes
@@ -12705,7 +12807,7 @@ caplo publish --prune
 
 Write a workspace agent, its sub-agents, and their packages into a project.
 
-```sh
+```plaintext
 caplo pull agent/<name> [dir] [flags]
 ```
 
@@ -12715,7 +12817,7 @@ Packages the agents use that the project lacks are pulled from their workspace d
 
 **Examples**
 
-```sh
+```plaintext
 caplo pull "agent/Shop Concierge"
 caplo pull agent/concierge ./shop
 ```
@@ -12732,7 +12834,7 @@ caplo pull agent/concierge ./shop
 
 Create or update the workspace drafts, children first, so you can live test them.
 
-```sh
+```plaintext
 caplo push [agent/<name> | tool/<name>]... [flags]
 ```
 
@@ -12746,7 +12848,7 @@ With -o json or yaml the plan is one document: the project, workspace, environme
 
 **Examples**
 
-```sh
+```plaintext
 caplo push
 caplo push agent/concierge
 caplo push --dry-run -o json
@@ -12767,7 +12869,7 @@ caplo push --dry-run -o json
 
 Run the selected tool packages’ fixtures locally, like caplo tool test.
 
-```sh
+```plaintext
 caplo test [agent/<name> | tool/<name>]... [flags]
 ```
 
@@ -12777,7 +12879,7 @@ Selectors are agent/\<file key or name>, where a file key wins over a name, and 
 
 **Examples**
 
-```sh
+```plaintext
 caplo test
 caplo test tool/order-desk -v
 caplo test agent/orders
@@ -12796,7 +12898,7 @@ caplo test agent/orders
 
 Check the project offline: schemas, references, link cycles, and the depth limit.
 
-```sh
+```plaintext
 caplo validate [flags]
 ```
 
@@ -12808,7 +12910,7 @@ Every environment in caplo.yaml is checked: the agent keys it names and its agen
 
 **Examples**
 
-```sh
+```plaintext
 caplo validate
 caplo validate --env prod
 caplo validate -C ~/src/shop
@@ -12831,7 +12933,7 @@ Generated from `caplo` v0.4.1, the latest release. `caplo secret --help` prints 
 
 Manage workspace secrets that package secrets bind to.
 
-```sh
+```plaintext
 caplo secret
 ```
 
@@ -12839,7 +12941,7 @@ A workspace secret holds one value for many packages: each package secret bound 
 
 **Examples**
 
-```sh
+```plaintext
 caplo secret set orders-api-key
 caplo secret usage orders-api-key
 ```
@@ -12857,7 +12959,7 @@ caplo secret usage orders-api-key
 
 Delete a workspace secret that no package secret binds.
 
-```sh
+```plaintext
 caplo secret delete <name> [flags]
 ```
 
@@ -12865,7 +12967,7 @@ Deletes a workspace secret. A secret that package secrets are bound to is not de
 
 **Examples**
 
-```sh
+```plaintext
 caplo secret delete orders-api-key --yes
 ```
 
@@ -12881,13 +12983,13 @@ caplo secret delete orders-api-key --yes
 
 List the workspace secrets and how many package secrets bind each.
 
-```sh
+```plaintext
 caplo secret list [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo secret list
 ```
 
@@ -12903,7 +13005,7 @@ caplo secret list
 
 Create a workspace secret or rotate its value, from a hidden prompt or from stdin when it is not a terminal.
 
-```sh
+```plaintext
 caplo secret set <name> [flags]
 ```
 
@@ -12911,7 +13013,7 @@ Creates a workspace secret, or rotates the value of an existing one for every pa
 
 **Examples**
 
-```sh
+```plaintext
 caplo secret set orders-api-key --description "Orders API key"
 printf %s "$ORDERS_API_KEY" | caplo secret set orders-api-key
 ```
@@ -12928,13 +13030,13 @@ printf %s "$ORDERS_API_KEY" | caplo secret set orders-api-key
 
 List the package secrets bound to a workspace secret.
 
-```sh
+```plaintext
 caplo secret usage <name> [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo secret usage orders-api-key
 ```
 
@@ -12954,7 +13056,7 @@ Generated from `caplo` v0.4.1, the latest release. `caplo tool --help` prints th
 
 Build, test, publish, and run tool packages.
 
-```sh
+```plaintext
 caplo tool
 ```
 
@@ -12964,7 +13066,7 @@ Commands that act on a workspace package take its name, or read caplo.yaml in �
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool init orders --type mcp
 cd orders && npm install
 caplo tool test
@@ -12995,7 +13097,7 @@ caplo tool push && caplo tool publish
 
 Archive a package: no more pushes, builds, or publishes; its versions stay live until revoked.
 
-```sh
+```plaintext
 caplo tool archive [package] [flags]
 ```
 
@@ -13003,7 +13105,7 @@ Archives a package: it can no longer be pushed, built, or published. Its publish
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool archive orders --yes
 ```
 
@@ -13020,7 +13122,7 @@ caplo tool archive orders --yes
 
 Show, follow, and cancel builds.
 
-```sh
+```plaintext
 caplo tool build
 ```
 
@@ -13028,7 +13130,7 @@ A build is named by its ID; \[package] defaults to the one caplo.yaml in –dir 
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool build list orders
 caplo tool build logs orders 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f
 ```
@@ -13046,13 +13148,13 @@ caplo tool build logs orders 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f
 
 Cancel a queued or running build.
 
-```sh
+```plaintext
 caplo tool build cancel [package] <build> [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool build cancel orders 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f
 ```
 
@@ -13068,13 +13170,13 @@ caplo tool build cancel orders 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f
 
 Show a build: status, bundle, tools, and diagnostics.
 
-```sh
+```plaintext
 caplo tool build get [package] <build> [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool build get orders 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f
 ```
 
@@ -13091,13 +13193,13 @@ caplo tool build get orders 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f
 
 List a package’s builds, newest first.
 
-```sh
+```plaintext
 caplo tool build list [package] [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool build list orders
 caplo tool build list orders --status failed -n 5
 ```
@@ -13117,13 +13219,13 @@ caplo tool build list orders --status failed -n 5
 
 Print a build’s log, following it until the build finishes.
 
-```sh
+```plaintext
 caplo tool build logs [package] <build> [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool build logs orders 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f
 ```
 
@@ -13139,7 +13241,7 @@ caplo tool build logs orders 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f
 
 Delete a package that was never published; archive a published one instead.
 
-```sh
+```plaintext
 caplo tool delete [package] [flags]
 ```
 
@@ -13147,7 +13249,7 @@ Deletes a package that has never published a version, with its draft and builds.
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool delete orders-draft --yes
 ```
 
@@ -13164,7 +13266,7 @@ caplo tool delete orders-draft --yes
 
 Run the package over stdio in MCP Inspector, or for another MCP client with –no-inspector.
 
-```sh
+```plaintext
 caplo tool dev [flags]
 ```
 
@@ -13172,7 +13274,7 @@ Runs the package’s src/stdio.ts with Node 24 in MCP Inspector, started with np
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool dev
 ORDERS_API_KEY=test caplo tool dev --no-inspector --dir ~/src/orders
 ```
@@ -13190,13 +13292,13 @@ ORDERS_API_KEY=test caplo tool dev --no-inspector --dir ~/src/orders
 
 Show a package, its latest build, and the tools of its latest active version.
 
-```sh
+```plaintext
 caplo tool get [package] [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool get orders
 caplo tool get -o json
 ```
@@ -13214,7 +13316,7 @@ caplo tool get -o json
 
 Create a function or mcp package from the SDK templates.
 
-```sh
+```plaintext
 caplo tool init <directory> [flags]
 ```
 
@@ -13222,7 +13324,7 @@ Creates a package in directory, which must be missing or empty, from the functio
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool init orders --type mcp
 caplo tool init tools/weather --type function
 ```
@@ -13240,7 +13342,7 @@ caplo tool init tools/weather --type function
 
 List the workspace’s tool packages.
 
-```sh
+```plaintext
 caplo tool list [flags]
 ```
 
@@ -13248,7 +13350,7 @@ Lists the packages with their type, latest active version, latest build, and dra
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool list
 caplo tool list --type mcp --archived
 ```
@@ -13267,7 +13369,7 @@ caplo tool list --type mcp --archived
 
 Show recent live invocations of the package with their log lines; the runners keep the last hour.
 
-```sh
+```plaintext
 caplo tool logs [package] [flags]
 ```
 
@@ -13275,7 +13377,7 @@ Prints the package’s recent live invocations with each tool’s status, timing
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool logs orders
 caplo tool logs orders -n 50 -f
 ```
@@ -13294,7 +13396,7 @@ caplo tool logs orders -n 50 -f
 
 Publish the latest succeeded build, or –build \<id>, as a new version.
 
-```sh
+```plaintext
 caplo tool publish [package] [flags]
 ```
 
@@ -13302,7 +13404,7 @@ Publishes the package’s latest succeeded build, or the build –build names, a
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool publish
 caplo tool publish orders --build 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f
 ```
@@ -13320,7 +13422,7 @@ caplo tool publish orders --build 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f
 
 Download the draft, or the exact source of a published version, to run it locally.
 
-```sh
+```plaintext
 caplo tool pull <package>[@version] [flags]
 ```
 
@@ -13328,7 +13430,7 @@ Writes the package’s draft, or with @version the exact source of the build tha
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool pull orders
 caplo tool pull orders@3 --dir /tmp/orders-v3
 ```
@@ -13345,7 +13447,7 @@ caplo tool pull orders@3 --dir /tmp/orders-v3
 
 Upload the package as the workspace draft, build it, and stream the build log.
 
-```sh
+```plaintext
 caplo tool push [flags]
 ```
 
@@ -13353,7 +13455,7 @@ Uploads the package directory as its workspace draft, creating the package on it
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool push
 caplo tool push --dir tools/orders
 ```
@@ -13370,7 +13472,7 @@ caplo tool push --dir tools/orders
 
 Restore an archived package.
 
-```sh
+```plaintext
 caplo tool restore [package] [flags]
 ```
 
@@ -13378,7 +13480,7 @@ Restores an archived package, so it can be pushed, built, and published again.
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool restore orders
 ```
 
@@ -13394,7 +13496,7 @@ caplo tool restore orders
 
 Manage the secret values live calls receive.
 
-```sh
+```plaintext
 caplo tool secret
 ```
 
@@ -13402,7 +13504,7 @@ A package’s live calls receive the secrets its caplo.yaml declares, by name. E
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool secret list orders
 caplo tool secret bind ORDERS_API_KEY orders-api-key -p orders
 ```
@@ -13421,13 +13523,13 @@ caplo tool secret bind ORDERS_API_KEY orders-api-key -p orders
 
 Fill a secret from a workspace secret, replacing the package’s own value.
 
-```sh
+```plaintext
 caplo tool secret bind <NAME> <workspace-secret> [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool secret bind ORDERS_API_KEY orders-api-key -p orders
 ```
 
@@ -13444,7 +13546,7 @@ caplo tool secret bind ORDERS_API_KEY orders-api-key -p orders
 
 List the secrets the latest active version declares and where each value comes from.
 
-```sh
+```plaintext
 caplo tool secret list [package] [flags]
 ```
 
@@ -13452,7 +13554,7 @@ Lists the names the package’s latest active version declares, and any other na
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool secret list orders
 ```
 
@@ -13469,7 +13571,7 @@ caplo tool secret list orders
 
 Set a secret from a hidden prompt, or from stdin when it is not a terminal.
 
-```sh
+```plaintext
 caplo tool secret set <NAME> [flags]
 ```
 
@@ -13477,7 +13579,7 @@ Sets the package’s own value of a secret for live calls. The value comes from 
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool secret set ORDERS_API_KEY -p orders
 printf %s "$ORDERS_API_KEY" | caplo tool secret set ORDERS_API_KEY -p orders
 ```
@@ -13495,7 +13597,7 @@ printf %s "$ORDERS_API_KEY" | caplo tool secret set ORDERS_API_KEY -p orders
 
 Remove a secret’s workspace secret binding; live calls that need it fail until it is bound or set.
 
-```sh
+```plaintext
 caplo tool secret unbind <NAME> [flags]
 ```
 
@@ -13503,7 +13605,7 @@ Removes the binding and leaves the secret unset. It asks first; –yes skips the
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool secret unbind ORDERS_API_KEY -p orders
 ```
 
@@ -13521,7 +13623,7 @@ caplo tool secret unbind ORDERS_API_KEY -p orders
 
 Remove a secret; live calls that need it fail.
 
-```sh
+```plaintext
 caplo tool secret unset <NAME> [flags]
 ```
 
@@ -13529,7 +13631,7 @@ Removes the package’s own value of a secret. It asks first; –yes skips the q
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool secret unset ORDERS_API_KEY -p orders --yes
 ```
 
@@ -13547,7 +13649,7 @@ caplo tool secret unset ORDERS_API_KEY -p orders --yes
 
 Bundle the package like the builder and run its fixtures in local Node 24, or with –remote on Caplo’s test runner.
 
-```sh
+```plaintext
 caplo tool test [flags]
 ```
 
@@ -13557,7 +13659,7 @@ Bundles the package with the builder’s esbuild version, options, and rejection
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool test
 caplo tool test -v
 caplo tool test --remote
@@ -13577,13 +13679,13 @@ caplo tool test --remote
 
 Show and revoke published versions.
 
-```sh
+```plaintext
 caplo tool version
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool version list orders
 caplo tool version revoke orders@3 --reason "leaks order notes"
 ```
@@ -13600,7 +13702,7 @@ caplo tool version revoke orders@3 --reason "leaks order notes"
 
 Show a published version and its tools.
 
-```sh
+```plaintext
 caplo tool version get [<package>@]<version> [flags]
 ```
 
@@ -13608,7 +13710,7 @@ Shows a published version: its status, build, bundle digest, egress, declared se
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool version get orders@3
 caplo tool version get 3 --dir tools/orders
 ```
@@ -13626,13 +13728,13 @@ caplo tool version get 3 --dir tools/orders
 
 List a package’s published versions.
 
-```sh
+```plaintext
 caplo tool version list [package] [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool version list orders
 caplo tool version list -o json
 ```
@@ -13650,7 +13752,7 @@ caplo tool version list -o json
 
 Revoke a published version so agents stop resolving it.
 
-```sh
+```plaintext
 caplo tool version revoke [<package>@]<version> [flags]
 ```
 
@@ -13658,7 +13760,7 @@ Revokes a published version so agents stop resolving it. It needs –reason and 
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool version revoke orders@3 --reason "leaks order notes"
 ```
 
@@ -13680,7 +13782,7 @@ Generated from `caplo` v0.4.1, the latest release. `caplo workspace --help` prin
 
 List, show, create, and select workspaces.
 
-```sh
+```plaintext
 caplo workspace
 ```
 
@@ -13688,7 +13790,7 @@ Commands act on the workspace that –workspace or CAPLO_WORKSPACE names, by ID 
 
 **Examples**
 
-```sh
+```plaintext
 caplo workspace list
 caplo workspace use "Shop staging"
 ```
@@ -13707,7 +13809,7 @@ caplo workspace use "Shop staging"
 
 Manage API clients and their keys for CI and automation.
 
-```sh
+```plaintext
 caplo workspace api-client
 ```
 
@@ -13721,7 +13823,7 @@ A project environment can name its own key variable with apiKeyEnv; see caplo pu
 
 **Examples**
 
-```sh
+```plaintext
 caplo workspace api-client create ci --scope agents:write,agents:publish,tools:write,tools:publish
 CAPLO_API_KEY=... CAPLO_WORKSPACE=5b1e9c2a-... caplo publish --yes
 ```
@@ -13739,7 +13841,7 @@ CAPLO_API_KEY=... CAPLO_WORKSPACE=5b1e9c2a-... caplo publish --yes
 
 Create an API client and print its first key.
 
-```sh
+```plaintext
 caplo workspace api-client create <name> --scope <scope>... [flags]
 ```
 
@@ -13749,7 +13851,7 @@ Scopes: agents:read, agents:write, agents:publish tools:read, tools:write, tools
 
 **Examples**
 
-```sh
+```plaintext
 caplo workspace api-client create ci --scope agents:write --scope agents:publish
 caplo workspace api-client create reports --scope conversations:read,usage:read
 ```
@@ -13767,13 +13869,13 @@ caplo workspace api-client create reports --scope conversations:read,usage:read
 
 List the workspace’s API clients and their keys.
 
-```sh
+```plaintext
 caplo workspace api-client list [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo workspace api-client list
 ```
 
@@ -13789,7 +13891,7 @@ caplo workspace api-client list
 
 Revoke an API client’s active keys, or only the ones –key names.
 
-```sh
+```plaintext
 caplo workspace api-client revoke <client> [flags]
 ```
 
@@ -13797,7 +13899,7 @@ Revokes the API client’s active keys: every one, the ones –key names, or all
 
 **Examples**
 
-```sh
+```plaintext
 caplo workspace api-client revoke ci --except 9d3e1f20-4b5a-4c6d-8e7f-0a1b2c3d4e5f
 caplo workspace api-client revoke ci --key caplo_sk_3f9a6b1c --yes
 ```
@@ -13816,7 +13918,7 @@ caplo workspace api-client revoke ci --key caplo_sk_3f9a6b1c --yes
 
 Add a new key to an API client and print it; its other keys stay active until revoked.
 
-```sh
+```plaintext
 caplo workspace api-client rotate <client> [flags]
 ```
 
@@ -13824,7 +13926,7 @@ Adds a key to the API client and prints it on standard output, once. The client�
 
 **Examples**
 
-```sh
+```plaintext
 caplo workspace api-client rotate ci
 ```
 
@@ -13840,13 +13942,13 @@ caplo workspace api-client rotate ci
 
 Create a workspace you own and select it.
 
-```sh
+```plaintext
 caplo workspace create <name>
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo workspace create "Shop staging"
 ```
 
@@ -13856,13 +13958,13 @@ caplo workspace create "Shop staging"
 
 Show a workspace, by default the selected one.
 
-```sh
+```plaintext
 caplo workspace get [name or ID] [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo workspace get
 caplo workspace get "Shop staging" -o json
 ```
@@ -13879,7 +13981,7 @@ caplo workspace get "Shop staging" -o json
 
 List your workspaces.
 
-```sh
+```plaintext
 caplo workspace list [flags]
 ```
 
@@ -13887,7 +13989,7 @@ Lists the workspaces you belong to with your role; \* marks the selected one.
 
 **Examples**
 
-```sh
+```plaintext
 caplo workspace list
 ```
 
@@ -13903,7 +14005,7 @@ caplo workspace list
 
 Select the workspace for later commands.
 
-```sh
+```plaintext
 caplo workspace use <name or ID>
 ```
 
@@ -13911,7 +14013,7 @@ Saves the workspace, by ID or exact name, as the one later commands act on. –w
 
 **Examples**
 
-```sh
+```plaintext
 caplo workspace use "Shop staging"
 ```
 
@@ -13925,7 +14027,7 @@ Generated from the schema in `caplo` v0.4.1. Guide: [Test tools](/tools/testing/
 
 For validation and completion in your editor, add this first line to the file (YAML language server, used by VS Code and others):
 
-```yaml
+```plaintext
 # yaml-language-server: $schema=https://docs.caplo.si/schemas/fixture.schema.json
 ```
 
@@ -13973,7 +14075,7 @@ Generated from `@caplo/tools` 0.1.8 on npm. Install with `npm install @caplo/too
 
 [Section titled “applied()”](#applied)
 
-```ts
+```plaintext
 function applied(result): Applied;
 ```
 
@@ -13999,7 +14101,7 @@ Reports that the provider applied the change, with its result. A status handler 
 
 [Section titled “context()”](#context)
 
-```ts
+```plaintext
 function context(extra): ToolContext;
 ```
 
@@ -14023,7 +14125,7 @@ function context(extra): ToolContext;
 
 [Section titled “defineTool()”](#definetool)
 
-```ts
+```plaintext
 function defineTool<Args, Result>(definition): FunctionTool<Args, Result>;
 ```
 
@@ -14056,7 +14158,7 @@ function defineTool<Args, Result>(definition): FunctionTool<Args, Result>;
 
 [Section titled “pending()”](#pending)
 
-```ts
+```plaintext
 function pending(operationRef, message?): Pending;
 ```
 
@@ -14083,7 +14185,7 @@ Reports that the provider accepted the change but has not finished it. The runne
 
 [Section titled “rejected()”](#rejected)
 
-```ts
+```plaintext
 function rejected(message): Rejected;
 ```
 
@@ -14109,7 +14211,7 @@ Reports that the provider definitively did not apply the change, for example bec
 
 [Section titled “serveStdio()”](#servestdio)
 
-```ts
+```plaintext
 function serveStdio(createServer, options?): Promise<void>;
 ```
 
@@ -14136,7 +14238,7 @@ Runs a package over stdio so local MCP clients and MCP Inspector can use it.
 
 [Section titled “stepUpFromChallenge()”](#stepupfromchallenge)
 
-```ts
+```plaintext
 function stepUpFromChallenge(header): StepUpRequired | undefined;
 ```
 
@@ -14162,7 +14264,7 @@ Maps a client API’s RFC 9470 step-up challenge (`WWW-Authenticate: Bearer erro
 
 [Section titled “stepUpRequired()”](#stepuprequired)
 
-```ts
+```plaintext
 function stepUpRequired(requirement?): StepUpRequired;
 ```
 
@@ -14305,7 +14407,7 @@ The visitor’s answer: accept with content, decline, or cancel (dismissed witho
 
 [Section titled “createServer()”](#createserver)
 
-```ts
+```plaintext
 createServer(): McpServerLike;
 ```
 
@@ -14344,7 +14446,7 @@ createServer(): McpServerLike;
 
 [Section titled “handler()”](#handler)
 
-```ts
+```plaintext
 handler(args, ctx): Result | Promise<Result>;
 ```
 
@@ -14367,7 +14469,7 @@ handler(args, ctx): Result | Promise<Result>;
 
 [Section titled “status()?”](#status)
 
-```ts
+```plaintext
 status?(input, ctx):
   | StatusAnswer
 | Promise<StatusAnswer>;
@@ -14458,7 +14560,7 @@ The parts of an MCP request handler’s `extra` argument that `context` reads.
 
 [Section titled “debug()”](#debug)
 
-```ts
+```plaintext
 debug(message, data?): void;
 ```
 
@@ -14481,7 +14583,7 @@ debug(message, data?): void;
 
 [Section titled “error()”](#error)
 
-```ts
+```plaintext
 error(message, data?): void;
 ```
 
@@ -14504,7 +14606,7 @@ error(message, data?): void;
 
 [Section titled “info()”](#info)
 
-```ts
+```plaintext
 info(message, data?): void;
 ```
 
@@ -14527,7 +14629,7 @@ info(message, data?): void;
 
 [Section titled “warn()”](#warn)
 
-```ts
+```plaintext
 warn(message, data?): void;
 ```
 
@@ -14560,7 +14662,7 @@ warn(message, data?): void;
 
 [Section titled “connect()”](#connect)
 
-```ts
+```plaintext
 connect(transport): Promise<void>;
 ```
 
@@ -14623,7 +14725,7 @@ connect(transport): Promise<void>;
 
 [Section titled “get()”](#get)
 
-```ts
+```plaintext
 get(name): string;
 ```
 
@@ -14647,7 +14749,7 @@ Returns a declared secret; throws when the runner did not supply it.
 
 [Section titled “has()”](#has)
 
-```ts
+```plaintext
 has(name): boolean;
 ```
 
@@ -14767,7 +14869,7 @@ A verified customer: the Caplo subject and binding, and the namespace-scoped ide
 
 [Section titled “elicit()”](#elicit)
 
-```ts
+```plaintext
 elicit(params): Promise<ElicitResult>;
 ```
 
@@ -14791,7 +14893,7 @@ Asks the visitor for missing details with an MCP form-mode elicitation (function
 
 [Section titled “requireSubject()”](#requiresubject)
 
-```ts
+```plaintext
 requireSubject(): Readonly<Subject>;
 ```
 
@@ -14838,7 +14940,7 @@ The subset of the MCP SDK `Transport` interface the Caplo runtime and `serveStdi
 
 [Section titled “close()”](#close)
 
-```ts
+```plaintext
 close(): Promise<void>;
 ```
 
@@ -14852,7 +14954,7 @@ close(): Promise<void>;
 
 [Section titled “onclose()?”](#onclose)
 
-```ts
+```plaintext
 onclose?(): void;
 ```
 
@@ -14866,7 +14968,7 @@ onclose?(): void;
 
 [Section titled “onerror()?”](#onerror)
 
-```ts
+```plaintext
 onerror?(error): void;
 ```
 
@@ -14888,7 +14990,7 @@ onerror?(error): void;
 
 [Section titled “onmessage()?”](#onmessage)
 
-```ts
+```plaintext
 onmessage?(message): void;
 ```
 
@@ -14910,7 +15012,7 @@ onmessage?(message): void;
 
 [Section titled “send()”](#send)
 
-```ts
+```plaintext
 send(message): Promise<void>;
 ```
 
@@ -14932,7 +15034,7 @@ send(message): Promise<void>;
 
 [Section titled “start()”](#start)
 
-```ts
+```plaintext
 start(): Promise<void>;
 ```
 
@@ -14950,7 +15052,7 @@ start(): Promise<void>;
 
 [Section titled “EffectOutcome”](#effectoutcome)
 
-```ts
+```plaintext
 type EffectOutcome =
   | {
   outcome: "applied";
@@ -14973,7 +15075,7 @@ type EffectOutcome =
 
 [Section titled “ElicitProperty”](#elicitproperty)
 
-```ts
+```plaintext
 type ElicitProperty =
   | {
   default?: string;
@@ -15037,7 +15139,7 @@ A primitive property of a form-mode elicitation schema (MCP `PrimitiveSchemaDefi
 
 [Section titled “JsonSchema”](#jsonschema)
 
-```ts
+```plaintext
 type JsonSchema = object;
 ```
 
@@ -15045,7 +15147,7 @@ type JsonSchema = object;
 
 [Section titled “Indexable”](#indexable)
 
-```ts
+```plaintext
 [key: string]: unknown
 ```
 
@@ -15057,7 +15159,7 @@ type JsonSchema = object;
 
 [Section titled “type”](#type)
 
-```ts
+```plaintext
 type: "object";
 ```
 
@@ -15067,7 +15169,7 @@ type: "object";
 
 [Section titled “Level”](#level)
 
-```ts
+```plaintext
 type Level = typeof LEVELS[number];
 ```
 
@@ -15077,7 +15179,7 @@ type Level = typeof LEVELS[number];
 
 [Section titled “LogLevel”](#loglevel)
 
-```ts
+```plaintext
 type LogLevel = "debug" | "info" | "warning" | "error";
 ```
 
@@ -15087,7 +15189,7 @@ type LogLevel = "debug" | "info" | "warning" | "error";
 
 [Section titled “StatusAnswer”](#statusanswer)
 
-```ts
+```plaintext
 type StatusAnswer = Applied | Rejected | Pending;
 ```
 
@@ -15099,7 +15201,7 @@ type StatusAnswer = Applied | Rejected | Pending;
 
 [Section titled “AUTHENTICATION_META_KEY”](#authentication_meta_key)
 
-```ts
+```plaintext
 const AUTHENTICATION_META_KEY: "caplo/authentication" = "caplo/authentication";
 ```
 
@@ -15111,7 +15213,7 @@ Result `_meta` key with which a tool asks for the customer to authenticate again
 
 [Section titled “CONTEXT_META_KEY”](#context_meta_key)
 
-```ts
+```plaintext
 const CONTEXT_META_KEY: "caplo/context" = "caplo/context";
 ```
 
@@ -15121,7 +15223,7 @@ const CONTEXT_META_KEY: "caplo/context" = "caplo/context";
 
 [Section titled “EFFECT_META_KEY”](#effect_meta_key)
 
-```ts
+```plaintext
 const EFFECT_META_KEY: "caplo/effect" = "caplo/effect";
 ```
 
@@ -15133,7 +15235,7 @@ Result `_meta` key carrying a write’s typed outcome.
 
 [Section titled “EFFECT_OUTCOME_CAPABILITY”](#effect_outcome_capability)
 
-```ts
+```plaintext
 const EFFECT_OUTCOME_CAPABILITY: object;
 ```
 
@@ -15154,7 +15256,7 @@ MCP server capability a bundle advertises when its write results carry a typed o
 
 [Section titled “LEVELS”](#levels)
 
-```ts
+```plaintext
 const LEVELS: readonly ["low", "standard", "high"];
 ```
 
@@ -15166,7 +15268,7 @@ Caplo assurance levels, weakest first.
 
 [Section titled “MAX_AUTH_AGE_SECONDS”](#max_auth_age_seconds)
 
-```ts
+```plaintext
 const MAX_AUTH_AGE_SECONDS: 86400 = 86400;
 ```
 
@@ -15178,7 +15280,7 @@ The longest freshness a step-up may ask for, in seconds.
 
 [Section titled “OPERATION_STATUS_CAPABILITY”](#operation_status_capability)
 
-```ts
+```plaintext
 const OPERATION_STATUS_CAPABILITY: object;
 ```
 
@@ -15199,7 +15301,7 @@ MCP server capability a bundle advertises when it answers `caplo/status`: the ru
 
 [Section titled “STATUS_METHOD”](#status_method)
 
-```ts
+```plaintext
 const STATUS_METHOD: "caplo/status" = "caplo/status";
 ```
 
@@ -15211,7 +15313,7 @@ JSON-RPC method the runner sends to ask for the status of an earlier write.
 
 [Section titled “SUBJECT_CONTEXT_CAPABILITY”](#subject_context_capability)
 
-```ts
+```plaintext
 const SUBJECT_CONTEXT_CAPABILITY: object;
 ```
 
@@ -15248,7 +15350,7 @@ MCP server capability a bundle advertises when its tools read the verified subje
 
 [Section titled “Constructor”](#constructor)
 
-```ts
+```plaintext
 new ElicitationUnavailableError(): ElicitationUnavailableError;
 ```
 
@@ -15284,7 +15386,7 @@ new ElicitationUnavailableError(): ElicitationUnavailableError;
 
 [Section titled “Constructor”](#constructor-1)
 
-```ts
+```plaintext
 new MissingSecretError(name): MissingSecretError;
 ```
 
@@ -15328,7 +15430,7 @@ new MissingSecretError(name): MissingSecretError;
 
 [Section titled “Constructor”](#constructor-2)
 
-```ts
+```plaintext
 new MissingSubjectError(): MissingSubjectError;
 ```
 
@@ -15360,7 +15462,7 @@ Generated from `@caplo/tools` 0.1.8 on npm. Install with `npm install @caplo/too
 
 [Section titled “verifyCustomerContext()”](#verifycustomercontext)
 
-```ts
+```plaintext
 function verifyCustomerContext(token, options): Promise<CustomerContextClaims>;
 ```
 
@@ -15435,7 +15537,7 @@ Records each token id once; `use` resolves false when the id was already used.
 
 [Section titled “use()”](#use)
 
-```ts
+```plaintext
 use(jti, expiresAt): boolean | Promise<boolean>;
 ```
 
@@ -15480,7 +15582,7 @@ use(jti, expiresAt): boolean | Promise<boolean>;
 
 [Section titled “CustomerContextLevel”](#customercontextlevel)
 
-```ts
+```plaintext
 type CustomerContextLevel = "low" | "standard" | "high";
 ```
 
@@ -15490,7 +15592,7 @@ type CustomerContextLevel = "low" | "standard" | "high";
 
 [Section titled “VerifyFailure”](#verifyfailure)
 
-```ts
+```plaintext
 type VerifyFailure =
   | "malformed"
   | "typ"
@@ -15530,7 +15632,7 @@ type VerifyFailure =
 
 [Section titled “Constructor”](#constructor)
 
-```ts
+```plaintext
 new CustomerContextError(reason, message): CustomerContextError;
 ```
 
@@ -15585,7 +15687,7 @@ A process-local replay store; use a shared store when the API runs on more than 
 
 [Section titled “Constructor”](#constructor-1)
 
-```ts
+```plaintext
 new MemoryReplayStore(): MemoryReplayStore;
 ```
 
@@ -15603,7 +15705,7 @@ new MemoryReplayStore(): MemoryReplayStore;
 
 [Section titled “use()”](#use-1)
 
-```ts
+```plaintext
 use(jti, expiresAt): boolean;
 ```
 

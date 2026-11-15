@@ -25,6 +25,8 @@ For WhatsApp, Messenger, Instagram and phone, you first connect the provider acc
 
 ## Create a channel
 
+![The channel types offered by Create channel](/_astro/create-channel.BaxZzUD__yIqxJ.webp)
+
 1. In the console, open **Channels** under **Deploy**.
 
 2. Select **Create channel** and choose the channel type.
@@ -36,6 +38,8 @@ For WhatsApp, Messenger, Instagram and phone, you first connect the provider acc
 5. Select **Create channel**. For a website widget, the console opens the entry point editor, where you configure the conversation and copy the embed code. See [Install the website widget](/channels/website-widget/install/).
 
 The channel page shows **What customers get**: the agent release, each entry point and its state, and **Launch checks**. Select **Review checks** to see which release, tool, knowledge or entry point settings still need attention.
+
+![A channel page showing the agent release, the website entry point and launch checks](/_astro/channel-capabilities.Y9R8VBoN_ZFKS4N.webp)
 
 ## Deploy a new release
 
@@ -55,20 +59,20 @@ To pick a specific release, or to point the channel at a different agent, select
 
 List your channels and the release each one serves:
 
-```sh
+```plaintext
 caplo channel list
 caplo channel get "Website"
 ```
 
 Point a channel at its agent’s newest release that is not revoked:
 
-```sh
+```plaintext
 caplo channel deploy "Website"
 ```
 
 Pick a release with `@` and a version or release number, or point the channel at another agent:
 
-```sh
+```plaintext
 caplo channel deploy "Website" --agent "Shop Concierge@1.4.0"
 ```
 
@@ -84,7 +88,7 @@ Open the channel, select **Change release**, choose the earlier **Agent release*
 
 Point a channel back at the newest release of its agent that is older than the one it serves and not revoked:
 
-```sh
+```plaintext
 caplo channel rollback "Website"
 ```
 

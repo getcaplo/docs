@@ -54,13 +54,13 @@ The server’s section on the **Tools** page shows its status, authentication an
 
 1. **Check the server.** Nothing is saved. Add `--bearer-stdin`, or `--header X-API-Key --value-stdin`, to check with a credential.
 
-   ```sh
+   ```plaintext
    caplo mcp check https://mcp.example.com/mcp
    ```
 
 2. **Add it.** Give it a name and the authentication method. Secrets are read from standard input (a hidden prompt on a terminal) or from an environment variable, never from a flag value.
 
-   ```sh
+   ```plaintext
    # OAuth, a user signs in; Caplo registers itself where the server allows it
    caplo mcp add crm --url https://mcp.example.com/mcp --auth oauth --display-name "Customer CRM"
 
@@ -82,13 +82,13 @@ The server’s section on the **Tools** page shows its status, authentication an
 
 3. **Authorize (OAuth).** Open the printed URL in a browser signed in to the Caplo console; the console completes the authorization. `--open` opens it for you. The client credentials grant completes at once.
 
-   ```sh
+   ```plaintext
    caplo mcp connect crm --open
    ```
 
 4. **Review the tools.** List them, then enable and classify the ones agents may use, by their remote name:
 
-   ```sh
+   ```plaintext
    caplo mcp tools crm
    caplo mcp review crm \
      --enable search_contacts=read \
@@ -101,11 +101,11 @@ The server’s section on the **Tools** page shows its status, authentication an
 
 5. **Publish.**
 
-   ```sh
+   ```plaintext
    caplo mcp publish crm
    ```
 
-   ```txt
+   ```plaintext
    Published crm version 1 with 2 tools
    ...
    Agent files use them as crm/<tool>

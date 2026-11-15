@@ -19,7 +19,7 @@ Steps 2 to 4 change nothing in the workspace. Steps 5 and 6 change only drafts, 
 
 ## Validate
 
-```sh
+```plaintext
 caplo validate
 ```
 
@@ -27,7 +27,7 @@ Checks schemas, references, link cycles, the sub-agent depth limit, fast routing
 
 ## Test tool packages
 
-```sh
+```plaintext
 caplo test
 caplo test tool/order-desk -v
 ```
@@ -36,7 +36,7 @@ Runs each selected package’s fixtures on your machine, the same way as `caplo 
 
 ## Review the difference
 
-```sh
+```plaintext
 caplo diff
 caplo diff agent/concierge -o json
 ```
@@ -45,7 +45,7 @@ Compares each package’s files with its workspace draft, and each agent file an
 
 ## Push drafts
 
-```sh
+```plaintext
 caplo push
 caplo push --dry-run
 ```
@@ -64,7 +64,7 @@ A push replaces the workspace draft with your file. Edits someone made to that d
 
 ### Try it in a test chat
 
-```sh
+```plaintext
 caplo agent chat "Shop Concierge"
 ```
 
@@ -72,7 +72,7 @@ This opens a private test conversation with the agent’s draft in your terminal
 
 ## Evaluate
 
-```sh
+```plaintext
 caplo eval
 caplo eval agent/concierge
 ```
@@ -83,7 +83,7 @@ It exits with code 3 when any case fails or a selected agent has no eval cases. 
 
 ## Publish
 
-```sh
+```plaintext
 caplo publish
 caplo publish agent/orders --dry-run
 caplo publish --yes
@@ -123,7 +123,7 @@ The plan shows each new version. A first release is 1.0.0. After that, changing 
 
 ### Clean up removed agents
 
-```sh
+```plaintext
 caplo publish --prune
 ```
 
@@ -131,7 +131,7 @@ Agents are never deleted when you remove their file. `--prune` adds an `archive`
 
 ## Pull console changes
 
-```sh
+```plaintext
 caplo pull "agent/Shop Concierge"
 ```
 

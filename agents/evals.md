@@ -47,11 +47,13 @@ When the grader cannot reach a verdict, the case ends as an error with **The des
 2. Select **Add case**, fill in the fields, and select **Save case**. Cases save immediately; they are not part of the draft.
 3. Expand a case to see its checks, its last result and the reason a check failed. **Edit** and **Remove** change it.
 
+![The Test tab of an agent listing its eval cases and their last results](/_astro/agent-evals.Cv7lHaBB_2sGKnm.webp)
+
 **CLI**
 
 In a project, list cases under `evals` in the agent file:
 
-```yaml
+```plaintext
 evals:
   - name: Reports a shipped order
     input: What's the status of order SO-1002?
@@ -72,7 +74,7 @@ This list form is the project convention. The console’s **Export YAML** writes
 
 An agent with [fast routing](/agents/sub-agents-and-routing/#routing) publishes only when the run proves routing works. Add cases that set `routedBy` and name a direct sub-agent in `subAgent`:
 
-```yaml
+```plaintext
 evals:
   - name: Routes an order question
     input: Where is my order SO-1002?
@@ -99,7 +101,7 @@ Runs start from the publish dialog. Select **Publish agent**, then **Run tests**
 
 **CLI**
 
-```sh
+```plaintext
 caplo agent eval run "Support Desk"
 caplo agent eval list "Support Desk"
 caplo agent eval get "Support Desk" <run-id>
@@ -107,7 +109,7 @@ caplo agent eval get "Support Desk" <run-id>
 
 In a project, `caplo eval` pushes the selected agents first, then runs their cases:
 
-```sh
+```plaintext
 caplo eval agent/support
 ```
 

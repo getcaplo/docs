@@ -4,14 +4,14 @@
 
 > What tools are, the three ways to give agents tools, and how a tool version reaches a published agent.
 
-A tool is a function an agent can call during a conversation: look up an order, check stock, book an appointment, cancel a subscription. Each tool has a name, a description the model reads, an input schema for its arguments and, optionally, an output schema for its result. Caplo runs the tool, checks its result against the schema, and hands the result to the agent. Every tool also has a policy that you set, not the model: * **Effect.** A `read` tool only looks things up. A `write` tool changes something, and by default runs only after the customer confirms it. * **Timeout.** From 1 to 30 seconds. * **Network and secrets.** A tool package reaches only the hosts it lists and receives only the secrets it declares. ## Three ways to provide tools [Section titled “Three ways to provide tools”](#three-ways-to-provide-tools) | Kind | What you build | Where it runs | Choose it when | | ----------------- | ------------------------------------------------------------------------------ | -------------------- | --------------------------------------------------------------------------------------------------------- | | Function package | One tool, written as a TypeScript function with `defineTool` | On Caplo, in Node 24 | You need a single tool, or you are wrapping one API call. This is the quickest start. | | MCP package | An MCP server with several tools, written with the official MCP TypeScript SDK | On Caplo, in Node 24 | You have several related tools that share code, or you want the same server to work in other MCP clients. | | Remote MCP server | Nothing in Caplo; you connect an MCP server you or a vendor already runs | On that server | The tools already exist behind an HTTPS MCP endpoint, or they must run in your own infrastructure. | Function and MCP packages are both **tool packages**: a folder with a `caplo.yaml`, a `package.json` with a lockfile, and TypeScript source. You build and publish them with the `caplo` CLI or in Tool Studio, and Caplo hosts them. A remote MCP server stays where it is; Caplo calls it with the credential you configure and only for the tools you review and publish. ## How a tool reaches an agent [Section titled “How a tool reaches an agent”](#how-a-tool-reaches-an-agent) 1. You publish a tool package build, or a reviewed remote MCP tool list, as a numbered **version**. A version never changes. 2. You select tools on the agent, in the console or in agent YAML as `<package>/<tool>`, for example `orders/get_order`. 3. When you publish the agent, its release **pins** the latest published version of each package it uses. Publishing a new tool version does not change running agents. They keep calling the pinned version until you publish the agent again, which pins the newest version. Revoking a version is the exception: agents that pin it stop calling its tools at once. See [Give an agent tools](/agents/tools/) and [Agents and releases](/concepts/agents-and-releases/). The model sees each tool as `<package>__<tool>` (hyphens in the package name become underscores), so tools from different packages never collide. ## Guides [Section titled “Guides”](#guides) [Build your first tool](/tools/first-tool/)Create, test, push and publish a function package with the CLI or in Tool Studio. [Define tools and use the call context](/tools/define-tool-and-context/)defineTool, MCP packages, schemas, caplo.yaml and the per-call context. [Write tools safely](/tools/write-tools/)Effects, customer confirmation, idempotency keys, outcomes and status checks. [Secrets and network access](/tools/secrets-and-egress/)Declare secrets, set or bind their values, and allow the hosts a package calls. [Show results to customers](/tools/present-results/)Cards, choices, details, timelines, receipts, files, progress and forms. [Build customer-aware tools](/tools/customer-aware-tools/)Act for a verified customer and verify customer context tokens in your API. [Test tools with fixtures](/tools/testing/)Run fixtures locally and on Caplo before you publish. [Manage versions and read logs](/tools/versions-and-logs/)Builds, versions, revoking, archiving and live invocation logs. [Connect a remote MCP server](/tools/remote-mcp/)Check, connect, review and publish the tools of an MCP server you already run. [Tool limits](/tools/limits/)Runtime, timeouts, memory, sizes, network and log retention.
+A tool is a function an agent can call during a conversation: look up an order, check stock, book an appointment, cancel a subscription. Each tool has a name, a description the model reads, an input schema for its arguments and, optionally, an output schema for its result. Caplo runs the tool, checks its result against the schema, and hands the result to the agent. Every tool also has a policy that you set, not the model: * **Effect.** A `read` tool only looks things up. A `write` tool changes something, and by default runs only after the customer confirms it. * **Timeout.** From 1 to 30 seconds. * **Network and secrets.** A tool package reaches only the hosts it lists and receives only the secrets it declares. ## Three ways to provide tools [Section titled “Three ways to provide tools”](#three-ways-to-provide-tools) | Kind | What you build | Where it runs | Choose it when | | ----------------- | ------------------------------------------------------------------------------ | -------------------- | --------------------------------------------------------------------------------------------------------- | | Function package | One tool, written as a TypeScript function with `defineTool` | On Caplo, in Node 24 | You need a single tool, or you are wrapping one API call. This is the quickest start. | | MCP package | An MCP server with several tools, written with the official MCP TypeScript SDK | On Caplo, in Node 24 | You have several related tools that share code, or you want the same server to work in other MCP clients. | | Remote MCP server | Nothing in Caplo; you connect an MCP server you or a vendor already runs | On that server | The tools already exist behind an HTTPS MCP endpoint, or they must run in your own infrastructure. | Function and MCP packages are both **tool packages**: a folder with a `caplo.yaml`, a `package.json` with a lockfile, and TypeScript source. You build and publish them with the `caplo` CLI or in Tool Studio, and Caplo hosts them. A remote MCP server stays where it is; Caplo calls it with the credential you configure and only for the tools you review and publish. ## How a tool reaches an agent [Section titled “How a tool reaches an agent”](#how-a-tool-reaches-an-agent) 1. You publish a tool package build, or a reviewed remote MCP tool list, as a numbered **version**. A version never changes. 2. You select tools on the agent, in the console or in agent YAML as `<package>/<tool>`, for example `orders/get_order`. 3. When you publish the agent, its release **pins** the latest published version of each package it uses. Publishing a new tool version does not change running agents. They keep calling the pinned version until you publish the agent again, which pins the newest version. Revoking a version is the exception: agents that pin it stop calling its tools at once. See [Give an agent tools](/agents/tools/) and [Agents and releases](/concepts/agents-and-releases/). The model sees each tool as `<package>__<tool>` (hyphens in the package name become underscores), so tools from different packages never collide. ![The Tools page of the Caplo console with the workspace tool packages](/_astro/tools.Ctd_J_ds_ZRAkaT.webp) ## Guides [Section titled “Guides”](#guides) [Build your first tool](/tools/first-tool/)Create, test, push and publish a function package with the CLI or in Tool Studio. [Define tools and use the call context](/tools/define-tool-and-context/)defineTool, MCP packages, schemas, caplo.yaml and the per-call context. [Write tools safely](/tools/write-tools/)Effects, customer confirmation, idempotency keys, outcomes and status checks. [Secrets and network access](/tools/secrets-and-egress/)Declare secrets, set or bind their values, and allow the hosts a package calls. [Show results to customers](/tools/present-results/)Cards, choices, details, timelines, receipts, files, progress and forms. [Build customer-aware tools](/tools/customer-aware-tools/)Act for a verified customer and verify customer context tokens in your API. [Test tools with fixtures](/tools/testing/)Run fixtures locally and on Caplo before you publish. [Manage versions and read logs](/tools/versions-and-logs/)Builds, versions, revoking, archiving and live invocation logs. [Connect a remote MCP server](/tools/remote-mcp/)Check, connect, review and publish the tools of an MCP server you already run. [Tool limits](/tools/limits/)Runtime, timeouts, memory, sizes, network and log retention.
 
 # Build customer-aware tools
 
 > Let a tool act for the verified customer in the conversation, and verify Caplo's customer context token in your own API.
 
 Some tools must act for one specific customer: “show my orders”, “change my delivery address”. The customer’s identity must not come from the model, because a model can be talked into passing someone else’s account number. A customer-aware tool instead receives the **verified customer** from Caplo, which knows who the visitor is because they signed in through your [customer identity](/channels/website-widget/settings/) setup. ## Before you start [Section titled “Before you start”](#before-you-start) * A customer identity connection in **Settings**, **Customer identity**, so visitors can verify who they are (for example with your own sign-in). * A channel whose customer verification lets or requires visitors to verify. See [Website widget settings](/channels/website-widget/settings/). ## Declare the subject [Section titled “Declare the subject”](#declare-the-subject) Add `subject` to the tool’s policy in `caplo.yaml`: 
-```yaml
+```plaintext
 tools:
   - name: list_my_orders
     effect: read
@@ -21,7 +21,7 @@ tools:
       selector: account
 ```
  * `policy: verified_required` means the tool runs only for a verified customer. Caplo passes that customer in the call context, never through arguments. Tools without `subject` never receive it. * `selector` is optional. It names a string input property that Caplo fills with the customer’s resource reference on every call. The model cannot set it: a call where the model supplied it is refused. The property must be optional in the input schema (not listed in `required`), and it can never be shown in a [presentation](/tools/present-results/). For a function package, put `subject` at the top level beside `effect`. ## Read the customer in code [Section titled “Read the customer in code”](#read-the-customer-in-code) `ctx.subject` holds the verified customer. Call `ctx.requireSubject()` to get it or fail: it throws when the call has none, so the tool can never run unscoped. 
-```ts
+```plaintext
 import { defineTool } from "@caplo/tools";
 
 
@@ -41,7 +41,7 @@ export default defineTool({
 });
 ```
  | Property | What it is | | ----------------------------------------- | ------------------------------------------------------------------------------------ | | `externalSubject` | The customer’s ID in your system, as your sign-in asserted it (its `sub`). | | `subjectNamespace`, `subjectNamespaceRef` | The identity namespace the customer verified in. | | `resourceRef` | `subjectNamespaceRef:externalSubject`, a stable key to map to your customer account. | | `level` | How strongly the customer verified: `low`, `standard` or `high`. | | `subjectId`, `bindingId` | Caplo’s IDs for the customer and their sign-in. | | `customerToken` | A customer context token, when the channel is set to send one. See below. | Function packages announce support for the subject automatically. An MCP package must add the capability when it creates the server, or Caplo refuses to send it subject calls: 
-```ts
+```plaintext
 import { SUBJECT_CONTEXT_CAPABILITY } from "@caplo/tools";
 
 
@@ -50,8 +50,8 @@ const server = new McpServer(
   { capabilities: { logging: {}, experimental: { ...SUBJECT_CONTEXT_CAPABILITY } } },
 );
 ```
- ## Customer context tokens [Section titled “Customer context tokens”](#customer-context-tokens) Passing the customer ID to your API with a shared API key means your API trusts the tool completely. A **customer context token** lets your API check for itself that Caplo verified this customer for this call. It is a signed JWT that: * lasts 60 seconds and is meant for a single call; * names your API as its audience and your workspace’s Caplo issuer; * carries the customer’s ID in `sub`, the agent in `act`, the verification level in `acr`, and for a write, the confirmed action in `caplo.action` and `caplo.actionDigest`. ### Set it up [Section titled “Set it up”](#set-it-up) 1. In **Settings**, **Customer identity**, edit the connection your customers use and list your API under **API audiences**: one HTTPS URL per line, up to 8. Tools can only get tokens for these audiences. 2. On the same page, under **Customer context tokens**, copy the **Issuer** (and the **JWKS URL**, if your API needs it). Give them to whoever runs the API. 3. In the website channel’s settings, under **Customer verification**, find the tool’s operation in **Verified tool operations** and choose your API in its **customer token audience**. Adding an operation to a channel is not yet available in the console or the CLI: [contact support](/resources/support/) with the channel and the tools, then set the audience here. See [Customer identity](/identity/). 4. In the tool, send the token as a bearer token. It is not an enumerable property, so spreading or logging the subject does not leak it, but never log it yourself: 
-   ```ts
+ ## Customer context tokens [Section titled “Customer context tokens”](#customer-context-tokens) Passing the customer ID to your API with a shared API key means your API trusts the tool completely. A **customer context token** lets your API check for itself that Caplo verified this customer for this call. It is a signed JWT that: * lasts 60 seconds and is meant for a single call; * names your API as its audience and your workspace’s Caplo issuer; * carries the customer’s ID in `sub`, the agent in `act`, the verification level in `acr`, and for a write, the confirmed action in `caplo.action` and `caplo.actionDigest`. ### Set it up [Section titled “Set it up”](#set-it-up) 1. In **Settings**, **Customer identity**, edit the connection your customers use and list your API under **API audiences**: one HTTPS URL per line, up to 8. Tools can only get tokens for these audiences. 2. On the same page, under **Customer context tokens**, copy the **Issuer** (and the **JWKS URL**, if your API needs it). Give them to whoever runs the API. ![The Customer context tokens card with the Issuer and JWKS URL](/_astro/customer-context-tokens.D1gznfiw_Z62Tlq.webp) 3. In the website channel’s settings, under **Customer verification**, find the tool’s operation in **Verified tool operations** and choose your API in its **customer token audience**. Adding an operation to a channel is not yet available in the console or the CLI: [contact support](/resources/support/) with the channel and the tools, then set the audience here. See [Customer identity](/identity/). 4. In the tool, send the token as a bearer token. It is not an enumerable property, so spreading or logging the subject does not leak it, but never log it yourself: 
+   ```plaintext
    const customer = ctx.requireSubject();
    if (!customer.customerToken) throw new Error("no customer context token is configured for this tool");
    const response = await fetch("https://api.shop.example/me/orders", {
@@ -60,7 +60,7 @@ const server = new McpServer(
    });
    ```
  ### Verify the token in your API [Section titled “Verify the token in your API”](#verify-the-token-in-your-api) Install `@caplo/tools` in your API and use `verifyCustomerContext` from `@caplo/tools/verify`. It has no runtime dependencies; it uses `fetch` and WebCrypto. 
-```ts
+```plaintext
 import { CustomerContextError, MemoryReplayStore, verifyCustomerContext } from "@caplo/tools/verify";
 
 
@@ -89,7 +89,7 @@ export async function customerFrom(request: Request) {
 > Write function and MCP packages, design their schemas, read secrets and IDs from the call context, and set each tool's policy in caplo.yaml.
 
 A tool package has two halves. The **code** defines each tool’s name, description and schemas, and does the work. **`caplo.yaml`** sets what Caplo enforces around it: effect, timeout, confirmation, network access and secrets. Caplo reads the tool list from your code when it builds the package and joins it with `caplo.yaml`; a tool without a policy, or a policy for a tool the code does not list, fails the build. ## Function packages [Section titled “Function packages”](#function-packages) A function package has exactly one tool. Its entry file (`entry` in `caplo.yaml`, `src/tool.ts` by default) default-exports a `defineTool`: 
-```ts
+```plaintext
 import { defineTool } from "@caplo/tools";
 
 
@@ -129,7 +129,7 @@ export default defineTool<Input, Output>({
 });
 ```
  | Field | Notes | | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | | `name` | Lowercase letters, digits and underscores, starting with a letter, at most 48 characters. | | `description` | What the tool does and when to use it. The model chooses tools by this text, so be specific. | | `inputSchema` | A JSON Schema with `type: object`. Caplo validates arguments against it before your handler runs. | | `outputSchema` | Optional JSON Schema with `type: object`. When set, a result that does not match fails the call. It is required for [result presentation](/tools/present-results/). | | `handler(args, ctx)` | Receives the validated arguments and the [call context](#the-call-context). | | `status` | Optional, for write tools. See [Write tools safely](/tools/write-tools/#answer-status-checks). | What the handler returns becomes the tool result. A plain object becomes the structured result and its JSON text; a string becomes text. If the handler throws, the call returns the error message as an error result, and the model sees it. Write schemas for the model as much as for validation: describe each property, use `enum` for fixed choices, `pattern` or `maxLength` for identifiers, and `additionalProperties: false` so the model cannot invent arguments. Return only the fields the agent needs; results over 256 KiB fail. ## MCP packages [Section titled “MCP packages”](#mcp-packages) An MCP package is an MCP server with one or more tools. Its entry file (`src/server.ts` by default) exports `createServer()`, which returns a server from the official MCP TypeScript SDK: 
-```ts
+```plaintext
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { context } from "@caplo/tools";
 import { z } from "zod";
@@ -166,7 +166,7 @@ export function createServer() {
 }
 ```
  Create the server with `capabilities: { logging: {} }`. Without it, log lines are dropped. Caplo ignores MCP tool annotations such as `readOnlyHint`; the effect comes from `caplo.yaml`. ### Run the server in other MCP clients [Section titled “Run the server in other MCP clients”](#run-the-server-in-other-mcp-clients) `caplo tool init` also writes `src/stdio.ts`, which runs the package over standard input and output with `serveStdio`. The same code then works in MCP Inspector, Claude Desktop or any other local MCP client: 
-```ts
+```plaintext
 import { serveStdio } from "@caplo/tools";
 import { createServer } from "./server.ts";
 
@@ -174,7 +174,7 @@ import { createServer } from "./server.ts";
 await serveStdio(createServer, { secrets: ["SHOP_API_KEY"] });
 ```
  `serveStdio` reads the listed secrets from environment variables of the same name. That is for local development only; on Caplo, secrets never come from the environment. `caplo tool dev --no-inspector` starts this file with Node 24. For a function package, `src/stdio.ts` calls `serveStdio(() => tool.createServer())`. ## The call context [Section titled “The call context”](#the-call-context) A function handler receives the context as its second argument. In an MCP package, call `context(extra)` with the handler’s `extra` argument. | Property | What it is | | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | | `secrets.get(name)` | The value of a secret declared in `caplo.yaml`. Throws if the call has no value for it. `secrets.has(name)` checks first. See [Secrets and network access](/tools/secrets-and-egress/). | | `log.debug`, `log.info`, `log.warn`, `log.error` | `(message, data?)`. Lines are kept with the invocation and shown by `caplo tool logs` and in test output. A log call never fails the tool. | | `signal` | An `AbortSignal` that fires at the deadline or when the call is cancelled. Pass it to `fetch` and other I/O. | | `deadline` | A `Date`: when the call times out. | | `idempotencyKey` | Write tools only. The same key for every attempt of one confirmed action. See [Write tools safely](/tools/write-tools/#use-the-idempotency-key). | | `invocationId` | This call’s ID, also shown in `caplo tool logs`. | | `conversationId`, `turnId` | The conversation and turn the call belongs to. | | `workspaceId`, `packageVersionId` | The workspace and the package version running. | | `subject`, `requireSubject()` | The verified customer, for tools that declare `subject`. See [Build customer-aware tools](/tools/customer-aware-tools/). | | `canElicit`, `elicit()` | Function packages: ask the visitor for missing details. See [Ask for missing details](/tools/present-results/#ask-for-missing-details). | Caution Module-level variables persist between calls that run in the same worker, and those calls can belong to different conversations and customers. Never keep per-customer data in module scope. Caches of public data, such as a parsed price list, are fine. `console.log` output is not part of your invocation logs. Use `log` from the context. ## caplo.yaml [Section titled “caplo.yaml”](#caployaml) | Field | Required | Notes | | ------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------- | | `apiVersion` | Yes | `v1` (also `v1.0` or `v1.0.0`). | | `kind` | Yes | `ToolPackage`. | | `name` | Yes | Lowercase letters, digits and dashes, starting with a letter, 2 to 40 characters. Unique in the workspace and used in tool names. | | `type` | Yes | `function` or `mcp`. | | `description` | No | Up to 500 characters. | | `entry` | Yes | The entry module, for example `src/tool.ts` or `src/server.ts`. | | `runtime` | Yes | `node24`. | | `tools` | MCP only | One policy entry per tool the server lists, up to 64. | | `egress` | No | Hosts the package may call. Empty or absent means no network. | | `secrets` | No | Names of secrets the package reads. | | `tests` | No | Glob of fixture files, default `tests/*.json`. | Each `tools` entry, or for a function package the same fields at the top level: | Field | Required | Notes | | ---------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------ | | `name` | MCP only | The tool name as the server lists it. | | `effect` | Yes | `read` or `write`. | | `timeoutSeconds` | Yes | 1 to 30. | | `confirmation` | No | Write tools only: `required` (the default) or `none`. A read tool with `confirmation` fails the build. | | `subject` | No | The tool acts for a verified customer. See [Build customer-aware tools](/tools/customer-aware-tools/). | | `presentation` | No | What the customer sees: confirmation fields, receipts, result layouts and files. See [Show results to customers](/tools/present-results/). | | `progress` | No | A status line while the tool runs. | | `elicitation` | No | Read tools only: fields the tool may ask the visitor for. | A complete MCP package with a read tool and a write tool: 
-```yaml
+```plaintext
 apiVersion: v1
 kind: ToolPackage
 name: orders
@@ -200,7 +200,7 @@ secrets:
 tests: tests/*.json
 ```
  For a function package, leave out `tools` and put the policy beside `name`: 
-```yaml
+```plaintext
 apiVersion: v1
 kind: ToolPackage
 name: order-lookup
@@ -221,16 +221,16 @@ secrets:
 > Create a function package, run it locally, test it, then push and publish it with the CLI or in Tool Studio.
 
 This page takes a one-tool function package from nothing to a published version an agent can use. The starter tool, `double_value`, doubles a number; replace its body with your own logic once the loop works. ## Before you start [Section titled “Before you start”](#before-you-start) * The **Owner**, **Admin** or **Developer** role in the workspace. These roles can create, build and publish tools. * For the CLI path: the `caplo` CLI ([install it](/cli/install/)), signed in with `caplo auth login` and with a workspace selected with `caplo workspace use`. See [Sign in from the CLI](/cli/authentication/). * For the CLI path: **Node.js 24** and npm. Tool packages run on Node 24, and `caplo tool test` refuses any other major version. Local tests run on macOS and Linux; on Windows, use WSL. ## Create, test and publish [Section titled “Create, test and publish”](#create-test-and-publish) * CLI 1. **Create the package.** `caplo tool init` writes a package from the SDK template into a new or empty directory and names it after the directory: 
-     ```sh
+     ```plaintext
      caplo tool init double-value --type function
      cd double-value
      ```
  You get `caplo.yaml`, `package.json`, `tsconfig.json`, `src/tool.ts` (the tool), `src/stdio.ts` (runs it for local MCP clients) and `tests/double-value.json` (a fixture). Use `--type mcp` for an MCP package with several tools; see [Define tools and use the call context](/tools/define-tool-and-context/). 2. **Install dependencies.** 
-     ```sh
+     ```plaintext
      npm install
      ```
  This also writes `package-lock.json`. Keep it and commit it: Caplo installs exactly what the lockfile lists, and a push without a lockfile fails to build. `yarn.lock` and `pnpm-lock.yaml` also work. 3. **Look at the tool.** `src/tool.ts` exports one `defineTool`: 
-     ```ts
+     ```plaintext
      import { defineTool } from "@caplo/tools";
 
 
@@ -246,15 +246,15 @@ This page takes a one-tool function package from nothing to a published version 
      });
      ```
  `caplo.yaml` names the package and sets the tool’s policy: `effect: read` and `timeoutSeconds: 5`. 4. **Call it by hand.** `caplo tool dev` opens MCP Inspector (started with `npx`) connected to your package, so you can list and call the tool: 
-     ```sh
+     ```plaintext
      caplo tool dev
      ```
  Secrets your `caplo.yaml` declares are read from environment variables of the same name. To use the package from another local MCP client instead, run `caplo tool dev --no-inspector`, which speaks MCP on standard input and output. 5. **Run the fixtures.** `caplo tool test` bundles the package the way Caplo’s builder does, checks `caplo.yaml` against the tools the code lists, and runs every fixture in `tests/`: 
-     ```sh
+     ```plaintext
      caplo tool test
      ```
  
-     ```txt
+     ```plaintext
      bundle 7.5 KB (d64251e71094, esbuild 0.28.2)
      tool double_value__double_value (read, 5s)
      capabilities subject-context/1 effect-outcome/1 operation-status/1
@@ -263,20 +263,20 @@ This page takes a one-tool function package from nothing to a published version 
      1 passed, 0 failed
      ```
  `double_value__double_value` is the name the model sees. See [Test tools with fixtures](/tools/testing/). 6. **Push and build.** `caplo tool push` uploads the folder as the package’s workspace draft (creating the package on the first push), builds it, and streams the build log. `node_modules`, `.git` and anything your `.gitignore` files ignore are left out. 
-     ```sh
+     ```plaintext
      caplo tool push
      ```
  The build installs from your lockfile, bundles the code, runs safety checks and lists the tools with no network access. It ends with `Build <id> succeeded` and the tools it found, or with an error code such as `lockfile_required` or `tool_policy_missing`. 7. **Publish.** `caplo tool publish` turns the latest succeeded build into the next version: 
-     ```sh
+     ```plaintext
      caplo tool publish
      ```
  
-     ```txt
+     ```plaintext
      Published double-value version 1 from build <BUILD_ID>
        double_value__double_value (read, 5s)
      ```
  * Tool Studio Tool Studio is a browser editor at [studio.caplo.si](https://studio.caplo.si) for writing, building, testing and publishing tool packages without installing anything. 1. In the console, open **Tools**, select **Add tools**, then **Create package**. Studio opens on this workspace in a new tab; sign in if it asks. 2. In the **Packages** view, select **Create Package**. Choose **Function** (one tool written as a function) or **MCP server** (several tools in one server), then enter a package name such as `double-value`: a lowercase letter, then lowercase letters, digits or dashes. 3. Studio creates the package from the same template as the CLI. Edit `src/tool.ts` and `caplo.yaml`. Your edits are saved to the package’s workspace draft. When you save `package.json`, Studio resolves the dependencies and updates the lockfile for you. 4. In the **Tools** view, select **Build**. When the build succeeds, Studio offers **Run Tests** and **Publish**. To call a tool by hand, select **Call Tool** on it, fill in the arguments and select **Send Call**. 5. Select **Run Fixture Tests** to run the files in `tests/`. 6. In the **Versions** view, select **Publish** and confirm. Studio builds the draft first if it changed since the last build. You can return to a package from the console: **Tools** lists each package with **Open in Studio**. ## Give the tool to an agent [Section titled “Give the tool to an agent”](#give-the-tool-to-an-agent) A published tool appears on every agent’s **Tools & actions** tab, grouped under its package. Select it there, or list it in agent YAML by package and tool name: 
-```yaml
+```plaintext
 tools:
   - double-value/double_value
 ```
@@ -293,7 +293,7 @@ These limits apply to every workspace. A call or build that exceeds one fails wi
 > Use caplo.yaml presentation to show progress, confirmation cards, receipts, result layouts and files, and let read tools ask the visitor for missing details.
 
 By default a tool’s result goes only to the agent, which answers in text. A `presentation` in the tool’s `caplo.yaml` policy also shows the customer selected parts of it: a confirmation card for a write, a receipt afterwards, a list of products as cards, a delivery timeline, a PDF invoice. The agent’s text reply goes out as usual alongside. Presentation is display metadata only. It selects and labels properties of the tool’s schemas; nothing else of the arguments or result is shown, and it grants no permission to run anything. The build checks every path and role against your input and output schemas and fails with a clear message if something does not fit. Result layouts, confirmation cards and forms appear in the [website widget](/channels/website-widget/install/). Where a channel cannot show them, the customer gets the agent’s text reply. Design your tools so the text result is enough on its own. ## Show progress [Section titled “Show progress”](#show-progress) `progress` shows a status line while the tool runs. It is fixed text: it cannot include values from the call. 
-```yaml
+```plaintext
 tools:
   - name: search_products
     effect: read
@@ -303,7 +303,7 @@ tools:
       spoken: Let me look that up.
 ```
  * `label`: shown in the widget. 3 to 40 characters, no trailing punctuation, no links. * `spoken`: optional, said in voice conversations. One sentence of 3 to 90 characters ending with a full stop. ## Confirmation and receipt [Section titled “Confirmation and receipt”](#confirmation-and-receipt) For a [write tool](/tools/write-tools/), `fields` chooses which input arguments the review card shows, and `receipt` chooses which properties of the result to show once the write succeeds. 
-```yaml
+```plaintext
 tools:
   - name: cancel_order
     effect: write
@@ -342,8 +342,8 @@ tools:
             label: Status
             display: plain
 ```
- * Up to 12 fields, each a direct property of the input schema with one primitive type (string, number, integer or boolean). * `display: last4` shows only the last four characters of a string, for example a card or account number. A masked field cannot be editable. * `editable: true` lets the customer change a string argument before confirming. With `input: text`, the property needs a `maxLength` of 1 to 1000. With `input: select`, the property needs a string `enum` of 1 to 20 values, and `options` must label every value exactly once. * `writeOnly` properties, `format: password` properties, names that match a declared secret and the [subject selector](/tools/customer-aware-tools/) cannot be shown. `readOnly` properties can be shown but not edited. * On a voice call, the title and each field are read aloud as “Label: value”. A `last4` value is read as “ending in” its last four characters, and an absent value as “not provided”. * `receipt.fields` (up to 12) come from the structured result, so the tool needs an `outputSchema`. A receipt only displays values; it never decides whether the write succeeded. ## Show a result [Section titled “Show a result”](#show-a-result) `result` shows items from the tool’s structured result with the agent’s reply. The tool needs an `outputSchema`, and `path` names a direct array property of it (or, for a detail, an object). | Layout | Shows | Columns | Item actions | | --------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------- | ----------------- | | `list`, `table` | Up to 20 items | Up to 6, no roles | None | | `cards` | Up to 20 items as cards | Up to 6; `title` role required | Up to 2 | | `choices` | Up to 10 items the customer taps to reply | Up to 6; `title` role required | Exactly 1 `reply` | | `detail` | One object: the result itself, or the object property `path` names | Up to 12; `title` role required | Up to 2 | | `comparison` | Up to 4 items side by side | Up to 12; `title` role required; columns without a role become rows | Up to 2 | | `timeline` | Up to 12 steps | Up to 4, every column needs a role; `title` and `status` required | None | Columns are direct primitive properties of an item. A result that does not fit the layout’s bounds, for example 25 items for `cards`, shows no component; the agent’s reply still goes out. Return at most as many items as the layout shows. ### Cards [Section titled “Cards”](#cards) 
-```yaml
+ * Up to 12 fields, each a direct property of the input schema with one primitive type (string, number, integer or boolean). * `display: last4` shows only the last four characters of a string, for example a card or account number. A masked field cannot be editable. * `editable: true` lets the customer change a string argument before confirming. With `input: text`, the property needs a `maxLength` of 1 to 1000. With `input: select`, the property needs a string `enum` of 1 to 20 values, and `options` must label every value exactly once. * `writeOnly` properties, `format: password` properties, names that match a declared secret and the [subject selector](/tools/customer-aware-tools/) cannot be shown. `readOnly` properties can be shown but not edited. * On a voice call, the title and each field are read aloud as “Label: value”. A `last4` value is read as “ending in” its last four characters, and an absent value as “not provided”. * `receipt.fields` (up to 12) come from the structured result, so the tool needs an `outputSchema`. A receipt only displays values; it never decides whether the write succeeded. ![A confirmation card for a booking tool in the website widget](/_astro/widget-confirm.Bm7Gk4UV_Z1dIOgl.webp) ![The receipt the widget shows after the booking succeeded](/_astro/widget-receipt.BT2d0xh0_1P4Fqz.webp) ## Show a result [Section titled “Show a result”](#show-a-result) `result` shows items from the tool’s structured result with the agent’s reply. The tool needs an `outputSchema`, and `path` names a direct array property of it (or, for a detail, an object). | Layout | Shows | Columns | Item actions | | --------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------- | ----------------- | | `list`, `table` | Up to 20 items | Up to 6, no roles | None | | `cards` | Up to 20 items as cards | Up to 6; `title` role required | Up to 2 | | `choices` | Up to 10 items the customer taps to reply | Up to 6; `title` role required | Exactly 1 `reply` | | `detail` | One object: the result itself, or the object property `path` names | Up to 12; `title` role required | Up to 2 | | `comparison` | Up to 4 items side by side | Up to 12; `title` role required; columns without a role become rows | Up to 2 | | `timeline` | Up to 12 steps | Up to 4, every column needs a role; `title` and `status` required | None | Columns are direct primitive properties of an item. A result that does not fit the layout’s bounds, for example 25 items for `cards`, shows no component; the agent’s reply still goes out. Return at most as many items as the layout shows. ### Cards [Section titled “Cards”](#cards) 
+```plaintext
     presentation:
       schemaVersion: 1
       title: Product search
@@ -382,8 +382,8 @@ tools:
             label: View
             path: /url
 ```
- Here the output schema has a `products` array whose items have `imageUrl`, `name`, `price`, `currency` and `url`. ### Column roles [Section titled “Column roles”](#column-roles) | Role | Property type | Layouts | Shows | | ------------------------- | ----------------------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- | | `title` | string | all with roles | The item’s heading. | | `subtitle`, `description` | string | cards, detail, comparison; `description` also choices and timeline | Secondary text. | | `image` | string | cards, detail, comparison | An image. The value must be an `https` URL. | | `link` | string | cards, detail, comparison | A link. The value must be an `https` URL. | | `money` | number or integer | cards, detail, comparison | An amount, with `currency` set to a fixed `code` such as `USD` or the `path` of a string property holding the ISO 4217 code. | | `badge` | string, number or integer | cards, detail, comparison | A short highlighted value, such as a status. | | `status` | string with an `enum` | timeline | The step’s state. `statuses` maps every enum value to `done`, `current` or `upcoming`. | | `time` | string with `format: date` or `date-time` | timeline | When the step happened or is due. | Each role can be used by one column only, and a column with a role uses `display: plain`. Values that are not `https` URLs are left off the card. ### Actions [Section titled “Actions”](#actions) * `reply` sends a message as the customer, built from `template`. `{name}` inserts the item’s value of the listed column `name`; image, link, status and time columns cannot be inserted. * `link` opens the URL in the listed string column `path`. * Labels are up to 20 characters. Neither kind calls a tool; the agent handles the reply like any message. ### Choices [Section titled “Choices”](#choices) 
-```yaml
+ Here the output schema has a `products` array whose items have `imageUrl`, `name`, `price`, `currency` and `url`. ![A cards result in the website widget: two products with image, status, price and actions](/_astro/widget-cards.JIqOSjeC_1jNFij.webp) ### Column roles [Section titled “Column roles”](#column-roles) | Role | Property type | Layouts | Shows | | ------------------------- | ----------------------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- | | `title` | string | all with roles | The item’s heading. | | `subtitle`, `description` | string | cards, detail, comparison; `description` also choices and timeline | Secondary text. | | `image` | string | cards, detail, comparison | An image. The value must be an `https` URL. | | `link` | string | cards, detail, comparison | A link. The value must be an `https` URL. | | `money` | number or integer | cards, detail, comparison | An amount, with `currency` set to a fixed `code` such as `USD` or the `path` of a string property holding the ISO 4217 code. | | `badge` | string, number or integer | cards, detail, comparison | A short highlighted value, such as a status. | | `status` | string with an `enum` | timeline | The step’s state. `statuses` maps every enum value to `done`, `current` or `upcoming`. | | `time` | string with `format: date` or `date-time` | timeline | When the step happened or is due. | Each role can be used by one column only, and a column with a role uses `display: plain`. Values that are not `https` URLs are left off the card. ### Actions [Section titled “Actions”](#actions) * `reply` sends a message as the customer, built from `template`. `{name}` inserts the item’s value of the listed column `name`; image, link, status and time columns cannot be inserted. * `link` opens the URL in the listed string column `path`. * Labels are up to 20 characters. Neither kind calls a tool; the agent handles the reply like any message. ### Choices [Section titled “Choices”](#choices) 
+```plaintext
       result:
         path: /slots
         layout: choices
@@ -398,8 +398,8 @@ tools:
             label: Book
             template: Book the {label} slot
 ```
- Each choice sends its filled-in reply. Columns without a role must appear in the template. ### Detail [Section titled “Detail”](#detail) 
-```yaml
+ Each choice sends its filled-in reply. Columns without a role must appear in the template. ![A choices result in the website widget: delivery windows the customer taps to reply](/_astro/widget-choices.BKbyZL30_Z13FGYe.webp) ### Detail [Section titled “Detail”](#detail) 
+```plaintext
       result:
         layout: detail
         title: Your order
@@ -423,8 +423,8 @@ tools:
             display: plain
             role: link
 ```
- Without `path`, a detail shows the result object itself. ### Comparison [Section titled “Comparison”](#comparison) 
-```yaml
+ Without `path`, a detail shows the result object itself. ![A detail result in the website widget: one product with its specification rows](/_astro/widget-detail.BT92E4bY_21Ns5v.webp) ### Comparison [Section titled “Comparison”](#comparison) 
+```plaintext
       result:
         path: /plans
         layout: comparison
@@ -447,8 +447,8 @@ tools:
             label: Contract
             display: plain
 ```
- ### Timeline [Section titled “Timeline”](#timeline) 
-```yaml
+ ![A comparison result in the website widget: two products side by side](/_astro/widget-comparison.CxW_VEfP_2ttxR3.webp) ### Timeline [Section titled “Timeline”](#timeline) 
+```plaintext
       result:
         path: /steps
         layout: timeline
@@ -471,8 +471,8 @@ tools:
             display: plain
             role: time
 ```
- The `state` property’s schema is `{ "type": "string", "enum": ["complete", "in_progress", "not_started"] }`, and `at` is a string with `format: date-time`. ## Return files [Section titled “Return files”](#return-files) A read tool can hand the customer up to three files per call, such as an invoice PDF or a floor plan. Declare the types and the largest size: 
-```yaml
+ The `state` property’s schema is `{ "type": "string", "enum": ["complete", "in_progress", "not_started"] }`, and `at` is a string with `format: date-time`. ![A timeline result in the website widget: the delivery progress of an order](/_astro/widget-timeline.D_vEPE6B_2po6Wf.webp) ## Return files [Section titled “Return files”](#return-files) A read tool can hand the customer up to three files per call, such as an invoice PDF or a floor plan. Declare the types and the largest size: 
+```plaintext
 tools:
   - name: get_invoice
     effect: read
@@ -490,7 +490,7 @@ tools:
         maxBytes: 2097152
 ```
  `accept` lists any of `image/jpeg`, `image/png`, `image/gif`, `image/webp` and `application/pdf`. `maxBytes` is 1024 to 10485760 (10 MiB) per file. Return each file as an MCP embedded resource with base64 content. The last part of `uri` is the file name the customer sees: 
-```ts
+```plaintext
 return {
   content: [
     { type: "text", text: `Invoice ${invoice.number} for order ${orderId}` },
@@ -498,8 +498,8 @@ return {
   ],
 };
 ```
- Embedded resources are written with the MCP SDK, so files need an MCP package. Caplo takes the files out of the result before the model sees it, checks that each file’s content matches its type, scans it, and shows it with the reply as a download where the channel can. A file of an undeclared type, over `maxBytes`, or a fourth file fails the call. Where the channel cannot deliver files, such as a phone call, the agent is told the file was not delivered, so also return the essentials as text. ## Ask for missing details [Section titled “Ask for missing details”](#ask-for-missing-details) A read tool can ask the visitor for details it needs while it runs, with an MCP form. Declare every field the tool may ask for: 
-```yaml
+ Embedded resources are written with the MCP SDK, so files need an MCP package. Caplo takes the files out of the result before the model sees it, checks that each file’s content matches its type, scans it, and shows it with the reply as a download where the channel can. A file of an undeclared type, over `maxBytes`, or a fourth file fails the call. Where the channel cannot deliver files, such as a phone call, the agent is told the file was not delivered, so also return the essentials as text. ![A PDF invoice the visitor can download from the website widget](/_astro/widget-file.bJQwGIN5_29tq3k.webp) ## Ask for missing details [Section titled “Ask for missing details”](#ask-for-missing-details) A read tool can ask the visitor for details it needs while it runs, with an MCP form. Declare every field the tool may ask for: 
+```plaintext
 tools:
   - name: find_store
     effect: read
@@ -509,7 +509,7 @@ tools:
         - name: city
 ```
  Then ask from the code. In a function package, use `ctx.canElicit` and `ctx.elicit`: 
-```ts
+```plaintext
 async handler(args, ctx) {
   let city = args.city;
   if (!city) {
@@ -524,18 +524,18 @@ async handler(args, ctx) {
   // look up stores in city...
 }
 ```
- In an MCP package, check `server.server.getClientCapabilities()?.elicitation` and call `server.server.elicitInput({ message, requestedSchema })`. * Forms are offered only in website widget text conversations. Elsewhere, such as phone calls and evaluations, `canElicit` is false; return a message that lets the agent ask in the conversation instead. * The answer is `accept` with `content`, `decline`, or `cancel`. * When the visitor answers, the tool runs again from the start with the same arguments, and the earlier `elicit` call returns the stored answer. Ask before doing any work, and keep everything before the question safe to repeat. * Up to 12 declared fields and three questions per call. Fields use the MCP form subset: strings (with `minLength`, `maxLength`, `format` `email`, `uri`, `date` or `date-time`, or an `enum`), numbers, integers, booleans and arrays of enum strings. `pattern` is not supported. * Write tools cannot ask; they collect input through [editable confirmation fields](#confirmation-and-receipt). Caution Never ask for a password, card number, one-time code or other credential. Caplo refuses fields and forms whose names, titles or options name one, and the build rejects such field names.
+ In an MCP package, check `server.server.getClientCapabilities()?.elicitation` and call `server.server.elicitInput({ message, requestedSchema })`. * Forms are offered only in website widget text conversations. Elsewhere, such as phone calls and evaluations, `canElicit` is false; return a message that lets the agent ask in the conversation instead. * The answer is `accept` with `content`, `decline`, or `cancel`. * When the visitor answers, the tool runs again from the start with the same arguments, and the earlier `elicit` call returns the stored answer. Ask before doing any work, and keep everything before the question safe to repeat. * Up to 12 declared fields and three questions per call. Fields use the MCP form subset: strings (with `minLength`, `maxLength`, `format` `email`, `uri`, `date` or `date-time`, or an `enum`), numbers, integers, booleans and arrays of enum strings. `pattern` is not supported. * Write tools cannot ask; they collect input through [editable confirmation fields](#confirmation-and-receipt). Caution Never ask for a password, card number, one-time code or other credential. Caplo refuses fields and forms whose names, titles or options name one, and the build rejects such field names. ![A form in the website widget asking for a delivery address and window](/_astro/widget-form.Bd9RWIXH_1CHdww.webp)
 
 # Connect a remote MCP server
 
 > Check an MCP server you already run, add it with its credential, review the tools it lists, and publish them for agents.
 
 If your tools already exist behind an MCP endpoint, yours or a vendor’s, connect the server instead of rebuilding them as a tool package. Caplo calls the server over HTTPS with a credential you configure, and only for the tools you review and publish. ## How it works [Section titled “How it works”](#how-it-works) * **Workspace credential.** Caplo stores one credential per server and uses it for every conversation in the workspace. Agents can reach anything that credential can, so give it the narrowest access that works. * **Review before use.** Caplo lists the server’s tools, but none reaches an agent until you enable it, classify it as `read` or `write`, and publish. Write tools ask the customer to confirm by default, as with [tool packages](/tools/write-tools/). * **Pinned contracts.** Publishing creates a numbered version that pins each enabled tool’s description and schemas. Agents pin that version when you publish them. * **Change detection.** Caplo checks each server about every 15 minutes. If a published tool’s schema changes or the tool disappears, the server shows **Tools changed** and Caplo stops calling the changed tools until you review the new list and publish again. * **Idempotency.** Calls to write tools carry the action’s idempotency key in the request’s `_meta` as `io.caplo/idempotencyKey`, so your server can apply each confirmed write once. * **Network.** Calls leave through Caplo’s egress. Servers on private, loopback or link-local addresses are not reachable. Responses must be under 256 KiB, and each tool has a timeout of 1 to 30 seconds (20 by default). The server’s name is permanent, unique among the workspace’s packages and servers, and prefixes its tools: a `search` tool on server `crm` is `crm/search` in agent YAML and `crm__search` to the model. ## Authentication [Section titled “Authentication”](#authentication) | Method | CLI `--auth` | Use it when | | ------------------------ | ---------------------------------------- | -------------------------------------------------------------------------------------------------------- | | No auth | `none` | The server is public. | | Bearer token | `bearer` | The server takes a static token as `Authorization: Bearer`. | | Custom header | `header` | The server takes an API key in a header you name, such as `X-API-Key`. | | OAuth, a user signs in | `oauth` (grant `authorization_code`) | The server uses OAuth with PKCE. A workspace member signs in once; Caplo stores and refreshes the token. | | OAuth, the client itself | `oauth --oauth-grant client_credentials` | Machine-to-machine OAuth with a confidential client and its secret. | For OAuth, Caplo registers itself with the authorization server where the server allows it. Otherwise use a client an administrator registered: pass its client ID and secret, and add Caplo’s redirect URI (shown in the console, or by `caplo mcp get`) to the client’s allowed redirect URIs. Tokens, header values and client secrets are write-only. Caplo stores them encrypted and never shows them again. ## Connect, review and publish [Section titled “Connect, review and publish”](#connect-review-and-publish) * Console 1. Open **Tools**, select **Add tools**, then **Connect MCP server**. 2. **Server.** Enter the **Server URL**, for example `https://mcp.example.com/mcp`, and select **Check server**. Caplo reports whether the endpoint speaks MCP, how many tools it lists, and whether it asks for OAuth. Checking saves nothing. Leave **Transport** on **Detect automatically** unless you know the server only speaks one. Select **Continue**. 3. **Connection.** Enter a **Display name** and a **Name** (lowercase, permanent), then choose the **Authentication method**: * **Bearer token** or **Custom header**: paste the value. * **OAuth**: under **Who signs in**, choose **A user signs in** or **The client itself**. Choose **Register automatically**, or **Use a registered client** and enter its **Client ID** and, for a confidential client, its **Client secret**. Copy the **Redirect URI** into a registered client’s settings. Select **Save server**, or **Save and authorize** for OAuth, which sends you to the authorization server to sign in. 4. **Tools.** Caplo shows how many tools it discovered. Select **Review tools**. 5. In the review, enable each tool agents may use and set its **Effect** (**Read only** or **Writes data**), its **Confirmation** for writes (**Customer confirms** or **No confirmation**) and its **Timeout**. Select **Save review**, then the publish button, which names how many tools it publishes, such as **Publish 2 tools**. The server’s section on the **Tools** page shows its status, authentication and how many tools are published, with **Connect** or **Reconnect** (OAuth), **Review tools** (or **Review changes**), **Check now**, **Edit** and **Remove**. * CLI 1. **Check the server.** Nothing is saved. Add `--bearer-stdin`, or `--header X-API-Key --value-stdin`, to check with a credential. 
-     ```sh
+     ```plaintext
      caplo mcp check https://mcp.example.com/mcp
      ```
  2. **Add it.** Give it a name and the authentication method. Secrets are read from standard input (a hidden prompt on a terminal) or from an environment variable, never from a flag value. 
-     ```sh
+     ```plaintext
      # OAuth, a user signs in; Caplo registers itself where the server allows it
      caplo mcp add crm --url https://mcp.example.com/mcp --auth oauth --display-name "Customer CRM"
 
@@ -553,11 +553,11 @@ If your tools already exist behind an MCP endpoint, yours or a vendor’s, conne
      caplo mcp add crm --url https://mcp.example.com/mcp --auth header --header-name X-API-Key --secret-env CRM_API_KEY
      ```
  Use `--scope` (repeatable) to request specific OAuth scopes and `--token-auth-method` if the token endpoint needs `client_secret_basic` or `client_secret_post`. 3. **Authorize (OAuth).** Open the printed URL in a browser signed in to the Caplo console; the console completes the authorization. `--open` opens it for you. The client credentials grant completes at once. 
-     ```sh
+     ```plaintext
      caplo mcp connect crm --open
      ```
  4. **Review the tools.** List them, then enable and classify the ones agents may use, by their remote name: 
-     ```sh
+     ```plaintext
      caplo mcp tools crm
      caplo mcp review crm \
        --enable search_contacts=read \
@@ -566,11 +566,11 @@ If your tools already exist behind an MCP endpoint, yours or a vendor’s, conne
        --timeout search_contacts=10
      ```
  `--enable` without `=read` or `=write` keeps the tool’s current effect or takes the one the server’s `readOnlyHint` suggests. Check it: hints are only suggestions. Tools you do not name keep their review; `--disable` turns one off. 5. **Publish.** 
-     ```sh
+     ```plaintext
      caplo mcp publish crm
      ```
  
-     ```txt
+     ```plaintext
      Published crm version 1 with 2 tools
      ...
      Agent files use them as crm/<tool>
@@ -582,17 +582,17 @@ If your tools already exist behind an MCP endpoint, yours or a vendor’s, conne
 > Declare the secrets a tool package reads, set or bind their values without putting them in code, and allow the hosts the package may call.
 
 A tool package gets nothing it does not declare. It reads only the secrets named in its `caplo.yaml`, and it reaches only the hosts listed there. Both lists are frozen into each published version. ## Declare secrets [Section titled “Declare secrets”](#declare-secrets) List each secret by name in `caplo.yaml`. Names are upper case: a letter, then letters, digits or underscores, up to 64 characters, and at most 50 per package. 
-```yaml
+```plaintext
 secrets:
   - SHOP_API_KEY
   - SHOP_WEBHOOK_SECRET
 ```
  Read a value from the [call context](/tools/define-tool-and-context/#the-call-context): 
-```ts
+```plaintext
 const apiKey = secrets.get("SHOP_API_KEY");
 ```
  `secrets.get` throws if the call has no value for the name. Secrets are never environment variables on Caplo, and `caplo.yaml` holds only names. Caution Never put a secret value in source code, `caplo.yaml`, fixtures you commit, logs or chat. Do not log the value or return it in a result; anything a tool returns can reach the model. ## Provide the values [Section titled “Provide the values”](#provide-the-values) Each declared name gets its value in one of two ways: * **A package value**, set for this package only. * **A workspace secret binding.** A workspace secret is a value stored once and bound to any number of packages, for example one API key that three packages use. Rotating the workspace secret updates every package bound to it. Binding a name to a workspace secret replaces the package’s own value. Live calls use a new or rotated value within a minute. A live call to a tool whose package declares a secret that has no value fails before the tool runs. Values are write-only: once saved, neither the console nor the CLI shows them again. * Console **Package value or binding** 1. Open **Tools**. Each tool package has a **Secrets** button; a package whose published version declares secrets without values shows a warning badge such as **1 secret not set**. 2. Select **Secrets**. For each declared name, select **Set value** to store a value for **This package only**, or **Use workspace secret** to choose a workspace secret, then **Save secret** or **Bind secret**. 3. To remove one, select **Unbind** or **Remove**. Live calls that need it fail until it is set or bound again. The list shows the names your latest published version declares. Setting a package value needs the **Owner**, **Admin** or **Developer** role; binding a workspace secret needs **Owner** or **Admin**. **Workspace secrets** Open **Settings**, then **Secrets**, and select **Create secret**. Names are lowercase letters, digits and hyphens, such as `shop-prod`. **Rotate value** replaces the value; **Delete secret** removes it and cannot be undone. * CLI Run these in the package folder, or pass `-p <package>`. Values are read from a hidden prompt, or from standard input when it is not a terminal, so they never appear in your shell history. 
-  ```sh
+  ```plaintext
   # A value for this package only
   caplo tool secret set SHOP_API_KEY
 
@@ -606,7 +606,7 @@ const apiKey = secrets.get("SHOP_API_KEY");
   caplo tool secret list
   ```
  In scripts, pipe the value in, for example from your CI secret store: `printf '%s' "$SHOP_KEY" | caplo secret set shop-prod`. | Command | What it does | | -------------------------------------------------- | ------------------------------------------------------------------------------------ | | `caplo tool secret set <NAME>` | Sets the package’s own value. Refused while the name is bound to a workspace secret. | | `caplo tool secret unset <NAME>` | Removes the package’s own value. | | `caplo tool secret bind <NAME> <workspace-secret>` | Fills the name from a workspace secret, replacing the package’s own value. | | `caplo tool secret unbind <NAME>` | Removes the binding. | | `caplo secret set <name>` | Creates a workspace secret or rotates its value. | | `caplo secret list` | Lists workspace secrets and how many package secrets bind each. | | `caplo secret usage <name>` | Lists the package secrets bound to a workspace secret. | | `caplo secret delete <name>` | Deletes a workspace secret. Refused while any package secret is bound to it. | See the [`caplo tool secret`](/reference/cli/tool/#caplo-tool-secret) and [`caplo secret`](/reference/cli/secret/) references. ### Secrets in development and tests [Section titled “Secrets in development and tests”](#secrets-in-development-and-tests) * `caplo tool dev` reads each declared secret from an environment variable of the same name: `SHOP_API_KEY=test-key caplo tool dev`. * A fixture can carry test values in its `secrets` field. Use test credentials there, never production ones. See [Test tools with fixtures](/tools/testing/). * Live calls never use these values; they use only what you set or bind in the workspace. ## Allow network access [Section titled “Allow network access”](#allow-network-access) A package can make outbound requests only to the hosts in its `egress` list. Without the list, or with an empty one, it has no network access at all. 
-```yaml
+```plaintext
 egress:
   - api.shop.example
   - "*.payments.example"
@@ -618,7 +618,7 @@ egress:
 > Write JSON fixtures for your tools, run them locally with caplo tool test and on Caplo with --remote, and gate project publishes on them.
 
 A fixture is one tool call and what you expect back. Fixtures live in your package as JSON files, run the same way on your machine and on Caplo, and stop a project publish when they fail. ## Write a fixture [Section titled “Write a fixture”](#write-a-fixture) Each file in `tests/` (or the glob `tests` sets in `caplo.yaml`) holds one fixture: 
-```json
+```plaintext
 {
   "name": "looks up a shipped order",
   "tool": "get_order",
@@ -632,11 +632,11 @@ A fixture is one tool call and what you expect back. Fixtures live in your packa
 }
 ```
  | Field | Required | Notes | | ----------- | -------- | ------------------------------------------------------------------------------- | | `name` | No | A label for the output. | | `tool` | Yes | The tool name as the package lists it, such as `get_order`, not the model name. | | `arguments` | Yes | The call’s arguments, an object. | | `secrets` | No | Test values for declared secrets, by name. | | `expect` | Yes | At least one of the checks below. | | Check | Passes when | | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | | `isError` | The result’s error flag equals it. Use `true` to test a refusal, such as an unknown order. | | `structuredContent` | Every listed property equals the result’s property of that name. Values are compared exactly, including nested objects and arrays; properties you do not list are ignored. | | `textIncludes` | The result’s text content contains this string. | The full schema is in the [fixture reference](/reference/fixtures/). Caution Fixtures are source files you push and often commit. Put test credentials in `secrets`, never production ones. Live calls never use fixture secrets. Tips: * Write one fixture per behaviour that matters: a normal result, an empty result, an invalid input your API rejects. * Keep expectations to the properties you care about, so harmless additions to the result do not break the test. * If a tool calls a live API, point fixtures at a test account or sandbox whose data does not change. ## Run fixtures locally [Section titled “Run fixtures locally”](#run-fixtures-locally) 
-```sh
+```plaintext
 caplo tool test
 ```
  `caplo tool test` bundles the package with the builder’s exact settings, loads it from an empty directory with no environment variables, checks `caplo.yaml` against the tools the code lists, and runs each fixture in Node 24 with the tool’s timeout. Run `npm install` first. 
-```txt
+```plaintext
 bundle 8.1 KB (5be0c2d41a7e, esbuild 0.28.2)
 tool order_lookup__get_order (read, 5s)
 capabilities subject-context/1 effect-outcome/1 operation-status/1
@@ -647,11 +647,11 @@ FAIL tests/unknown-order.json (refuses an unknown order)
 1 passed, 1 failed
 ```
  * Log lines are printed for failing fixtures; add `-v` to print them for passing ones too. * The command exits with code 3 when a fixture fails, so CI can gate on it. * Local tests use your machine’s network and do not enforce the `egress` list. * Local tests run every fixture, **including write tools**, for real. Point write fixtures at a test environment, or leave writes to `--remote`, which skips them. * It needs Node 24 exactly, on macOS or Linux (on Windows, use WSL). ## Run fixtures on Caplo [Section titled “Run fixtures on Caplo”](#run-fixtures-on-caplo) 
-```sh
+```plaintext
 caplo tool test --remote
 ```
  `--remote` pushes the folder as the package’s workspace draft and builds it, like `caplo tool push`, then runs the fixtures on Caplo, which runs packages the same way as live calls: * The `egress` list is enforced. A refused host is printed under the fixture as `egress denied <host>: <reason>`. * Fixtures for write tools are skipped and reported as `skip ... (write_effect)`. * Each result shows its execution time, and `cold` when the package had to load first. * Fixture `secrets` are used; workspace secret values are not. Run `--remote` before you publish to catch a missing egress host or a dependency that behaves differently in the build. The build on Caplo is the one that gets published, and it installs strictly from your lockfile. In Tool Studio, **Run Fixture Tests** in the **Tools** view does the same for the latest build. ## Fixtures in projects [Section titled “Fixtures in projects”](#fixtures-in-projects) In a [project](/cli/projects/), `caplo test` runs the selected packages’ fixtures locally, like `caplo tool test`. `caplo publish` goes further: for each package it publishes, it pushes, builds and runs the fixtures on Caplo, and stops the publish if any fixture fails. Agents that use the package are not published either. 
-```sh
+```plaintext
 caplo test tool/orders
 caplo publish tool/orders
 ```
@@ -661,34 +661,34 @@ caplo publish tool/orders
 
 > Follow builds, publish and revoke versions, archive or delete packages, pull a version's exact source, and read recent invocation logs.
 
-A tool package moves through three stages: 1. **Draft.** The files you push or edit in Tool Studio. There is one draft per package, and each change raises its revision (`r1`, `r2`…). 2. **Build.** A snapshot of the draft, installed, bundled, checked and introspected. A build is `queued`, `running`, `succeeded`, `failed` or `cancelled`. 3. **Version.** A succeeded build you published, numbered `v1`, `v2`… A version never changes. Agents pin versions. ## Builds [Section titled “Builds”](#builds) `caplo tool push` starts a build and streams its log; so does **Build** in Tool Studio. To look at builds afterwards: 
-```sh
+A tool package moves through three stages: 1. **Draft.** The files you push or edit in Tool Studio. There is one draft per package, and each change raises its revision (`r1`, `r2`…). 2. **Build.** A snapshot of the draft, installed, bundled, checked and introspected. A build is `queued`, `running`, `succeeded`, `failed` or `cancelled`. 3. **Version.** A succeeded build you published, numbered `v1`, `v2`… A version never changes. Agents pin versions. ## Builds [Section titled “Builds”](#builds) `caplo tool push` starts a build and streams its log; so does **Build** in Tool Studio. To look at builds afterwards: ![Tool packages with their published version and build status](/_astro/tool-packages.CrRiszlt_Z2juLkE.webp) 
+```plaintext
 caplo tool build list orders --status failed
 caplo tool build get orders <BUILD_ID>
 caplo tool build logs orders <BUILD_ID>
 caplo tool build cancel orders <BUILD_ID>
 ```
  A build installs dependencies from your lockfile with install scripts disabled, checks them against known malicious packages, bundles the code, rejects unsafe code, and starts the bundle with no network access to read its tool list. Common failures: | Code | Cause | | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | | `lockfile_required`, `lockfile_mismatch` | No `package-lock.json`, `yarn.lock` or `pnpm-lock.yaml`, or it does not match `package.json`. Run `npm install` and push again. | | `install_failed`, `install_timeout` | Installing failed, or took over 90 seconds. | | `malicious_package` | A dependency is a known malicious package. | | `native_addon` | A dependency needs a native `.node` addon. | | `forbidden_import` | The code imports `child_process`, `cluster`, `worker_threads` or `inspector`. | | `dynamic_require` | The code requires a path the bundler cannot resolve, or reads package files at run time. | | `bundle_too_large` | The bundle is over 10 MiB. | | `config_invalid` | `caplo.yaml` fails its schema, or its `name` or `type` differs from the package. | | `entry_invalid`, `compile_failed` | The entry module is missing, exports the wrong thing, or does not compile. | | `introspection_failed` | Loading the bundle or listing its tools failed. Code that calls the network while loading fails here. | | `tool_policy_missing`, `tool_policy_unknown_tool` | A listed tool has no policy in `caplo.yaml`, or a policy names a tool the code does not list. | | `tool_name_invalid`, `schema_invalid` | A tool name or model name breaks the naming rules, or a schema or presentation is invalid. | | `build_timeout` | The build took over 120 seconds. | Run `caplo tool test` locally first: it applies the same bundling, rejection and policy checks. ## Publish a version [Section titled “Publish a version”](#publish-a-version) 
-```sh
+```plaintext
 caplo tool publish                      # the latest succeeded build
 caplo tool publish orders --build <BUILD_ID>
 ```
  In Tool Studio, select **Publish** in the **Versions** view. List and inspect versions with `caplo tool version list orders` and `caplo tool version get orders@3`, or see the latest one on the console’s **Tools** page. A new version does not reach agents by itself. Each agent release pins the version that was current when the agent was published, and keeps it until you publish the agent again. See [Publish an agent](/agents/publishing/). ## Revoke a version [Section titled “Revoke a version”](#revoke-a-version) Revoke a version when it must stop running at once, for example because it has a bug that harms customers or leaks data. 
-```sh
+```plaintext
 caplo tool version revoke orders@3 --reason "Refunds the wrong amount for partial orders"
 ```
  The reason is required and is recorded with the version. In Tool Studio, select **Revoke Version** on the version in the **Versions** view. Caution Revoking cannot be undone. Agent releases that pin the version stop calling its tools immediately, so those agents lose the tools until you publish a fixed version and publish the agents again. ## Archive, restore and delete [Section titled “Archive, restore and delete”](#archive-restore-and-delete) * `caplo tool archive orders` stops all pushes, builds and publishes. Published versions keep running until you revoke them. `caplo tool list --archived` includes archived packages. * `caplo tool restore orders` makes an archived package editable again. * `caplo tool delete orders` deletes a package that never published a version, with its draft and builds. A published package can only be archived. ## Pull source [Section titled “Pull source”](#pull-source) `caplo tool pull` downloads a package into a new or empty directory: 
-```sh
+```plaintext
 caplo tool pull orders                  # the current draft
 caplo tool pull orders@3 --dir ./orders-v3   # the exact source version 3 was built from
 ```
  Every file is checked against its recorded SHA-256 before anything is written. Use it to debug what a pinned version really runs, or to start working on a package someone else created in Tool Studio. Then run `npm install` and `caplo tool dev --no-inspector` to run it locally. ## Read invocation logs [Section titled “Read invocation logs”](#read-invocation-logs) `caplo tool logs` shows the package’s recent live calls with their outcome, timing, errors, refused hosts and log lines: 
-```sh
+```plaintext
 caplo tool logs orders -n 50
 caplo tool logs orders -f
 ```
  
-```txt
+```plaintext
 14:02:11 get_order succeeded 182.4 ms cold 7d4c2a9e-...
   log info {"message":"order found","invocationId":"7d4c2a9e-...","orderId":"SO-1002"}
 14:03:40 get_order failed tool_timeout 5001.2 ms 0b81f6d3-...
@@ -702,15 +702,15 @@ caplo tool logs orders -f
 > Mark tools that change data as writes, require customer confirmation, use the idempotency key, report outcomes and answer status checks.
 
 A write tool changes something outside the conversation: it cancels an order, books a slot, sends an email, issues a refund. Caplo treats writes differently from reads, so mark every such tool as one and give Caplo the information it needs to know whether the change happened. ## Choose the effect [Section titled “Choose the effect”](#choose-the-effect) Set `effect` in `caplo.yaml` for every tool: * `read`: only looks things up. Running it twice has no side effects. * `write`: changes data or triggers an action, including anything that sends a message or costs money. The effect is yours to set; Caplo does not infer it from the code or from MCP annotations. For writes, Caplo asks the customer to confirm (unless you turn that off), passes an idempotency key, tracks the outcome, and never runs the tool in places where nobody can approve it: fixture runs on Caplo skip write tools, and evaluations do not run writes. ## Customer confirmation [Section titled “Customer confirmation”](#customer-confirmation) `confirmation: required` is the default for write tools. The agent proposes the call with exact arguments, the customer reviews it, and the tool runs only after the customer confirms, with exactly those arguments. 
-```yaml
+```plaintext
 tools:
   - name: cancel_order
     effect: write
     timeoutSeconds: 15
     confirmation: required
 ```
- * In the website widget, the customer sees a review card. Add a [`presentation`](/tools/present-results/#confirmation-and-receipt) to choose which arguments it shows, how they are labelled, and which ones the customer may change before confirming. * In WhatsApp, Messenger and Instagram, the customer gets a message with **Confirm** and **Cancel** buttons. Fields cannot be edited there. * On a voice call, in the website widget or by phone, Caplo reads the `presentation`’s title and fields aloud and the caller says yes or no. Without a `presentation`, the caller hears only a request to confirm, so the agent has to say what will change. Fields cannot be edited by voice. * If the customer declines, or a different customer verifies in the same conversation, the write does not run. * While an earlier write in the conversation still waits for a decision, or its outcome is unknown, the agent cannot start another write. `confirmation: none` runs the write as soon as the agent calls it. Use it only for low-risk actions where a confirmation step adds nothing, such as adding a note to a support ticket. ## Use the idempotency key [Section titled “Use the idempotency key”](#use-the-idempotency-key) Every write call carries `idempotencyKey` in its context. The key is the same for every attempt and status check of one confirmed action, and different for every other action. Send it to your API so that a repeated request applies the change only once: 
-```ts
+ * In the website widget, the customer sees a review card. Add a [`presentation`](/tools/present-results/#confirmation-and-receipt) to choose which arguments it shows, how they are labelled, and which ones the customer may change before confirming. * In WhatsApp, Messenger and Instagram, the customer gets a message with **Confirm** and **Cancel** buttons. Fields cannot be edited there. * On a voice call, in the website widget or by phone, Caplo reads the `presentation`’s title and fields aloud and the caller says yes or no. Without a `presentation`, the caller hears only a request to confirm, so the agent has to say what will change. Fields cannot be edited by voice. * If the customer declines, or a different customer verifies in the same conversation, the write does not run. * While an earlier write in the conversation still waits for a decision, or its outcome is unknown, the agent cannot start another write. `confirmation: none` runs the write as soon as the agent calls it. Use it only for low-risk actions where a confirmation step adds nothing, such as adding a note to a support ticket. ![A confirmation card in the website widget with Confirm request, Edit details and Decline request](/_astro/widget-confirm.Bm7Gk4UV_Z1dIOgl.webp) ## Use the idempotency key [Section titled “Use the idempotency key”](#use-the-idempotency-key) Every write call carries `idempotencyKey` in its context. The key is the same for every attempt and status check of one confirmed action, and different for every other action. Send it to your API so that a repeated request applies the change only once: 
+```plaintext
 async handler({ orderId }, { secrets, signal, idempotencyKey }) {
   const response = await fetch(`https://api.shop.example/orders/${encodeURIComponent(orderId)}/cancel`, {
     method: "POST",
@@ -724,7 +724,7 @@ async handler({ orderId }, { secrets, signal, idempotencyKey }) {
 }
 ```
  If your API has no idempotency support, store the key with the change on your side and check it before applying the change again. ## Report the outcome [Section titled “Report the outcome”](#report-the-outcome) When a write ends, Caplo records one of these outcomes and the agent and customer are told accordingly: | Your handler | Outcome | Meaning | | ----------------------------------------- | ----------- | ------------------------------------------------------------------------------------ | | Returns a value | Applied | The change happened. The value is the result. | | Returns `rejected(message)` | Not applied | The provider definitely did not make the change, for example it refused the request. | | Returns `pending(operationRef, message?)` | Pending | The provider accepted the change but has not finished it. | | Throws | Unknown | The change may or may not have happened. | Return `rejected` only when you are certain nothing changed. When in doubt, throw: an unknown outcome is safer than a false “not applied”, which could lead the customer to try again and, for example, pay twice. 
-```ts
+```plaintext
 import { defineTool, pending, rejected } from "@caplo/tools";
 
 
@@ -746,7 +746,7 @@ export default defineTool({
 });
 ```
  `operationRef` is your reference for the pending operation: 1 to 256 printable ASCII characters. Caplo keeps it for status checks and never shows it to the model. Typed outcomes need `@caplo/tools` 0.1.6 or later, which the templates already use. ### Outcomes in MCP packages [Section titled “Outcomes in MCP packages”](#outcomes-in-mcp-packages) An MCP package reports the same outcomes in the result metadata. Advertise the capability when you create the server, and add `_meta` to each write result: 
-```ts
+```plaintext
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { EFFECT_META_KEY, EFFECT_OUTCOME_CAPABILITY } from "@caplo/tools";
 
@@ -765,7 +765,7 @@ const server = new Server(
 // { content, _meta: { [EFFECT_META_KEY]: { version: 1, outcome: "pending", operationRef: "op_123" } } }
 ```
  Without the capability or the metadata, an error result from a write counts as unknown. ## Answer status checks [Section titled “Answer status checks”](#answer-status-checks) When a write’s outcome is unknown or pending, Caplo can ask your package what happened. Add a `status` handler to the `defineTool`: 
-```ts
+```plaintext
 import { applied, defineTool, pending, rejected } from "@caplo/tools";
 
 
@@ -788,7 +788,7 @@ export default defineTool({
 });
 ```
  * `ctx.idempotencyKey` is the original write’s key, and `operationRef` is the reference your `pending` returned, if any. * Return `applied(result)`, `rejected(message)` or `pending(operationRef)`. Throw when the provider cannot tell. Any other return value leaves the write unknown. * Caplo asks one check at a time per write, up to 8 times with growing gaps between checks. An MCP package answers the `caplo/status` request (`STATUS_METHOD`) with params `name` and `operationRef`, and advertises `OPERATION_STATUS_CAPABILITY` beside `EFFECT_OUTCOME_CAPABILITY`. ## Ask the customer to verify again [Section titled “Ask the customer to verify again”](#ask-the-customer-to-verify-again) For tools that act for a [verified customer](/tools/customer-aware-tools/), your API may need a stronger or more recent sign-in before it allows an operation. Return `stepUpRequired` instead of a result: 
-```ts
+```plaintext
 import { stepUpRequired, stepUpFromChallenge } from "@caplo/tools";
 
 
@@ -807,113 +807,113 @@ if (stepUp) return stepUp;
 > API reference for @caplo/tools, generated from the published package.
 
 ## Functions [Section titled “Functions”](#functions) ### applied() [Section titled “applied()”](#applied) 
-```ts
+```plaintext
 function applied(result): Applied;
 ```
  Reports that the provider applied the change, with its result. A status handler must return it to confirm a change; a tool handler may return the result directly. #### Parameters [Section titled “Parameters”](#parameters) | Parameter | Type | | --------- | --------- | | `result` | `unknown` | #### Returns [Section titled “Returns”](#returns) [`Applied`](#applied) *** ### context() [Section titled “context()”](#context) 
-```ts
+```plaintext
 function context(extra): ToolContext;
 ```
  #### Parameters [Section titled “Parameters”](#parameters-1) | Parameter | Type | | --------- | ------------------------------- | | `extra` | [`HandlerExtra`](#handlerextra) | #### Returns [Section titled “Returns”](#returns-1) [`ToolContext`](#toolcontext) *** ### defineTool() [Section titled “defineTool()”](#definetool) 
-```ts
+```plaintext
 function defineTool<Args, Result>(definition): FunctionTool<Args, Result>;
 ```
  #### Type Parameters [Section titled “Type Parameters”](#type-parameters) | Type Parameter | Default type | | -------------- | ------------ | | []()`Args` | `any` | | []()`Result` | `unknown` | #### Parameters [Section titled “Parameters”](#parameters-2) | Parameter | Type | | ------------ | --------------------------------------------------------------------- | | `definition` | [`FunctionToolDefinition`](#functiontooldefinition)<`Args`, `Result`> | #### Returns [Section titled “Returns”](#returns-2) [`FunctionTool`](#functiontool)<`Args`, `Result`> *** ### pending() [Section titled “pending()”](#pending) 
-```ts
+```plaintext
 function pending(operationRef, message?): Pending;
 ```
  Reports that the provider accepted the change but has not finished it. The runner later asks `status` about it with this `operationRef`; it is never shown to the model. #### Parameters [Section titled “Parameters”](#parameters-3) | Parameter | Type | | -------------- | -------- | | `operationRef` | `string` | | `message?` | `string` | #### Returns [Section titled “Returns”](#returns-3) [`Pending`](#pending) *** ### rejected() [Section titled “rejected()”](#rejected) 
-```ts
+```plaintext
 function rejected(message): Rejected;
 ```
  Reports that the provider definitively did not apply the change, for example because it refused the request. Return it only when that is certain; throw when unsure, and the runner treats the change as unknown. #### Parameters [Section titled “Parameters”](#parameters-4) | Parameter | Type | | --------- | -------- | | `message` | `string` | #### Returns [Section titled “Returns”](#returns-4) [`Rejected`](#rejected) *** ### serveStdio() [Section titled “serveStdio()”](#servestdio) 
-```ts
+```plaintext
 function serveStdio(createServer, options?): Promise<void>;
 ```
  Runs a package over stdio so local MCP clients and MCP Inspector can use it. #### Parameters [Section titled “Parameters”](#parameters-5) | Parameter | Type | | -------------- | --------------------------------------- | | `createServer` | () => [`McpServerLike`](#mcpserverlike) | | `options?` | [`StdioOptions`](#stdiooptions) | #### Returns [Section titled “Returns”](#returns-5) `Promise`<`void`> *** ### stepUpFromChallenge() [Section titled “stepUpFromChallenge()”](#stepupfromchallenge) 
-```ts
+```plaintext
 function stepUpFromChallenge(header): StepUpRequired | undefined;
 ```
  Maps a client API’s RFC 9470 step-up challenge (`WWW-Authenticate: Bearer error="insufficient_user_authentication"`) to the result a tool returns; undefined for any other header. `acr_values` lists acceptable Caplo levels and the weakest one listed is required; `max_age` is the freshness in seconds. #### Parameters [Section titled “Parameters”](#parameters-6) | Parameter | Type | | --------- | --------------------------------- | | `header` | `string` \| `null` \| `undefined` | #### Returns [Section titled “Returns”](#returns-6) [`StepUpRequired`](#stepuprequired) | `undefined` *** ### stepUpRequired() [Section titled “stepUpRequired()”](#stepuprequired) 
-```ts
+```plaintext
 function stepUpRequired(requirement?): StepUpRequired;
 ```
  Reports that the provider refused the call until the customer authenticates again, at `level` or within `maxAuthAgeSeconds`, and applied nothing. A write waits for the customer to confirm on screen and then runs again. #### Parameters [Section titled “Parameters”](#parameters-7) | Parameter | Type | | -------------- | --------------------------------------------------------- | | `requirement?` | [`AuthenticationRequirement`](#authenticationrequirement) | #### Returns [Section titled “Returns”](#returns-7) [`StepUpRequired`](#stepuprequired) ## Interfaces [Section titled “Interfaces”](#interfaces) ### Applied [Section titled “Applied”](#applied-1) #### Properties [Section titled “Properties”](#properties) | Property | Modifier | Type | | --------------- | ---------- | ----------- | | []()`[OUTCOME]` | `readonly` | `"applied"` | | []()`result` | `readonly` | `unknown` | *** ### AuthenticationRequirement [Section titled “AuthenticationRequirement”](#authenticationrequirement) #### Properties [Section titled “Properties”](#properties-1) | Property | Type | Description | | ------------------------ | ----------------------------------- | -------------------------------------------------------------- | | []()`level?` | `"low"` \| `"standard"` \| `"high"` | - | | []()`maxAuthAgeSeconds?` | `number` | How recently the customer must have authenticated, in seconds. | *** ### CallContext [Section titled “CallContext”](#callcontext) Per-call context the runner places in the `tools/call` request `_meta`. #### Properties [Section titled “Properties”](#properties-2) | Property | Type | Description | | ----------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------- | | []()`conversationId?` | `string` | - | | []()`deadline?` | `number` | Epoch milliseconds. | | []()`idempotencyKey?` | `string` | - | | []()`invocationId?` | `string` | - | | []()`packageVersionId?` | `string` | - | | []()`secrets?` | `Record`<`string`, `string`> | - | | []()`subject?` | [`Subject`](#subject) | The owner-verified customer; only the runner sets it, from Conversation’s authority, never from arguments. | | []()`turnId?` | `string` | - | | []()`workspaceId?` | `string` | - | *** ### ElicitParams [Section titled “ElicitParams”](#elicitparams) MCP `elicitation/create` params in form mode. #### Properties [Section titled “Properties”](#properties-3) | Property | Type | | ---------------------------- | ------------------------------------------------------- | | []()`message` | `string` | | []()`mode?` | `"form"` | | []()`requestedSchema` | `object` | | `requestedSchema.properties` | `Record`<`string`, [`ElicitProperty`](#elicitproperty)> | | `requestedSchema.required?` | `string`\[] | | `requestedSchema.type` | `"object"` | *** ### ElicitResult [Section titled “ElicitResult”](#elicitresult) The visitor’s answer: accept with content, decline, or cancel (dismissed without a choice). #### Properties [Section titled “Properties”](#properties-4) | Property | Type | | -------------- | -------------------------------------------------------------------- | | []()`action` | `"accept"` \| `"decline"` \| `"cancel"` | | []()`content?` | `Record`<`string`, `string` \| `number` \| `boolean` \| `string`\[]> | *** ### FunctionTool [Section titled “FunctionTool”](#functiontool) #### Extends [Section titled “Extends”](#extends) * [`FunctionToolDefinition`](#functiontooldefinition)<`Args`, `Result`> #### Type Parameters [Section titled “Type Parameters”](#type-parameters-1) | Type Parameter | Default type | | -------------- | ------------ | | []()`Args` | `any` | | []()`Result` | `unknown` | #### Methods [Section titled “Methods”](#methods) ##### createServer() [Section titled “createServer()”](#createserver) 
-```ts
+```plaintext
 createServer(): McpServerLike;
 ```
  ###### Returns [Section titled “Returns”](#returns-8) [`McpServerLike`](#mcpserverlike) *** ### FunctionToolDefinition [Section titled “FunctionToolDefinition”](#functiontooldefinition) #### Extended by [Section titled “Extended by”](#extended-by) * [`FunctionTool`](#functiontool) #### Type Parameters [Section titled “Type Parameters”](#type-parameters-2) | Type Parameter | | -------------- | | []()`Args` | | []()`Result` | #### Methods [Section titled “Methods”](#methods-1) ##### handler() [Section titled “handler()”](#handler) 
-```ts
+```plaintext
 handler(args, ctx): Result | Promise<Result>;
 ```
  ###### Parameters [Section titled “Parameters”](#parameters-8) | Parameter | Type | | --------- | ----------------------------- | | `args` | `Args` | | `ctx` | [`ToolContext`](#toolcontext) | ###### Returns [Section titled “Returns”](#returns-9) `Result` | `Promise`<`Result`> ##### status()? [Section titled “status()?”](#status) 
-```ts
+```plaintext
 status?(input, ctx):
   | StatusAnswer
 | Promise<StatusAnswer>;
 ```
  Answers whether an earlier write was applied, for a write whose outcome is unknown or that returned `pending`. `ctx.idempotencyKey` is that write’s key and `operationRef` the reference its `pending` named. Return `applied(result)` when it was applied, `rejected` when it definitively was not, and `pending` while it is still in progress; throw when the provider cannot tell. Any other return leaves the write unknown. ###### Parameters [Section titled “Parameters”](#parameters-9) | Parameter | Type | | --------------------- | ------------------------------ | | `input` | { `operationRef?`: `string`; } | | `input.operationRef?` | `string` | | `ctx` | [`ToolContext`](#toolcontext) | ###### Returns [Section titled “Returns”](#returns-10) \| [`StatusAnswer`](#statusanswer) | `Promise`<[`StatusAnswer`](#statusanswer)> #### Properties [Section titled “Properties”](#properties-5) | Property | Type | | ------------------- | ------------------------------------- | | []()`annotations?` | [`ToolAnnotations`](#toolannotations) | | []()`description` | `string` | | []()`inputSchema` | [`JsonSchema`](#jsonschema) | | []()`name` | `string` | | []()`outputSchema?` | [`JsonSchema`](#jsonschema) | *** ### HandlerExtra [Section titled “HandlerExtra”](#handlerextra) The parts of an MCP request handler’s `extra` argument that `context` reads. #### Properties [Section titled “Properties”](#properties-6) | Property | Type | Description | | ----------------------- | -------------------------------------------------------- | ----------------------------------------------------------------------------- | | []()`_meta?` | `Record`<`string`, `unknown`> | - | | []()`elicit?` | (`params`) => `Promise`<[`ElicitResult`](#elicitresult)> | Set by a function package’s server when the client declared form elicitation. | | []()`sendNotification?` | (`notification`) => `Promise`<`void`> | - | | []()`signal` | `AbortSignal` | - | *** ### JsonRpcMessage [Section titled “JsonRpcMessage”](#jsonrpcmessage) #### Properties [Section titled “Properties”](#properties-7) | Property | Type | | --------------- | ------------------------- | | []()`error?` | `object` | | `error.code` | `number` | | `error.data?` | `unknown` | | `error.message` | `string` | | []()`id?` | `JsonRpcId` | | []()`jsonrpc` | `"2.0"` | | []()`method?` | `string` | | []()`params?` | `Record`<`string`, `any`> | | []()`result?` | `unknown` | *** ### Logger [Section titled “Logger”](#logger) #### Methods [Section titled “Methods”](#methods-2) ##### debug() [Section titled “debug()”](#debug) 
-```ts
+```plaintext
 debug(message, data?): void;
 ```
  ###### Parameters [Section titled “Parameters”](#parameters-10) | Parameter | Type | | --------- | ----------------------------- | | `message` | `string` | | `data?` | `Record`<`string`, `unknown`> | ###### Returns [Section titled “Returns”](#returns-11) `void` ##### error() [Section titled “error()”](#error) 
-```ts
+```plaintext
 error(message, data?): void;
 ```
  ###### Parameters [Section titled “Parameters”](#parameters-11) | Parameter | Type | | --------- | ----------------------------- | | `message` | `string` | | `data?` | `Record`<`string`, `unknown`> | ###### Returns [Section titled “Returns”](#returns-12) `void` ##### info() [Section titled “info()”](#info) 
-```ts
+```plaintext
 info(message, data?): void;
 ```
  ###### Parameters [Section titled “Parameters”](#parameters-12) | Parameter | Type | | --------- | ----------------------------- | | `message` | `string` | | `data?` | `Record`<`string`, `unknown`> | ###### Returns [Section titled “Returns”](#returns-13) `void` ##### warn() [Section titled “warn()”](#warn) 
-```ts
+```plaintext
 warn(message, data?): void;
 ```
  ###### Parameters [Section titled “Parameters”](#parameters-13) | Parameter | Type | | --------- | ----------------------------- | | `message` | `string` | | `data?` | `Record`<`string`, `unknown`> | ###### Returns [Section titled “Returns”](#returns-14) `void` *** ### McpServerLike [Section titled “McpServerLike”](#mcpserverlike) #### Methods [Section titled “Methods”](#methods-3) ##### connect() [Section titled “connect()”](#connect) 
-```ts
+```plaintext
 connect(transport): Promise<void>;
 ```
  ###### Parameters [Section titled “Parameters”](#parameters-14) | Parameter | Type | | ----------- | ------------------------- | | `transport` | [`Transport`](#transport) | ###### Returns [Section titled “Returns”](#returns-15) `Promise`<`void`> *** ### Pending [Section titled “Pending”](#pending-1) #### Properties [Section titled “Properties”](#properties-8) | Property | Modifier | Type | | ------------------ | ---------- | ----------- | | []()`[OUTCOME]` | `readonly` | `"pending"` | | []()`message?` | `readonly` | `string` | | []()`operationRef` | `readonly` | `string` | *** ### Rejected [Section titled “Rejected”](#rejected-1) #### Properties [Section titled “Properties”](#properties-9) | Property | Modifier | Type | | --------------- | ---------- | --------------- | | []()`[OUTCOME]` | `readonly` | `"not_applied"` | | []()`message` | `readonly` | `string` | *** ### Secrets [Section titled “Secrets”](#secrets) #### Methods [Section titled “Methods”](#methods-4) ##### get() [Section titled “get()”](#get) 
-```ts
+```plaintext
 get(name): string;
 ```
  Returns a declared secret; throws when the runner did not supply it. ###### Parameters [Section titled “Parameters”](#parameters-15) | Parameter | Type | | --------- | -------- | | `name` | `string` | ###### Returns [Section titled “Returns”](#returns-16) `string` ##### has() [Section titled “has()”](#has) 
-```ts
+```plaintext
 has(name): boolean;
 ```
  ###### Parameters [Section titled “Parameters”](#parameters-16) | Parameter | Type | | --------- | -------- | | `name` | `string` | ###### Returns [Section titled “Returns”](#returns-17) `boolean` *** ### StatusParams [Section titled “StatusParams”](#statusparams) `caplo/status` params: the tool and, when the write returned `pending`, the operation it named. #### Properties [Section titled “Properties”](#properties-10) | Property | Type | | ------------------- | ----------------------------- | | []()`_meta?` | `Record`<`string`, `unknown`> | | []()`name` | `string` | | []()`operationRef?` | `string` | *** ### StdioOptions [Section titled “StdioOptions”](#stdiooptions) #### Properties [Section titled “Properties”](#properties-11) | Property | Type | Description | | -------------- | ----------- | -------------------------------------------------------------------------------------------------------------------- | | []()`secrets?` | `string`\[] | Secret names to read from the environment. Local development only; the Caplo runtime never uses environment secrets. | *** ### StepUpRequired [Section titled “StepUpRequired”](#stepuprequired-1) #### Properties [Section titled “Properties”](#properties-12) | Property | Modifier | Type | | ----------------- | ---------- | --------------------------------------------------------- | | []()`[OUTCOME]` | `readonly` | `"step_up"` | | []()`requirement` | `readonly` | [`AuthenticationRequirement`](#authenticationrequirement) | *** ### Subject [Section titled “Subject”](#subject) A verified customer: the Caplo subject and binding, and the namespace-scoped identity a backend maps to its account. #### Properties [Section titled “Properties”](#properties-13) | Property | Type | Description | | ------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | | []()`bindingId` | `string` | - | | []()`customerToken?` | `string` | The customer context token for this call, present when the deployment pins a customer token audience for the tool. Send it as `Authorization: Bearer` to that API; it is not enumerable, so it never reaches logs by spreading. | | []()`externalSubject` | `string` | - | | []()`level?` | `"low"` \| `"standard"` \| `"high"` | - | | []()`resourceRef` | `string` | subjectNamespaceRef and externalSubject joined; the key a backend maps to its customer account. | | []()`subjectId` | `string` | - | | []()`subjectNamespace` | `string` | - | | []()`subjectNamespaceRef` | `string` | - | *** ### ToolAnnotations [Section titled “ToolAnnotations”](#toolannotations) #### Properties [Section titled “Properties”](#properties-14) | Property | Type | | ---------------------- | --------- | | []()`destructiveHint?` | `boolean` | | []()`idempotentHint?` | `boolean` | | []()`openWorldHint?` | `boolean` | | []()`readOnlyHint?` | `boolean` | | []()`title?` | `string` | *** ### ToolContext [Section titled “ToolContext”](#toolcontext) #### Methods [Section titled “Methods”](#methods-5) ##### elicit() [Section titled “elicit()”](#elicit) 
-```ts
+```plaintext
 elicit(params): Promise<ElicitResult>;
 ```
  Asks the visitor for missing details with an MCP form-mode elicitation (function packages; an `McpServer` uses `server.server.elicitInput`). Declare every field under `elicitation` in caplo.yaml; never ask for a credential. Throws `ElicitationUnavailableError` when `canElicit` is false. ###### Parameters [Section titled “Parameters”](#parameters-17) | Parameter | Type | | --------- | ------------------------------- | | `params` | [`ElicitParams`](#elicitparams) | ###### Returns [Section titled “Returns”](#returns-18) `Promise`<[`ElicitResult`](#elicitresult)> ##### requireSubject() [Section titled “requireSubject()”](#requiresubject) 
-```ts
+```plaintext
 requireSubject(): Readonly<Subject>;
 ```
  Returns the verified customer; throws when the call carries none, so a tool can never act unscoped. ###### Returns [Section titled “Returns”](#returns-19) `Readonly`<[`Subject`](#subject)> #### Properties [Section titled “Properties”](#properties-15) | Property | Type | Description | | ----------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------- | | []()`canElicit` | `boolean` | Whether `elicit` can ask the visitor now. False where no form can be shown, such as a phone call. | | []()`conversationId?` | `string` | - | | []()`deadline?` | `Date` | - | | []()`idempotencyKey?` | `string` | - | | []()`invocationId?` | `string` | - | | []()`log` | [`Logger`](#logger) | - | | []()`packageVersionId?` | `string` | - | | []()`secrets` | [`Secrets`](#secrets) | - | | []()`signal` | `AbortSignal` | - | | []()`subject?` | `Readonly`<[`Subject`](#subject)> | Present only for a tool that declares `subject` in caplo.yaml and runs for a verified customer. | | []()`turnId?` | `string` | - | | []()`workspaceId?` | `string` | - | *** ### Transport [Section titled “Transport”](#transport) The subset of the MCP SDK `Transport` interface the Caplo runtime and `serveStdio` use. #### Methods [Section titled “Methods”](#methods-6) ##### close() [Section titled “close()”](#close) 
-```ts
+```plaintext
 close(): Promise<void>;
 ```
  ###### Returns [Section titled “Returns”](#returns-20) `Promise`<`void`> ##### onclose()? [Section titled “onclose()?”](#onclose) 
-```ts
+```plaintext
 onclose?(): void;
 ```
  ###### Returns [Section titled “Returns”](#returns-21) `void` ##### onerror()? [Section titled “onerror()?”](#onerror) 
-```ts
+```plaintext
 onerror?(error): void;
 ```
  ###### Parameters [Section titled “Parameters”](#parameters-18) | Parameter | Type | | --------- | ------- | | `error` | `Error` | ###### Returns [Section titled “Returns”](#returns-22) `void` ##### onmessage()? [Section titled “onmessage()?”](#onmessage) 
-```ts
+```plaintext
 onmessage?(message): void;
 ```
  ###### Parameters [Section titled “Parameters”](#parameters-19) | Parameter | Type | | --------- | ----------------------------------- | | `message` | [`JsonRpcMessage`](#jsonrpcmessage) | ###### Returns [Section titled “Returns”](#returns-23) `void` ##### send() [Section titled “send()”](#send) 
-```ts
+```plaintext
 send(message): Promise<void>;
 ```
  ###### Parameters [Section titled “Parameters”](#parameters-20) | Parameter | Type | | --------- | ----------------------------------- | | `message` | [`JsonRpcMessage`](#jsonrpcmessage) | ###### Returns [Section titled “Returns”](#returns-24) `Promise`<`void`> ##### start() [Section titled “start()”](#start) 
-```ts
+```plaintext
 start(): Promise<void>;
 ```
  ###### Returns [Section titled “Returns”](#returns-25) `Promise`<`void`> ## Type Aliases [Section titled “Type Aliases”](#type-aliases) ### EffectOutcome [Section titled “EffectOutcome”](#effectoutcome) 
-```ts
+```plaintext
 type EffectOutcome =
   | {
   outcome: "applied";
@@ -930,7 +930,7 @@ type EffectOutcome =
 };
 ```
  *** ### ElicitProperty [Section titled “ElicitProperty”](#elicitproperty) 
-```ts
+```plaintext
 type ElicitProperty =
   | {
   default?: string;
@@ -986,75 +986,75 @@ type ElicitProperty =
 };
 ```
  A primitive property of a form-mode elicitation schema (MCP `PrimitiveSchemaDefinition`). *** ### JsonSchema [Section titled “JsonSchema”](#jsonschema) 
-```ts
+```plaintext
 type JsonSchema = object;
 ```
  #### Indexable [Section titled “Indexable”](#indexable) 
-```ts
+```plaintext
 [key: string]: unknown
 ```
  #### Properties [Section titled “Properties”](#properties-16) ##### type [Section titled “type”](#type) 
-```ts
+```plaintext
 type: "object";
 ```
  *** ### Level [Section titled “Level”](#level) 
-```ts
+```plaintext
 type Level = typeof LEVELS[number];
 ```
  *** ### LogLevel [Section titled “LogLevel”](#loglevel) 
-```ts
+```plaintext
 type LogLevel = "debug" | "info" | "warning" | "error";
 ```
  *** ### StatusAnswer [Section titled “StatusAnswer”](#statusanswer) 
-```ts
+```plaintext
 type StatusAnswer = Applied | Rejected | Pending;
 ```
  ## Variables [Section titled “Variables”](#variables) ### AUTHENTICATION_META_KEY [Section titled “AUTHENTICATION_META_KEY”](#authentication_meta_key) 
-```ts
+```plaintext
 const AUTHENTICATION_META_KEY: "caplo/authentication" = "caplo/authentication";
 ```
  Result `_meta` key with which a tool asks for the customer to authenticate again (step-up). *** ### CONTEXT_META_KEY [Section titled “CONTEXT_META_KEY”](#context_meta_key) 
-```ts
+```plaintext
 const CONTEXT_META_KEY: "caplo/context" = "caplo/context";
 ```
  *** ### EFFECT_META_KEY [Section titled “EFFECT_META_KEY”](#effect_meta_key) 
-```ts
+```plaintext
 const EFFECT_META_KEY: "caplo/effect" = "caplo/effect";
 ```
  Result `_meta` key carrying a write’s typed outcome. *** ### EFFECT_OUTCOME_CAPABILITY [Section titled “EFFECT_OUTCOME_CAPABILITY”](#effect_outcome_capability) 
-```ts
+```plaintext
 const EFFECT_OUTCOME_CAPABILITY: object;
 ```
  MCP server capability a bundle advertises when its write results carry a typed outcome under `_meta["caplo/effect"]`. Without it, or without the typed outcome, the runner reports an `isError` write as unknown: the change may have happened before the error. #### Type Declaration [Section titled “Type Declaration”](#type-declaration) | Name | Type | | ------------------------------ | -------- | | []()`caplo/effect-outcome` | `object` | | `caplo/effect-outcome.version` | `1` | *** ### LEVELS [Section titled “LEVELS”](#levels) 
-```ts
+```plaintext
 const LEVELS: readonly ["low", "standard", "high"];
 ```
  Caplo assurance levels, weakest first. *** ### MAX_AUTH_AGE_SECONDS [Section titled “MAX_AUTH_AGE_SECONDS”](#max_auth_age_seconds) 
-```ts
+```plaintext
 const MAX_AUTH_AGE_SECONDS: 86400 = 86400;
 ```
  The longest freshness a step-up may ask for, in seconds. *** ### OPERATION_STATUS_CAPABILITY [Section titled “OPERATION_STATUS_CAPABILITY”](#operation_status_capability) 
-```ts
+```plaintext
 const OPERATION_STATUS_CAPABILITY: object;
 ```
  MCP server capability a bundle advertises when it answers `caplo/status`: the runner may ask it whether an earlier write whose outcome is unknown or pending was applied. #### Type Declaration [Section titled “Type Declaration”](#type-declaration-1) | Name | Type | | -------------------------------- | -------- | | []()`caplo/operation-status` | `object` | | `caplo/operation-status.version` | `1` | *** ### STATUS_METHOD [Section titled “STATUS_METHOD”](#status_method) 
-```ts
+```plaintext
 const STATUS_METHOD: "caplo/status" = "caplo/status";
 ```
  JSON-RPC method the runner sends to ask for the status of an earlier write. *** ### SUBJECT_CONTEXT_CAPABILITY [Section titled “SUBJECT_CONTEXT_CAPABILITY”](#subject_context_capability) 
-```ts
+```plaintext
 const SUBJECT_CONTEXT_CAPABILITY: object;
 ```
  MCP server capability a bundle advertises when its tools read the verified subject through `context()`. Function tools advertise it automatically; MCP servers add it to `capabilities.experimental`. The host refuses subject calls to a bundle that does not advertise it. #### Type Declaration [Section titled “Type Declaration”](#type-declaration-2) | Name | Type | | ------------------------------- | -------- | | []()`caplo/subject-context` | `object` | | `caplo/subject-context.version` | `1` | ## Classes [Section titled “Classes”](#classes) ### ElicitationUnavailableError [Section titled “ElicitationUnavailableError”](#elicitationunavailableerror) #### Extends [Section titled “Extends”](#extends-1) * `Error` #### Constructors [Section titled “Constructors”](#constructors) ##### Constructor [Section titled “Constructor”](#constructor) 
-```ts
+```plaintext
 new ElicitationUnavailableError(): ElicitationUnavailableError;
 ```
  ###### Returns [Section titled “Returns”](#returns-26) [`ElicitationUnavailableError`](#elicitationunavailableerror) ###### Overrides [Section titled “Overrides”](#overrides) `Error.constructor` *** ### MissingSecretError [Section titled “MissingSecretError”](#missingsecreterror) #### Extends [Section titled “Extends”](#extends-2) * `Error` #### Constructors [Section titled “Constructors”](#constructors-1) ##### Constructor [Section titled “Constructor”](#constructor-1) 
-```ts
+```plaintext
 new MissingSecretError(name): MissingSecretError;
 ```
  ###### Parameters [Section titled “Parameters”](#parameters-21) | Parameter | Type | | --------- | -------- | | `name` | `string` | ###### Returns [Section titled “Returns”](#returns-27) [`MissingSecretError`](#missingsecreterror) ###### Overrides [Section titled “Overrides”](#overrides-1) `Error.constructor` *** ### MissingSubjectError [Section titled “MissingSubjectError”](#missingsubjecterror) #### Extends [Section titled “Extends”](#extends-3) * `Error` #### Constructors [Section titled “Constructors”](#constructors-2) ##### Constructor [Section titled “Constructor”](#constructor-2) 
-```ts
+```plaintext
 new MissingSubjectError(): MissingSubjectError;
 ```
  ###### Returns [Section titled “Returns”](#returns-28) [`MissingSubjectError`](#missingsubjecterror) ###### Overrides [Section titled “Overrides”](#overrides-2) `Error.constructor`
@@ -1064,19 +1064,19 @@ new MissingSubjectError(): MissingSubjectError;
 > API reference for @caplo/tools/verify, generated from the published package.
 
 ## Functions [Section titled “Functions”](#functions) ### verifyCustomerContext() [Section titled “verifyCustomerContext()”](#verifycustomercontext) 
-```ts
+```plaintext
 function verifyCustomerContext(token, options): Promise<CustomerContextClaims>;
 ```
  Verifies a customer context token and returns its claims; throws `CustomerContextError` otherwise. #### Parameters [Section titled “Parameters”](#parameters) | Parameter | Type | | --------- | --------------------------------- | | `token` | `string` | | `options` | [`VerifyOptions`](#verifyoptions) | #### Returns [Section titled “Returns”](#returns) `Promise`<[`CustomerContextClaims`](#customercontextclaims)> ## Interfaces [Section titled “Interfaces”](#interfaces) ### CustomerContextClaims [Section titled “CustomerContextClaims”](#customercontextclaims) The claims of a verified customer context token. #### Properties [Section titled “Properties”](#properties) | Property | Type | Description | | ----------------------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------- | | []()`acr` | [`CustomerContextLevel`](#customercontextlevel) | - | | []()`act` | `object` | The Caplo agent acting; for a person acting for another, `act.act` names the person present. | | `act.act?` | `object` | - | | `act.act.relationship?` | `string` | - | | `act.act.sub` | `string` | - | | `act.sub` | `string` | - | | []()`attributes?` | `Record`<`string`, `unknown`> | - | | []()`aud` | `string` | - | | []()`auth_time?` | `number` | - | | []()`caplo` | `object` | - | | `caplo.action?` | `string` | - | | `caplo.actionDigest?` | `string` | - | | `caplo.conversation` | `string` | - | | `caplo.namespace` | `string` | - | | []()`client_id` | `string` | - | | []()`exp` | `number` | - | | []()`iat` | `number` | - | | []()`iss` | `string` | - | | []()`jti` | `string` | - | | []()`scope` | `string` | - | | []()`sub` | `string` | The client’s own customer id. | *** ### ReplayStore [Section titled “ReplayStore”](#replaystore) Records each token id once; `use` resolves false when the id was already used. #### Methods [Section titled “Methods”](#methods) ##### use() [Section titled “use()”](#use) 
-```ts
+```plaintext
 use(jti, expiresAt): boolean | Promise<boolean>;
 ```
  ###### Parameters [Section titled “Parameters”](#parameters-1) | Parameter | Type | | ----------- | -------- | | `jti` | `string` | | `expiresAt` | `Date` | ###### Returns [Section titled “Returns”](#returns-1) `boolean` | `Promise`<`boolean`> *** ### VerifyOptions [Section titled “VerifyOptions”](#verifyoptions) #### Properties [Section titled “Properties”](#properties-1) | Property | Type | Description | | ---------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------- | | []()`audience` | `string` | This API’s audience, one of the connection’s API audiences. | | []()`clockToleranceSeconds?` | `number` | Allowed clock skew; default 0. | | []()`issuer` | `string` | The exact issuer shown in the Caplo Console, `https://…/identity/workspaces/<workspaceId>`. | | []()`replayStore?` | [`ReplayStore`](#replaystore) | Rejects a reused token; recommended for write APIs. | | []()`requiredScope?` | `string` | A scope the token must carry. | ## Type Aliases [Section titled “Type Aliases”](#type-aliases) ### CustomerContextLevel [Section titled “CustomerContextLevel”](#customercontextlevel) 
-```ts
+```plaintext
 type CustomerContextLevel = "low" | "standard" | "high";
 ```
  *** ### VerifyFailure [Section titled “VerifyFailure”](#verifyfailure) 
-```ts
+```plaintext
 type VerifyFailure =
   | "malformed"
   | "typ"
@@ -1094,15 +1094,15 @@ type VerifyFailure =
   | "replayed";
 ```
  ## Classes [Section titled “Classes”](#classes) ### CustomerContextError [Section titled “CustomerContextError”](#customercontexterror) #### Extends [Section titled “Extends”](#extends) * `Error` #### Constructors [Section titled “Constructors”](#constructors) ##### Constructor [Section titled “Constructor”](#constructor) 
-```ts
+```plaintext
 new CustomerContextError(reason, message): CustomerContextError;
 ```
  ###### Parameters [Section titled “Parameters”](#parameters-2) | Parameter | Type | | --------- | --------------------------------- | | `reason` | [`VerifyFailure`](#verifyfailure) | | `message` | `string` | ###### Returns [Section titled “Returns”](#returns-2) [`CustomerContextError`](#customercontexterror) ###### Overrides [Section titled “Overrides”](#overrides) `Error.constructor` #### Properties [Section titled “Properties”](#properties-2) | Property | Modifier | Type | | ------------ | ---------- | --------------------------------- | | []()`reason` | `readonly` | [`VerifyFailure`](#verifyfailure) | *** ### MemoryReplayStore [Section titled “MemoryReplayStore”](#memoryreplaystore) A process-local replay store; use a shared store when the API runs on more than one instance. #### Implements [Section titled “Implements”](#implements) * [`ReplayStore`](#replaystore) #### Constructors [Section titled “Constructors”](#constructors-1) ##### Constructor [Section titled “Constructor”](#constructor-1) 
-```ts
+```plaintext
 new MemoryReplayStore(): MemoryReplayStore;
 ```
  ###### Returns [Section titled “Returns”](#returns-3) [`MemoryReplayStore`](#memoryreplaystore) #### Methods [Section titled “Methods”](#methods-1) ##### use() [Section titled “use()”](#use-1) 
-```ts
+```plaintext
 use(jti, expiresAt): boolean;
 ```
  ###### Parameters [Section titled “Parameters”](#parameters-3) | Parameter | Type | | ----------- | -------- | | `jti` | `string` | | `expiresAt` | `Date` | ###### Returns [Section titled “Returns”](#returns-4) `boolean` ###### Implementation of [Section titled “Implementation of”](#implementation-of) [`ReplayStore`](#replaystore).[`use`](#use-1)

@@ -6,7 +6,7 @@ A project is a folder, usually a Git repository, that holds a set of agents and 
 
 ## Create a project
 
-```sh
+```plaintext
 caplo init support
 caplo init shop --template summit
 ```
@@ -20,7 +20,7 @@ caplo init shop --template summit
 
 The `summit` template creates this layout:
 
-```text
+```plaintext
 shop/
   caplo.yaml                  the project file
   agents/
@@ -45,7 +45,7 @@ Each tool package gets `package.json` and `tsconfig.json` from the current tool 
 
 The project’s `caplo.yaml` sits at the root of the folder:
 
-```yaml
+```plaintext
 apiVersion: v1
 kind: Project
 name: shop
@@ -98,7 +98,7 @@ Agent names must be unique in the project, ignoring case.
 
 Without arguments, `diff`, `push`, `test`, `eval` and `publish` act on the whole project. Pass selectors to act on part of it:
 
-```sh
+```plaintext
 caplo push agent/orders
 caplo test tool/order-desk
 caplo publish "agent/Shop Concierge" tool/store-stock
@@ -115,13 +115,13 @@ caplo publish "agent/Shop Concierge" tool/store-stock
 
 Project commands look for the project file in the current directory, then in each parent directory, skipping tool packages’ own `caplo.yaml` files. So you can run them from inside `agents/` or a package folder. To point at a project elsewhere, pass `-C` (`--dir`):
 
-```sh
+```plaintext
 caplo validate -C ~/src/shop
 ```
 
 ## Check a project offline
 
-```sh
+```plaintext
 caplo validate
 ```
 
@@ -140,7 +140,7 @@ Problems are printed with their file and the command exits with code 3. Tools of
 
 To bring an agent you built in the console under version control:
 
-```sh
+```plaintext
 caplo pull "agent/Shop Concierge"
 caplo pull agent/concierge ./shop
 ```

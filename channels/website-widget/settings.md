@@ -10,6 +10,8 @@ You need the Owner, Admin or Builder role to change these settings.
 
 ## General
 
+![The General tab of a website entry point, with Appearance, Settings and the live preview](/_astro/entry-general.Bk1L5BqX_1qyyMt.webp)
+
 | Setting                             | What it does                                                                                                                                                                                                                           |
 | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Entry point name**                | Shown in the console only.                                                                                                                                                                                                             |
@@ -22,6 +24,8 @@ The **Appearance** card on the same tab is where you apply a published design re
 ## Text and voice
 
 The widget supports text chat and, optionally, voice conversations in the browser.
+
+![The Conversation tab of a website entry point](/_astro/entry-conversation.DPTUBfTv_1zXjpR.webp)
 
 Voice is off for a new website channel unless you selected **Allow voice conversations** when creating it. To turn it on later:
 

@@ -28,7 +28,7 @@ API keys can list secrets with `tools:read` but cannot create, rotate, delete or
 
 The value is read from a hidden prompt, or from standard input when it is not a terminal, so it never appears in your shell history:
 
-```sh
+```plaintext
 caplo secret set shop-prod --description "Shop API production key"
 ```
 
@@ -46,7 +46,7 @@ Select **Rotate** next to the secret, enter the **New value**, and select **Rota
 
 Run `caplo secret set` with the existing name. Without `--description`, it keeps the current description.
 
-```sh
+```plaintext
 caplo secret set shop-prod
 ```
 
@@ -56,7 +56,7 @@ Every bound package uses the new value in live calls within a minute. There is n
 
 The list shows each secret with **Bound** and the number of package secrets that use it, or **Not bound**, and when it was last updated. For the packages and names behind the count:
 
-```sh
+```plaintext
 caplo secret list
 caplo secret usage shop-prod
 ```

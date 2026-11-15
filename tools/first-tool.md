@@ -16,7 +16,7 @@ This page takes a one-tool function package from nothing to a published version 
 
 1. **Create the package.** `caplo tool init` writes a package from the SDK template into a new or empty directory and names it after the directory:
 
-   ```sh
+   ```plaintext
    caplo tool init double-value --type function
    cd double-value
    ```
@@ -25,7 +25,7 @@ This page takes a one-tool function package from nothing to a published version 
 
 2. **Install dependencies.**
 
-   ```sh
+   ```plaintext
    npm install
    ```
 
@@ -33,7 +33,7 @@ This page takes a one-tool function package from nothing to a published version 
 
 3. **Look at the tool.** `src/tool.ts` exports one `defineTool`:
 
-   ```ts
+   ```plaintext
    import { defineTool } from "@caplo/tools";
 
 
@@ -53,7 +53,7 @@ This page takes a one-tool function package from nothing to a published version 
 
 4. **Call it by hand.** `caplo tool dev` opens MCP Inspector (started with `npx`) connected to your package, so you can list and call the tool:
 
-   ```sh
+   ```plaintext
    caplo tool dev
    ```
 
@@ -61,11 +61,11 @@ This page takes a one-tool function package from nothing to a published version 
 
 5. **Run the fixtures.** `caplo tool test` bundles the package the way Caplo’s builder does, checks `caplo.yaml` against the tools the code lists, and runs every fixture in `tests/`:
 
-   ```sh
+   ```plaintext
    caplo tool test
    ```
 
-   ```txt
+   ```plaintext
    bundle 7.5 KB (d64251e71094, esbuild 0.28.2)
    tool double_value__double_value (read, 5s)
    capabilities subject-context/1 effect-outcome/1 operation-status/1
@@ -78,7 +78,7 @@ This page takes a one-tool function package from nothing to a published version 
 
 6. **Push and build.** `caplo tool push` uploads the folder as the package’s workspace draft (creating the package on the first push), builds it, and streams the build log. `node_modules`, `.git` and anything your `.gitignore` files ignore are left out.
 
-   ```sh
+   ```plaintext
    caplo tool push
    ```
 
@@ -86,11 +86,11 @@ This page takes a one-tool function package from nothing to a published version 
 
 7. **Publish.** `caplo tool publish` turns the latest succeeded build into the next version:
 
-   ```sh
+   ```plaintext
    caplo tool publish
    ```
 
-   ```txt
+   ```plaintext
    Published double-value version 1 from build <BUILD_ID>
      double_value__double_value (read, 5s)
    ```
@@ -117,7 +117,7 @@ You can return to a package from the console: **Tools** lists each package with 
 
 A published tool appears on every agent’s **Tools & actions** tab, grouped under its package. Select it there, or list it in agent YAML by package and tool name:
 
-```yaml
+```plaintext
 tools:
   - double-value/double_value
 ```

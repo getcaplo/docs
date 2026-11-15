@@ -4,6 +4,8 @@
 
 Once an agent has a published release, three things put it on your website: a published widget design, a website channel that serves the release, and the channel’s embed code on your pages. This page is the short version; [Install the widget](/channels/website-widget/install/) covers every option.
 
+![The Caplo website widget open on caplo.si, showing its welcome screen](/_astro/widget-caplo-si-welcome.BtUdm0fU_5VYxL.webp)
+
 ## Before you start
 
 * A published agent release. If you do not have one yet, follow [Build your first agent in the console](/get-started/quickstart-console/) or [Build your first agent with the CLI](/get-started/quickstart-cli/).
@@ -22,7 +24,7 @@ Once an agent has a published release, three things put it on your website: a pu
 
 5. **Copy the embed code.** On the **Install** tab, select **Copy embed code**. It looks like this:
 
-   ```html
+   ```plaintext
    <script
      src="https://api.caplo.si/v1/messaging/widget/loader.js"
      data-widget-id="<WIDGET_ID>"

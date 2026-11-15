@@ -8,7 +8,7 @@ Generated from `caplo` v0.4.1, the latest release. `caplo channel --help` prints
 
 List channels and deploy agent releases to them.
 
-```sh
+```plaintext
 caplo channel
 ```
 
@@ -16,7 +16,7 @@ A channel is a website widget, WhatsApp number, Messenger or Instagram account, 
 
 **Examples**
 
-```sh
+```plaintext
 caplo channel list
 caplo channel deploy Website --agent "Shop Concierge"
 ```
@@ -32,7 +32,7 @@ caplo channel deploy Website --agent "Shop Concierge"
 
 Point channels at an agent release, by default their agent’s newest release.
 
-```sh
+```plaintext
 caplo channel deploy <channel>... [--agent <agent>[@<version>]] [flags]
 ```
 
@@ -40,7 +40,7 @@ Points each channel at the release: –agent names the agent and, after @, its v
 
 **Examples**
 
-```sh
+```plaintext
 caplo channel deploy Website
 caplo channel deploy Website "twilio/Support line" --agent "Shop Concierge@2.1.0" --yes
 ```
@@ -56,13 +56,13 @@ caplo channel deploy Website "twilio/Support line" --agent "Shop Concierge@2.1.0
 
 Show a channel and the release it serves.
 
-```sh
+```plaintext
 caplo channel get <channel> [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo channel get Website
 caplo channel get "twilio/Support line"
 ```
@@ -77,13 +77,13 @@ caplo channel get "twilio/Support line"
 
 List the workspace’s channels and the release each serves.
 
-```sh
+```plaintext
 caplo channel list [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo channel list
 caplo channel list --agent "Shop Concierge" -o json
 ```
@@ -99,7 +99,7 @@ caplo channel list --agent "Shop Concierge" -o json
 
 Point channels back at their agent’s release before the one they serve.
 
-```sh
+```plaintext
 caplo channel rollback <channel>... [flags]
 ```
 
@@ -107,7 +107,7 @@ Points each channel at the newest release of its agent, older than the one it se
 
 **Examples**
 
-```sh
+```plaintext
 caplo channel rollback Website --yes
 ```
 

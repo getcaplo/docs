@@ -12,7 +12,7 @@ These commands work on the project around the current directory, or the one `-C`
 
 Show how the project differs from the workspace drafts.
 
-```sh
+```plaintext
 caplo diff [agent/<name> | tool/<name>]... [flags]
 ```
 
@@ -24,7 +24,7 @@ With -o json or yaml the plan is one document: the project, workspace, environme
 
 **Examples**
 
-```sh
+```plaintext
 caplo diff
 caplo diff agent/concierge tool/order-desk
 caplo diff --env prod -o json
@@ -42,7 +42,7 @@ caplo diff --env prod -o json
 
 Push the selection, then run each selected agent’s eval cases against its draft.
 
-```sh
+```plaintext
 caplo eval [agent/<name> | tool/<name>]... [flags]
 ```
 
@@ -54,7 +54,7 @@ Selectors are agent/\<file key or name>, where a file key wins over a name, and 
 
 **Examples**
 
-```sh
+```plaintext
 caplo eval
 caplo eval agent/concierge
 caplo eval --env staging
@@ -71,7 +71,7 @@ caplo eval --env staging
 
 Create a project: caplo.yaml, agent files, and tool packages.
 
-```sh
+```plaintext
 caplo init [dir] [flags]
 ```
 
@@ -81,25 +81,25 @@ A project is a folder with caplo.yaml: apiVersion v1, kind Project, a name, and 
 
 In an agent file:
 
-```sh
+```plaintext
 subAgents link a project agent with local: <file key>, or any workspace agent with agentId. With release:
 latest, or no release, the link pins the child's newest release that is not revoked whenever the parent is
 pushed or published, so a child's new release publishes its parents again. A version pins that release. The
 child runs with its own release's tools and knowledge.
 ```
 
-```sh
+```plaintext
 tools name <package>/<tool> for a project package, <server>/<tool> for a published tool of a workspace remote
 MCP server (caplo mcp), or <package ID>/<tool>; a package alone selects all its tools. A name that is no
 project package is looked up as a remote MCP server when the project is diffed, pushed, or published.
 ```
 
-```sh
+```plaintext
 knowledgeBases name a workspace knowledge base by name or ID. A name resolves in the workspace the command acts
 on, so one file works in every environment.
 ```
 
-```sh
+```plaintext
 evals are the agent's eval cases; see caplo eval.
 ```
 
@@ -107,7 +107,7 @@ Workspace agents and packages are matched by name: a missing one is created and 
 
 **Examples**
 
-```sh
+```plaintext
 caplo init shop --template summit
 cd shop && (cd tools/order-desk && npm install) && (cd tools/store-stock && npm install)
 caplo init --name support
@@ -124,7 +124,7 @@ caplo init --name support
 
 Validate, push, test, evaluate, and publish bottom up: tools, then child agents, then parents.
 
-```sh
+```plaintext
 caplo publish [agent/<name> | tool/<name>]... [flags]
 ```
 
@@ -138,7 +138,7 @@ Selecting an agent also selects the project agents that link it at release: late
 
 Environments. caplo.yaml may define environments, each a workspace the project publishes to:
 
-```sh
+```plaintext
 environments:
   staging:
     workspace: 5b1e9c2a-...        # an ID, or a name when you log in rather than use an API key
@@ -161,7 +161,7 @@ With -o json or yaml the plan is one document: the project, workspace, environme
 
 **Examples**
 
-```sh
+```plaintext
 caplo publish
 caplo publish agent/orders --dry-run
 caplo publish --env prod --yes
@@ -183,7 +183,7 @@ caplo publish --prune
 
 Write a workspace agent, its sub-agents, and their packages into a project.
 
-```sh
+```plaintext
 caplo pull agent/<name> [dir] [flags]
 ```
 
@@ -193,7 +193,7 @@ Packages the agents use that the project lacks are pulled from their workspace d
 
 **Examples**
 
-```sh
+```plaintext
 caplo pull "agent/Shop Concierge"
 caplo pull agent/concierge ./shop
 ```
@@ -208,7 +208,7 @@ caplo pull agent/concierge ./shop
 
 Create or update the workspace drafts, children first, so you can live test them.
 
-```sh
+```plaintext
 caplo push [agent/<name> | tool/<name>]... [flags]
 ```
 
@@ -222,7 +222,7 @@ With -o json or yaml the plan is one document: the project, workspace, environme
 
 **Examples**
 
-```sh
+```plaintext
 caplo push
 caplo push agent/concierge
 caplo push --dry-run -o json
@@ -241,7 +241,7 @@ caplo push --dry-run -o json
 
 Run the selected tool packages’ fixtures locally, like caplo tool test.
 
-```sh
+```plaintext
 caplo test [agent/<name> | tool/<name>]... [flags]
 ```
 
@@ -251,7 +251,7 @@ Selectors are agent/\<file key or name>, where a file key wins over a name, and 
 
 **Examples**
 
-```sh
+```plaintext
 caplo test
 caplo test tool/order-desk -v
 caplo test agent/orders
@@ -268,7 +268,7 @@ caplo test agent/orders
 
 Check the project offline: schemas, references, link cycles, and the depth limit.
 
-```sh
+```plaintext
 caplo validate [flags]
 ```
 
@@ -280,7 +280,7 @@ Every environment in caplo.yaml is checked: the agent keys it names and its agen
 
 **Examples**
 
-```sh
+```plaintext
 caplo validate
 caplo validate --env prod
 caplo validate -C ~/src/shop

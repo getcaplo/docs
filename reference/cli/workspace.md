@@ -8,7 +8,7 @@ Generated from `caplo` v0.4.1, the latest release. `caplo workspace --help` prin
 
 List, show, create, and select workspaces.
 
-```sh
+```plaintext
 caplo workspace
 ```
 
@@ -16,7 +16,7 @@ Commands act on the workspace that –workspace or CAPLO_WORKSPACE names, by ID 
 
 **Examples**
 
-```sh
+```plaintext
 caplo workspace list
 caplo workspace use "Shop staging"
 ```
@@ -33,7 +33,7 @@ caplo workspace use "Shop staging"
 
 Manage API clients and their keys for CI and automation.
 
-```sh
+```plaintext
 caplo workspace api-client
 ```
 
@@ -47,7 +47,7 @@ A project environment can name its own key variable with apiKeyEnv; see caplo pu
 
 **Examples**
 
-```sh
+```plaintext
 caplo workspace api-client create ci --scope agents:write,agents:publish,tools:write,tools:publish
 CAPLO_API_KEY=... CAPLO_WORKSPACE=5b1e9c2a-... caplo publish --yes
 ```
@@ -63,7 +63,7 @@ CAPLO_API_KEY=... CAPLO_WORKSPACE=5b1e9c2a-... caplo publish --yes
 
 Create an API client and print its first key.
 
-```sh
+```plaintext
 caplo workspace api-client create <name> --scope <scope>... [flags]
 ```
 
@@ -73,7 +73,7 @@ Scopes: agents:read, agents:write, agents:publish tools:read, tools:write, tools
 
 **Examples**
 
-```sh
+```plaintext
 caplo workspace api-client create ci --scope agents:write --scope agents:publish
 caplo workspace api-client create reports --scope conversations:read,usage:read
 ```
@@ -89,13 +89,13 @@ caplo workspace api-client create reports --scope conversations:read,usage:read
 
 List the workspace’s API clients and their keys.
 
-```sh
+```plaintext
 caplo workspace api-client list [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo workspace api-client list
 ```
 
@@ -109,7 +109,7 @@ caplo workspace api-client list
 
 Revoke an API client’s active keys, or only the ones –key names.
 
-```sh
+```plaintext
 caplo workspace api-client revoke <client> [flags]
 ```
 
@@ -117,7 +117,7 @@ Revokes the API client’s active keys: every one, the ones –key names, or all
 
 **Examples**
 
-```sh
+```plaintext
 caplo workspace api-client revoke ci --except 9d3e1f20-4b5a-4c6d-8e7f-0a1b2c3d4e5f
 caplo workspace api-client revoke ci --key caplo_sk_3f9a6b1c --yes
 ```
@@ -134,7 +134,7 @@ caplo workspace api-client revoke ci --key caplo_sk_3f9a6b1c --yes
 
 Add a new key to an API client and print it; its other keys stay active until revoked.
 
-```sh
+```plaintext
 caplo workspace api-client rotate <client> [flags]
 ```
 
@@ -142,7 +142,7 @@ Adds a key to the API client and prints it on standard output, once. The client�
 
 **Examples**
 
-```sh
+```plaintext
 caplo workspace api-client rotate ci
 ```
 
@@ -156,13 +156,13 @@ caplo workspace api-client rotate ci
 
 Create a workspace you own and select it.
 
-```sh
+```plaintext
 caplo workspace create <name>
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo workspace create "Shop staging"
 ```
 
@@ -170,13 +170,13 @@ caplo workspace create "Shop staging"
 
 Show a workspace, by default the selected one.
 
-```sh
+```plaintext
 caplo workspace get [name or ID] [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo workspace get
 caplo workspace get "Shop staging" -o json
 ```
@@ -191,7 +191,7 @@ caplo workspace get "Shop staging" -o json
 
 List your workspaces.
 
-```sh
+```plaintext
 caplo workspace list [flags]
 ```
 
@@ -199,7 +199,7 @@ Lists the workspaces you belong to with your role; \* marks the selected one.
 
 **Examples**
 
-```sh
+```plaintext
 caplo workspace list
 ```
 
@@ -213,7 +213,7 @@ caplo workspace list
 
 Select the workspace for later commands.
 
-```sh
+```plaintext
 caplo workspace use <name or ID>
 ```
 
@@ -221,6 +221,6 @@ Saves the workspace, by ID or exact name, as the one later commands act on. –w
 
 **Examples**
 
-```sh
+```plaintext
 caplo workspace use "Shop staging"
 ```

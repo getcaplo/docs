@@ -29,6 +29,8 @@ Each provider has one of three settings, called its key source:
 
 **Caplo Managed** is offered only for providers Caplo runs an account for. When it is not, the option is disabled and shows “Not available in this environment”.
 
+![Language model providers on the Service providers page, each with Off, Caplo Managed and Your key](/_astro/service-providers.C1HhurgE_Z1RAbkt.webp)
+
 ### Defaults
 
 A new workspace starts with:

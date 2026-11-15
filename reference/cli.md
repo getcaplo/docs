@@ -8,7 +8,7 @@ Generated from `caplo` v0.4.1, the latest release. `caplo --help` prints the sam
 
 Install the CLI with the [installation guide](/cli/install/). Task guides are under [CLI](/cli/workflow/).
 
-```sh
+```plaintext
 caplo [flags]
 ```
 
@@ -89,7 +89,7 @@ These flags work with every command.
 
 Generate the autocompletion script for the specified shell.
 
-```sh
+```plaintext
 caplo completion
 ```
 
@@ -106,7 +106,7 @@ Generate the autocompletion script for caplo for the specified shell. See each s
 
 Generate the autocompletion script for bash.
 
-```sh
+```plaintext
 caplo completion bash
 ```
 
@@ -116,7 +116,7 @@ This script depends on the ‘bash-completion’ package. If it is not installed
 
 To load completions in your current shell session:
 
-```sh
+```plaintext
 source <(caplo completion bash)
 ```
 
@@ -124,13 +124,13 @@ To load completions for every new session, execute once:
 
 #### Linux:
 
-```sh
+```plaintext
 caplo completion bash > /etc/bash_completion.d/caplo
 ```
 
 #### macOS:
 
-```sh
+```plaintext
 caplo completion bash > $(brew --prefix)/etc/bash_completion.d/caplo
 ```
 
@@ -146,7 +146,7 @@ You will need to start a new shell for this setup to take effect.
 
 Generate the autocompletion script for fish.
 
-```sh
+```plaintext
 caplo completion fish [flags]
 ```
 
@@ -154,13 +154,13 @@ Generate the autocompletion script for the fish shell.
 
 To load completions in your current shell session:
 
-```sh
+```plaintext
 caplo completion fish | source
 ```
 
 To load completions for every new session, execute once:
 
-```sh
+```plaintext
 caplo completion fish > ~/.config/fish/completions/caplo.fish
 ```
 
@@ -176,7 +176,7 @@ You will need to start a new shell for this setup to take effect.
 
 Generate the autocompletion script for powershell.
 
-```sh
+```plaintext
 caplo completion powershell [flags]
 ```
 
@@ -184,7 +184,7 @@ Generate the autocompletion script for powershell.
 
 To load completions in your current shell session:
 
-```sh
+```plaintext
 caplo completion powershell | Out-String | Invoke-Expression
 ```
 
@@ -200,7 +200,7 @@ To load completions for every new session, add the output of the above command t
 
 Generate the autocompletion script for zsh.
 
-```sh
+```plaintext
 caplo completion zsh [flags]
 ```
 
@@ -208,13 +208,13 @@ Generate the autocompletion script for the zsh shell.
 
 If shell completion is not already enabled in your environment you will need to enable it. You can execute the following once:
 
-```sh
+```plaintext
 echo "autoload -U compinit; compinit" >> ~/.zshrc
 ```
 
 To load completions in your current shell session:
 
-```sh
+```plaintext
 source <(caplo completion zsh)
 ```
 
@@ -222,13 +222,13 @@ To load completions for every new session, execute once:
 
 #### Linux:
 
-```sh
+```plaintext
 caplo completion zsh > "${fpath[1]}/_caplo"
 ```
 
 #### macOS:
 
-```sh
+```plaintext
 caplo completion zsh > $(brew --prefix)/share/zsh/site-functions/_caplo
 ```
 
@@ -244,7 +244,7 @@ You will need to start a new shell for this setup to take effect.
 
 Show the caplo version.
 
-```sh
+```plaintext
 caplo version [flags]
 ```
 
@@ -252,7 +252,7 @@ Shows the CLI version, the commit it was built from, and the Go version and plat
 
 **Examples**
 
-```sh
+```plaintext
 caplo version
 caplo version -o json
 ```

@@ -8,7 +8,7 @@ Everything you need to call `caplo` from scripts, Makefiles and pipelines. For a
 
 Commands that show data take `--output` (`-o`) with `table` (the default), `json` or `yaml`:
 
-```sh
+```plaintext
 caplo agent list -o json
 caplo workspace get -o yaml
 caplo version -o json
@@ -16,7 +16,7 @@ caplo version -o json
 
 This covers the `list` and `get` commands, `caplo auth status`, `caplo config list`, `caplo version`, and `caplo workspace api-client` `list`, `create` and `rotate`. With `json` or `yaml`, standard output holds only that document, so you can pipe it straight into `jq`; prompts, warnings and errors go to standard error. Other commands print plain text meant for people. `caplo config get <key>` prints just the value:
 
-```sh
+```plaintext
 API_URL=$(caplo config get api-url)
 ```
 
@@ -48,7 +48,7 @@ Each entry in `resources` has:
 
 For example, to run a step only when a publish would change something:
 
-```sh
+```plaintext
 if caplo publish --dry-run -o json | jq -e '.changes' > /dev/null; then
   echo "Publishing"
 fi
@@ -91,7 +91,7 @@ When standard input is not a terminal, these commands do not read an answer from
 
 Commands that take a secret never accept it as an argument, so it does not end up in your shell history or process list. They read it from a hidden prompt in a terminal, or from standard input otherwise:
 
-```sh
+```plaintext
 printf %s "$ORDERS_API_KEY" | caplo secret set orders-api-key
 printf %s "$ORDERS_API_KEY" | caplo tool secret set ORDERS_API_KEY -p order-desk
 ```
@@ -104,13 +104,13 @@ API keys work the other way round: `caplo workspace api-client create` and `rota
 
 `caplo completion` prints a completion script for `bash`, `zsh`, `fish` or `powershell`. To try it in the current shell:
 
-```sh
+```plaintext
 source <(caplo completion zsh)
 ```
 
 To load it in every new zsh session, add that line to `~/.zshrc`. For bash, install the `bash-completion` package and save the script once:
 
-```sh
+```plaintext
 # macOS with Homebrew
 dir="$(brew --prefix)/etc/bash_completion.d"
 caplo completion bash > "$dir/caplo"

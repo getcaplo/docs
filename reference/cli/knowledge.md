@@ -8,7 +8,7 @@ Generated from `caplo` v0.4.1, the latest release. `caplo knowledge --help` prin
 
 Manage knowledge bases and sync their documents from a directory.
 
-```sh
+```plaintext
 caplo knowledge
 ```
 
@@ -18,7 +18,7 @@ A knowledge base holds documents an agent answers from. Each upload is extracted
 
 **Examples**
 
-```sh
+```plaintext
 caplo knowledge create "Returns policy" --owner support
 caplo knowledge sync "Returns policy" ./docs/returns --approve --publish --yes
 ```
@@ -36,7 +36,7 @@ caplo knowledge sync "Returns policy" ./docs/returns --approve --publish --yes
 
 Wait for extraction and approve documents for the next version, by default every one awaiting review.
 
-```sh
+```plaintext
 caplo knowledge approve <kb> [document]... [flags]
 ```
 
@@ -44,7 +44,7 @@ Approving a document skips reviewing its extracted text in the console. It waits
 
 **Examples**
 
-```sh
+```plaintext
 caplo knowledge approve "Returns policy"
 caplo knowledge approve "Returns policy" refunds.md exchanges.pdf
 ```
@@ -59,7 +59,7 @@ caplo knowledge approve "Returns policy" refunds.md exchanges.pdf
 
 Create a knowledge base.
 
-```sh
+```plaintext
 caplo knowledge create <name> --owner <team> [flags]
 ```
 
@@ -67,7 +67,7 @@ Creates a knowledge base. –owner names the team that owns its content. –audi
 
 **Examples**
 
-```sh
+```plaintext
 caplo knowledge create "Returns policy" --owner support --description "Return and refund rules"
 caplo knowledge create "Account help" --owner support --audience verified_customer
 ```
@@ -84,7 +84,7 @@ caplo knowledge create "Account help" --owner support --audience verified_custom
 
 Show a knowledge base, its documents, and its versions.
 
-```sh
+```plaintext
 caplo knowledge get <kb> [flags]
 ```
 
@@ -92,7 +92,7 @@ Shows the knowledge base, its newest version, and its documents with their extra
 
 **Examples**
 
-```sh
+```plaintext
 caplo knowledge get "Returns policy"
 ```
 
@@ -106,13 +106,13 @@ caplo knowledge get "Returns policy"
 
 List the workspace’s knowledge bases.
 
-```sh
+```plaintext
 caplo knowledge list [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo kb list
 ```
 
@@ -126,7 +126,7 @@ caplo kb list
 
 Publish a version from the approved documents and wait for it to index.
 
-```sh
+```plaintext
 caplo knowledge publish <kb> [flags]
 ```
 
@@ -134,7 +134,7 @@ Publishes a version from the approved documents, unless the newest version holds
 
 **Examples**
 
-```sh
+```plaintext
 caplo knowledge publish "Returns policy"
 caplo knowledge publish "Returns policy" --timeout 30m
 ```
@@ -149,7 +149,7 @@ caplo knowledge publish "Returns policy" --timeout 30m
 
 Make a knowledge base’s documents match a directory, and optionally approve and publish them.
 
-```sh
+```plaintext
 caplo knowledge sync <kb> <dir> [flags]
 ```
 
@@ -159,7 +159,7 @@ Uploads the directory’s new and changed documents and removes the ones whose f
 
 **Examples**
 
-```sh
+```plaintext
 caplo knowledge sync "Returns policy" ./docs/returns --dry-run
 caplo knowledge sync "Returns policy" ./docs/returns --approve --publish --yes
 ```

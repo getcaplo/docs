@@ -8,7 +8,7 @@ Generated from `caplo` v0.4.1, the latest release. `caplo auth --help` prints th
 
 Log in, log out, and show the session.
 
-```sh
+```plaintext
 caplo auth
 ```
 
@@ -16,7 +16,7 @@ A login session authenticates a person. CI and automation use an API client’s 
 
 **Examples**
 
-```sh
+```plaintext
 caplo auth login
 caplo auth status
 ```
@@ -31,7 +31,7 @@ caplo auth status
 
 Log in through the browser, or with –device on a machine without one.
 
-```sh
+```plaintext
 caplo auth login [flags]
 ```
 
@@ -41,7 +41,7 @@ The API and issuer are –api-url and –issuer, else CAPLO_API_URL and CAPLO_IS
 
 **Examples**
 
-```sh
+```plaintext
 caplo auth login
 caplo auth login --device
 caplo auth login --api-url https://api.staging.example.com --issuer https://auth.staging.example.com/realms/caplo
@@ -61,7 +61,7 @@ caplo auth login --api-url https://api.staging.example.com --issuer https://auth
 
 Revoke the session and delete the stored refresh token.
 
-```sh
+```plaintext
 caplo auth logout
 ```
 
@@ -69,7 +69,7 @@ Deletes the stored refresh token, then revokes the session at the issuer. When t
 
 **Examples**
 
-```sh
+```plaintext
 caplo auth logout
 ```
 
@@ -77,7 +77,7 @@ caplo auth logout
 
 Show the logged-in user, API, and selected workspace.
 
-```sh
+```plaintext
 caplo auth status [flags]
 ```
 
@@ -85,7 +85,7 @@ Shows the logged-in user, the API and issuer, where the credentials are stored, 
 
 **Examples**
 
-```sh
+```plaintext
 caplo auth status
 caplo auth status -o json
 ```

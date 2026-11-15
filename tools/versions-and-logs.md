@@ -12,7 +12,9 @@ A tool package moves through three stages:
 
 `caplo tool push` starts a build and streams its log; so does **Build** in Tool Studio. To look at builds afterwards:
 
-```sh
+![Tool packages with their published version and build status](/_astro/tool-packages.CrRiszlt_Z2juLkE.webp)
+
+```plaintext
 caplo tool build list orders --status failed
 caplo tool build get orders <BUILD_ID>
 caplo tool build logs orders <BUILD_ID>
@@ -41,7 +43,7 @@ Run `caplo tool test` locally first: it applies the same bundling, rejection and
 
 ## Publish a version
 
-```sh
+```plaintext
 caplo tool publish                      # the latest succeeded build
 caplo tool publish orders --build <BUILD_ID>
 ```
@@ -54,7 +56,7 @@ A new version does not reach agents by itself. Each agent release pins the versi
 
 Revoke a version when it must stop running at once, for example because it has a bug that harms customers or leaks data.
 
-```sh
+```plaintext
 caplo tool version revoke orders@3 --reason "Refunds the wrong amount for partial orders"
 ```
 
@@ -74,7 +76,7 @@ Revoking cannot be undone. Agent releases that pin the version stop calling its 
 
 `caplo tool pull` downloads a package into a new or empty directory:
 
-```sh
+```plaintext
 caplo tool pull orders                  # the current draft
 caplo tool pull orders@3 --dir ./orders-v3   # the exact source version 3 was built from
 ```
@@ -85,12 +87,12 @@ Every file is checked against its recorded SHA-256 before anything is written. U
 
 `caplo tool logs` shows the package’s recent live calls with their outcome, timing, errors, refused hosts and log lines:
 
-```sh
+```plaintext
 caplo tool logs orders -n 50
 caplo tool logs orders -f
 ```
 
-```txt
+```plaintext
 14:02:11 get_order succeeded 182.4 ms cold 7d4c2a9e-...
   log info {"message":"order found","invocationId":"7d4c2a9e-...","orderId":"SO-1002"}
 14:03:40 get_order failed tool_timeout 5001.2 ms 0b81f6d3-...

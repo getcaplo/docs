@@ -8,7 +8,7 @@ Generated from `caplo` v0.4.1, the latest release. `caplo secret --help` prints 
 
 Manage workspace secrets that package secrets bind to.
 
-```sh
+```plaintext
 caplo secret
 ```
 
@@ -16,7 +16,7 @@ A workspace secret holds one value for many packages: each package secret bound 
 
 **Examples**
 
-```sh
+```plaintext
 caplo secret set orders-api-key
 caplo secret usage orders-api-key
 ```
@@ -32,7 +32,7 @@ caplo secret usage orders-api-key
 
 Delete a workspace secret that no package secret binds.
 
-```sh
+```plaintext
 caplo secret delete <name> [flags]
 ```
 
@@ -40,7 +40,7 @@ Deletes a workspace secret. A secret that package secrets are bound to is not de
 
 **Examples**
 
-```sh
+```plaintext
 caplo secret delete orders-api-key --yes
 ```
 
@@ -54,13 +54,13 @@ caplo secret delete orders-api-key --yes
 
 List the workspace secrets and how many package secrets bind each.
 
-```sh
+```plaintext
 caplo secret list [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo secret list
 ```
 
@@ -74,7 +74,7 @@ caplo secret list
 
 Create a workspace secret or rotate its value, from a hidden prompt or from stdin when it is not a terminal.
 
-```sh
+```plaintext
 caplo secret set <name> [flags]
 ```
 
@@ -82,7 +82,7 @@ Creates a workspace secret, or rotates the value of an existing one for every pa
 
 **Examples**
 
-```sh
+```plaintext
 caplo secret set orders-api-key --description "Orders API key"
 printf %s "$ORDERS_API_KEY" | caplo secret set orders-api-key
 ```
@@ -97,13 +97,13 @@ printf %s "$ORDERS_API_KEY" | caplo secret set orders-api-key
 
 List the package secrets bound to a workspace secret.
 
-```sh
+```plaintext
 caplo secret usage <name> [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo secret usage orders-api-key
 ```
 

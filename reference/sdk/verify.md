@@ -10,7 +10,7 @@ Generated from `@caplo/tools` 0.1.8 on npm. Install with `npm install @caplo/too
 
 ### verifyCustomerContext()
 
-```ts
+```plaintext
 function verifyCustomerContext(token, options): Promise<CustomerContextClaims>;
 ```
 
@@ -69,7 +69,7 @@ Records each token id once; `use` resolves false when the id was already used.
 
 ##### use()
 
-```ts
+```plaintext
 use(jti, expiresAt): boolean | Promise<boolean>;
 ```
 
@@ -102,7 +102,7 @@ use(jti, expiresAt): boolean | Promise<boolean>;
 
 ### CustomerContextLevel
 
-```ts
+```plaintext
 type CustomerContextLevel = "low" | "standard" | "high";
 ```
 
@@ -110,7 +110,7 @@ type CustomerContextLevel = "low" | "standard" | "high";
 
 ### VerifyFailure
 
-```ts
+```plaintext
 type VerifyFailure =
   | "malformed"
   | "typ"
@@ -140,7 +140,7 @@ type VerifyFailure =
 
 ##### Constructor
 
-```ts
+```plaintext
 new CustomerContextError(reason, message): CustomerContextError;
 ```
 
@@ -179,7 +179,7 @@ A process-local replay store; use a shared store when the API runs on more than 
 
 ##### Constructor
 
-```ts
+```plaintext
 new MemoryReplayStore(): MemoryReplayStore;
 ```
 
@@ -191,7 +191,7 @@ new MemoryReplayStore(): MemoryReplayStore;
 
 ##### use()
 
-```ts
+```plaintext
 use(jti, expiresAt): boolean;
 ```
 

@@ -19,13 +19,13 @@ If you only want a single agent without tools or fast routing, run `caplo init m
 
 1. **Install the CLI.** On macOS or Linux:
 
-   ```sh
+   ```plaintext
    brew install getcaplo/tap/caplo
    ```
 
    Or install it to `~/.local/bin` without Homebrew:
 
-   ```sh
+   ```plaintext
    curl -fsSL https://cli.caplo.si/install.sh | sh
    ```
 
@@ -33,13 +33,13 @@ If you only want a single agent without tools or fast routing, run `caplo init m
 
 2. **Sign in.**
 
-   ```sh
+   ```plaintext
    caplo auth login
    ```
 
    Your browser opens to sign in; on a machine without a browser, use `caplo auth login --device`. If you belong to one workspace, the CLI selects it. Otherwise pick one:
 
-   ```sh
+   ```plaintext
    caplo workspace list
    caplo workspace use "<WORKSPACE_NAME>"
    ```
@@ -48,7 +48,7 @@ If you only want a single agent without tools or fast routing, run `caplo init m
 
 3. **Scaffold the project.**
 
-   ```sh
+   ```plaintext
    caplo init shop --template summit
    cd shop
    ```
@@ -69,14 +69,14 @@ If you only want a single agent without tools or fast routing, run `caplo init m
 
 4. **Install the tool dependencies.** Each package needs its dependencies and a lockfile before Caplo can build it.
 
-   ```sh
+   ```plaintext
    (cd tools/order-desk && npm install)
    (cd tools/store-stock && npm install)
    ```
 
 5. **Validate the project.** This runs offline and checks the files against the schemas, every tool and sub-agent reference, and the sub-agent links.
 
-   ```sh
+   ```plaintext
    caplo validate
    ```
 
@@ -84,7 +84,7 @@ If you only want a single agent without tools or fast routing, run `caplo init m
 
 6. **Push the drafts.**
 
-   ```sh
+   ```plaintext
    caplo push
    ```
 
@@ -92,7 +92,7 @@ If you only want a single agent without tools or fast routing, run `caplo init m
 
 7. **Chat with the draft.**
 
-   ```sh
+   ```plaintext
    caplo agent chat "Shop Concierge"
    ```
 
@@ -102,7 +102,7 @@ If you only want a single agent without tools or fast routing, run `caplo init m
 
 8. **Preview the publish.**
 
-   ```sh
+   ```plaintext
    caplo publish --dry-run
    ```
 
@@ -110,7 +110,7 @@ If you only want a single agent without tools or fast routing, run `caplo init m
 
 9. **Publish.** A project’s first publish to a workspace needs `--yes`, after you have reviewed the plan:
 
-   ```sh
+   ```plaintext
    caplo publish --yes
    ```
 

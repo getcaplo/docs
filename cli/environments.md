@@ -8,7 +8,7 @@ An environment is a named workspace that a project publishes to, such as `stagin
 
 Add an `environments` map to the project’s `caplo.yaml`:
 
-```yaml
+```plaintext
 apiVersion: v1
 kind: Project
 name: shop
@@ -46,7 +46,7 @@ Environment names start with a lowercase letter and use only lowercase letters, 
 
 Pass `--env` (`-e`), or set `CAPLO_ENV`, on `caplo validate`, `diff`, `push`, `eval` and `publish`:
 
-```sh
+```plaintext
 caplo diff --env staging
 caplo publish --env prod
 ```
@@ -75,7 +75,7 @@ Use this for settings that should really differ, such as model, temperature, gre
 
 An environment’s `channels` lists, for each agent key, the channels that should serve that agent:
 
-```yaml
+```plaintext
 channels:
   concierge: [Website, twilio/Support line, <CHANNEL_ID>]
 ```
@@ -100,13 +100,13 @@ When you publish to an environment with `promoteFrom`, every agent the publish w
 
 1. Publish to staging and test there:
 
-   ```sh
+   ```plaintext
    caplo publish --env staging
    ```
 
 2. When staging is good, publish the same commit to production:
 
-   ```sh
+   ```plaintext
    caplo publish --env prod
    ```
 
@@ -116,7 +116,7 @@ When you publish to an environment with `promoteFrom`, every agent the publish w
 
 To read the `promoteFrom` environment, the CLI uses that environment’s own `apiKeyEnv` key when its variable is set, and otherwise your login. A key for one workspace cannot read another, so when you publish with an API key, the `promoteFrom` environment needs `apiKeyEnv` and that variable must hold a key of its workspace with at least `agents:read`:
 
-```sh
+```plaintext
 CAPLO_STAGING_KEY=<STAGING_KEY> CAPLO_PROD_KEY=<PROD_KEY> caplo publish --env prod --yes
 ```
 

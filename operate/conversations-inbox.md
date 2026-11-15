@@ -28,6 +28,8 @@ The search box filters only the rows on the current page. To open any conversati
 
 Each row shows who is handling the conversation: **AI agent**, **Your team** (taken over in the console) or **External inbox** (handed off to a destination such as Chatwoot), plus signals for errors, handoffs and the estimated model cost.
 
+![The Conversations page with its counts, views and filters](/_astro/conversations.DZ37gNqJ_ZjtfFh.webp)
+
 ## Read a conversation
 
 Select a row to open it beside the list. The header shows the channel and **Participant hidden**: the customer’s identity stays masked until someone reveals it. Below it are the agent and release, start time, length, first response time and estimated cost.

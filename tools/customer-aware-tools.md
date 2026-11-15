@@ -13,7 +13,7 @@ Some tools must act for one specific customer: “show my orders”, “change m
 
 Add `subject` to the tool’s policy in `caplo.yaml`:
 
-```yaml
+```plaintext
 tools:
   - name: list_my_orders
     effect: read
@@ -32,7 +32,7 @@ For a function package, put `subject` at the top level beside `effect`.
 
 `ctx.subject` holds the verified customer. Call `ctx.requireSubject()` to get it or fail: it throws when the call has none, so the tool can never run unscoped.
 
-```ts
+```plaintext
 import { defineTool } from "@caplo/tools";
 
 
@@ -63,7 +63,7 @@ export default defineTool({
 
 Function packages announce support for the subject automatically. An MCP package must add the capability when it creates the server, or Caplo refuses to send it subject calls:
 
-```ts
+```plaintext
 import { SUBJECT_CONTEXT_CAPABILITY } from "@caplo/tools";
 
 
@@ -87,11 +87,13 @@ Passing the customer ID to your API with a shared API key means your API trusts 
 
 2. On the same page, under **Customer context tokens**, copy the **Issuer** (and the **JWKS URL**, if your API needs it). Give them to whoever runs the API.
 
+   ![The Customer context tokens card with the Issuer and JWKS URL](/_astro/customer-context-tokens.D1gznfiw_Z62Tlq.webp)
+
 3. In the website channel’s settings, under **Customer verification**, find the tool’s operation in **Verified tool operations** and choose your API in its **customer token audience**. Adding an operation to a channel is not yet available in the console or the CLI: [contact support](/resources/support/) with the channel and the tools, then set the audience here. See [Customer identity](/identity/).
 
 4. In the tool, send the token as a bearer token. It is not an enumerable property, so spreading or logging the subject does not leak it, but never log it yourself:
 
-   ```ts
+   ```plaintext
    const customer = ctx.requireSubject();
    if (!customer.customerToken) throw new Error("no customer context token is configured for this tool");
    const response = await fetch("https://api.shop.example/me/orders", {
@@ -104,7 +106,7 @@ Passing the customer ID to your API with a shared API key means your API trusts 
 
 Install `@caplo/tools` in your API and use `verifyCustomerContext` from `@caplo/tools/verify`. It has no runtime dependencies; it uses `fetch` and WebCrypto.
 
-```ts
+```plaintext
 import { CustomerContextError, MemoryReplayStore, verifyCustomerContext } from "@caplo/tools/verify";
 
 

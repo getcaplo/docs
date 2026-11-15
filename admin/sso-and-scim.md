@@ -89,6 +89,8 @@ Plan for an identity provider outage
 
 If your provider is down or misconfigured while SSO is required, nobody can enter the workspace through it. The Owner can lift the requirement: open `https://app.caplo.si/login?workspace=<WORKSPACE_ID>&recovery=1` and sign in with the email and password of their Caplo account, not through SSO. Caplo sets the policy back to **Optional** with **Invitation only** onboarding and records an owner recovery in the [audit log](/operate/audit-log/). This works only while **Recovery path confirmed** is on.
 
+![The Sign-in policy card in Settings, Identity & SSO](/_astro/settings-sso.ByhUM-T2_1amwLG.webp)
+
 ## SCIM provisioning
 
 SCIM lets your identity provider add, update and deactivate workspace members automatically.

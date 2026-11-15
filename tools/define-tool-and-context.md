@@ -8,7 +8,7 @@ A tool package has two halves. The **code** defines each tool’s name, descript
 
 A function package has exactly one tool. Its entry file (`entry` in `caplo.yaml`, `src/tool.ts` by default) default-exports a `defineTool`:
 
-```ts
+```plaintext
 import { defineTool } from "@caplo/tools";
 
 
@@ -65,7 +65,7 @@ Write schemas for the model as much as for validation: describe each property, u
 
 An MCP package is an MCP server with one or more tools. Its entry file (`src/server.ts` by default) exports `createServer()`, which returns a server from the official MCP TypeScript SDK:
 
-```ts
+```plaintext
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { context } from "@caplo/tools";
 import { z } from "zod";
@@ -108,7 +108,7 @@ Create the server with `capabilities: { logging: {} }`. Without it, log lines ar
 
 `caplo tool init` also writes `src/stdio.ts`, which runs the package over standard input and output with `serveStdio`. The same code then works in MCP Inspector, Claude Desktop or any other local MCP client:
 
-```ts
+```plaintext
 import { serveStdio } from "@caplo/tools";
 import { createServer } from "./server.ts";
 
@@ -172,7 +172,7 @@ Each `tools` entry, or for a function package the same fields at the top level:
 
 A complete MCP package with a read tool and a write tool:
 
-```yaml
+```plaintext
 apiVersion: v1
 kind: ToolPackage
 name: orders
@@ -200,7 +200,7 @@ tests: tests/*.json
 
 For a function package, leave out `tools` and put the policy beside `name`:
 
-```yaml
+```plaintext
 apiVersion: v1
 kind: ToolPackage
 name: order-lookup

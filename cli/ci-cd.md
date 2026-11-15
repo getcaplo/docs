@@ -12,7 +12,7 @@ In CI there is nobody to log in, so the CLI authenticates with an **API key** in
 
 2. Create an API client with the scopes a publish needs, and send its key straight into your repository’s secrets without printing it. With the [GitHub CLI](https://cli.github.com):
 
-   ```sh
+   ```plaintext
    caplo workspace api-client create github-deploy \
      --scope agents:write,agents:publish,tools:write,tools:publish \
      | gh secret set CAPLO_API_KEY
@@ -22,7 +22,7 @@ In CI there is nobody to log in, so the CLI authenticates with an **API key** in
 
 3. Store the workspace ID as `CAPLO_WORKSPACE`. It is not secret, but keeping it next to the key keeps them in step:
 
-   ```sh
+   ```plaintext
    caplo workspace get -o json
    gh secret set CAPLO_WORKSPACE --body <WORKSPACE_ID>
    ```
@@ -33,7 +33,7 @@ With an API key, the workspace must be given by ID, never by name.
 
 Save this as `.github/workflows/caplo.yml`. It pins the CLI version, so a new CLI release never changes your pipeline until you update the pin.
 
-```yaml
+```plaintext
 name: Caplo
 
 
@@ -108,7 +108,7 @@ Do not run `caplo push`, `caplo eval` or `caplo publish` on pull requests agains
 
 To see what a merge would change, add a step to `check` with a key that has only `agents:read` and `tools:read`:
 
-```yaml
+```plaintext
       - run: caplo diff
         env:
           CAPLO_API_KEY: ${{ secrets.CAPLO_READ_KEY }}
@@ -121,7 +121,7 @@ To see what a merge would change, add a step to `check` with a key that has only
 
 With [environments](/cli/environments/) in `caplo.yaml`, give each its own API client and secret, and select the environment per job:
 
-```yaml
+```plaintext
       - run: caplo publish --env staging --yes
         env:
           CAPLO_STAGING_KEY: ${{ secrets.CAPLO_STAGING_KEY }}
@@ -129,7 +129,7 @@ With [environments](/cli/environments/) in `caplo.yaml`, give each its own API c
 
 For production, run a separate job, for example on `workflow_dispatch` or a tag, that sets both keys. With `promoteFrom: staging`, the CLI reads staging with `CAPLO_STAGING_KEY` and refuses any agent staging has not released from the same source:
 
-```yaml
+```plaintext
       - run: caplo publish --env prod --yes
         env:
           CAPLO_PROD_KEY: ${{ secrets.CAPLO_PROD_KEY }}
@@ -186,7 +186,7 @@ Rules:
 
 Add `CAPLO_API_KEY` and `CAPLO_WORKSPACE` under **Settings**, **CI/CD**, **Variables** in GitLab, masked and protected so only protected branches can read them. Then in `.gitlab-ci.yml`:
 
-```yaml
+```plaintext
 stages: [check, publish]
 
 

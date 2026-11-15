@@ -10,7 +10,7 @@ Generated from `@caplo/tools` 0.1.8 on npm. Install with `npm install @caplo/too
 
 ### applied()
 
-```ts
+```plaintext
 function applied(result): Applied;
 ```
 
@@ -30,7 +30,7 @@ Reports that the provider applied the change, with its result. A status handler 
 
 ### context()
 
-```ts
+```plaintext
 function context(extra): ToolContext;
 ```
 
@@ -48,7 +48,7 @@ function context(extra): ToolContext;
 
 ### defineTool()
 
-```ts
+```plaintext
 function defineTool<Args, Result>(definition): FunctionTool<Args, Result>;
 ```
 
@@ -73,7 +73,7 @@ function defineTool<Args, Result>(definition): FunctionTool<Args, Result>;
 
 ### pending()
 
-```ts
+```plaintext
 function pending(operationRef, message?): Pending;
 ```
 
@@ -94,7 +94,7 @@ Reports that the provider accepted the change but has not finished it. The runne
 
 ### rejected()
 
-```ts
+```plaintext
 function rejected(message): Rejected;
 ```
 
@@ -114,7 +114,7 @@ Reports that the provider definitively did not apply the change, for example bec
 
 ### serveStdio()
 
-```ts
+```plaintext
 function serveStdio(createServer, options?): Promise<void>;
 ```
 
@@ -135,7 +135,7 @@ Runs a package over stdio so local MCP clients and MCP Inspector can use it.
 
 ### stepUpFromChallenge()
 
-```ts
+```plaintext
 function stepUpFromChallenge(header): StepUpRequired | undefined;
 ```
 
@@ -155,7 +155,7 @@ Maps a client API’s RFC 9470 step-up challenge (`WWW-Authenticate: Bearer erro
 
 ### stepUpRequired()
 
-```ts
+```plaintext
 function stepUpRequired(requirement?): StepUpRequired;
 ```
 
@@ -262,7 +262,7 @@ The visitor’s answer: accept with content, decline, or cancel (dismissed witho
 
 ##### createServer()
 
-```ts
+```plaintext
 createServer(): McpServerLike;
 ```
 
@@ -289,7 +289,7 @@ createServer(): McpServerLike;
 
 ##### handler()
 
-```ts
+```plaintext
 handler(args, ctx): Result | Promise<Result>;
 ```
 
@@ -306,7 +306,7 @@ handler(args, ctx): Result | Promise<Result>;
 
 ##### status()?
 
-```ts
+```plaintext
 status?(input, ctx):
   | StatusAnswer
 | Promise<StatusAnswer>;
@@ -377,7 +377,7 @@ The parts of an MCP request handler’s `extra` argument that `context` reads.
 
 ##### debug()
 
-```ts
+```plaintext
 debug(message, data?): void;
 ```
 
@@ -394,7 +394,7 @@ debug(message, data?): void;
 
 ##### error()
 
-```ts
+```plaintext
 error(message, data?): void;
 ```
 
@@ -411,7 +411,7 @@ error(message, data?): void;
 
 ##### info()
 
-```ts
+```plaintext
 info(message, data?): void;
 ```
 
@@ -428,7 +428,7 @@ info(message, data?): void;
 
 ##### warn()
 
-```ts
+```plaintext
 warn(message, data?): void;
 ```
 
@@ -451,7 +451,7 @@ warn(message, data?): void;
 
 ##### connect()
 
-```ts
+```plaintext
 connect(transport): Promise<void>;
 ```
 
@@ -496,7 +496,7 @@ connect(transport): Promise<void>;
 
 ##### get()
 
-```ts
+```plaintext
 get(name): string;
 ```
 
@@ -514,7 +514,7 @@ Returns a declared secret; throws when the runner did not supply it.
 
 ##### has()
 
-```ts
+```plaintext
 has(name): boolean;
 ```
 
@@ -604,7 +604,7 @@ A verified customer: the Caplo subject and binding, and the namespace-scoped ide
 
 ##### elicit()
 
-```ts
+```plaintext
 elicit(params): Promise<ElicitResult>;
 ```
 
@@ -622,7 +622,7 @@ Asks the visitor for missing details with an MCP form-mode elicitation (function
 
 ##### requireSubject()
 
-```ts
+```plaintext
 requireSubject(): Readonly<Subject>;
 ```
 
@@ -659,7 +659,7 @@ The subset of the MCP SDK `Transport` interface the Caplo runtime and `serveStdi
 
 ##### close()
 
-```ts
+```plaintext
 close(): Promise<void>;
 ```
 
@@ -669,7 +669,7 @@ close(): Promise<void>;
 
 ##### onclose()?
 
-```ts
+```plaintext
 onclose?(): void;
 ```
 
@@ -679,7 +679,7 @@ onclose?(): void;
 
 ##### onerror()?
 
-```ts
+```plaintext
 onerror?(error): void;
 ```
 
@@ -695,7 +695,7 @@ onerror?(error): void;
 
 ##### onmessage()?
 
-```ts
+```plaintext
 onmessage?(message): void;
 ```
 
@@ -711,7 +711,7 @@ onmessage?(message): void;
 
 ##### send()
 
-```ts
+```plaintext
 send(message): Promise<void>;
 ```
 
@@ -727,7 +727,7 @@ send(message): Promise<void>;
 
 ##### start()
 
-```ts
+```plaintext
 start(): Promise<void>;
 ```
 
@@ -739,7 +739,7 @@ start(): Promise<void>;
 
 ### EffectOutcome
 
-```ts
+```plaintext
 type EffectOutcome =
   | {
   outcome: "applied";
@@ -760,7 +760,7 @@ type EffectOutcome =
 
 ### ElicitProperty
 
-```ts
+```plaintext
 type ElicitProperty =
   | {
   default?: string;
@@ -822,13 +822,13 @@ A primitive property of a form-mode elicitation schema (MCP `PrimitiveSchemaDefi
 
 ### JsonSchema
 
-```ts
+```plaintext
 type JsonSchema = object;
 ```
 
 #### Indexable
 
-```ts
+```plaintext
 [key: string]: unknown
 ```
 
@@ -836,7 +836,7 @@ type JsonSchema = object;
 
 ##### type
 
-```ts
+```plaintext
 type: "object";
 ```
 
@@ -844,7 +844,7 @@ type: "object";
 
 ### Level
 
-```ts
+```plaintext
 type Level = typeof LEVELS[number];
 ```
 
@@ -852,7 +852,7 @@ type Level = typeof LEVELS[number];
 
 ### LogLevel
 
-```ts
+```plaintext
 type LogLevel = "debug" | "info" | "warning" | "error";
 ```
 
@@ -860,7 +860,7 @@ type LogLevel = "debug" | "info" | "warning" | "error";
 
 ### StatusAnswer
 
-```ts
+```plaintext
 type StatusAnswer = Applied | Rejected | Pending;
 ```
 
@@ -868,7 +868,7 @@ type StatusAnswer = Applied | Rejected | Pending;
 
 ### AUTHENTICATION_META_KEY
 
-```ts
+```plaintext
 const AUTHENTICATION_META_KEY: "caplo/authentication" = "caplo/authentication";
 ```
 
@@ -878,7 +878,7 @@ Result `_meta` key with which a tool asks for the customer to authenticate again
 
 ### CONTEXT_META_KEY
 
-```ts
+```plaintext
 const CONTEXT_META_KEY: "caplo/context" = "caplo/context";
 ```
 
@@ -886,7 +886,7 @@ const CONTEXT_META_KEY: "caplo/context" = "caplo/context";
 
 ### EFFECT_META_KEY
 
-```ts
+```plaintext
 const EFFECT_META_KEY: "caplo/effect" = "caplo/effect";
 ```
 
@@ -896,7 +896,7 @@ Result `_meta` key carrying a write’s typed outcome.
 
 ### EFFECT_OUTCOME_CAPABILITY
 
-```ts
+```plaintext
 const EFFECT_OUTCOME_CAPABILITY: object;
 ```
 
@@ -913,7 +913,7 @@ MCP server capability a bundle advertises when its write results carry a typed o
 
 ### LEVELS
 
-```ts
+```plaintext
 const LEVELS: readonly ["low", "standard", "high"];
 ```
 
@@ -923,7 +923,7 @@ Caplo assurance levels, weakest first.
 
 ### MAX_AUTH_AGE_SECONDS
 
-```ts
+```plaintext
 const MAX_AUTH_AGE_SECONDS: 86400 = 86400;
 ```
 
@@ -933,7 +933,7 @@ The longest freshness a step-up may ask for, in seconds.
 
 ### OPERATION_STATUS_CAPABILITY
 
-```ts
+```plaintext
 const OPERATION_STATUS_CAPABILITY: object;
 ```
 
@@ -950,7 +950,7 @@ MCP server capability a bundle advertises when it answers `caplo/status`: the ru
 
 ### STATUS_METHOD
 
-```ts
+```plaintext
 const STATUS_METHOD: "caplo/status" = "caplo/status";
 ```
 
@@ -960,7 +960,7 @@ JSON-RPC method the runner sends to ask for the status of an earlier write.
 
 ### SUBJECT_CONTEXT_CAPABILITY
 
-```ts
+```plaintext
 const SUBJECT_CONTEXT_CAPABILITY: object;
 ```
 
@@ -985,7 +985,7 @@ MCP server capability a bundle advertises when its tools read the verified subje
 
 ##### Constructor
 
-```ts
+```plaintext
 new ElicitationUnavailableError(): ElicitationUnavailableError;
 ```
 
@@ -1009,7 +1009,7 @@ new ElicitationUnavailableError(): ElicitationUnavailableError;
 
 ##### Constructor
 
-```ts
+```plaintext
 new MissingSecretError(name): MissingSecretError;
 ```
 
@@ -1039,7 +1039,7 @@ new MissingSecretError(name): MissingSecretError;
 
 ##### Constructor
 
-```ts
+```plaintext
 new MissingSubjectError(): MissingSubjectError;
 ```
 

@@ -9,7 +9,7 @@ The CLI authenticates in one of two ways:
 
 ## Log in
 
-```sh
+```plaintext
 caplo auth login
 ```
 
@@ -25,7 +25,7 @@ The browser returns to a short-lived listener on `127.0.0.1` on your machine, so
 
 On a remote server, in a container, or over SSH, use the device flow:
 
-```sh
+```plaintext
 caplo auth login --device
 ```
 
@@ -35,7 +35,7 @@ The CLI prints a URL and a code. Open the URL on any device, sign in, and confir
 
 ### Check and end the session
 
-```sh
+```plaintext
 caplo auth status
 caplo auth logout
 ```
@@ -65,7 +65,7 @@ The configuration directory is `CAPLO_CONFIG_DIR` if set, otherwise `$XDG_CONFIG
 
 `caplo config` shows and changes the settings in `config.yaml`:
 
-```sh
+```plaintext
 caplo config list
 caplo config get api-url
 caplo config set credential-storage file
@@ -102,7 +102,7 @@ Workspace Owners, Admins and Developers can manage API clients. You can only giv
 
 Log in as yourself, select the workspace, then:
 
-```sh
+```plaintext
 caplo workspace api-client create github-deploy \
   --scope agents:write,agents:publish,tools:write,tools:publish
 ```
@@ -132,7 +132,7 @@ The workspace also accepts `conversations:read`, `usage:read`, `endpoints:read` 
 
 Set two environment variables. The CLI then authenticates as the client for every command, instead of any login on the machine:
 
-```sh
+```plaintext
 export CAPLO_API_KEY=<API_KEY>
 export CAPLO_WORKSPACE=<WORKSPACE_ID>
 caplo auth status
@@ -169,7 +169,7 @@ If the API refuses a key, the CLI says that an API key cannot do this or that it
 
 Add a new key, switch your CI secret to it, then revoke the old ones:
 
-```sh
+```plaintext
 caplo workspace api-client rotate github-deploy
 caplo workspace api-client revoke github-deploy --except <NEW_KEY_ID_OR_PREFIX>
 ```
@@ -178,7 +178,7 @@ caplo workspace api-client revoke github-deploy --except <NEW_KEY_ID_OR_PREFIX>
 
 ### Revoke keys
 
-```sh
+```plaintext
 caplo workspace api-client revoke github-deploy
 caplo workspace api-client revoke github-deploy --key <KEY_ID_OR_PREFIX>
 ```

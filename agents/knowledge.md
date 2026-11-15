@@ -26,11 +26,13 @@ Each file can be up to 25 MiB. A knowledge base names documents by file name, so
 5. Select **Approve** on each file that is correct. A file that shows **Failed** could not be extracted; upload a corrected copy.
 6. Under **Approval & availability**, select **Publish version**. Caplo indexes the approved files; the base shows **Ready** when the version can be used.
 
+![A knowledge base with its approved files, document review and Approval & availability](/_astro/knowledge-base.BfS2Wt_S_Z1dnpL.webp)
+
 Owners, Admins and Builders can create bases and upload files. Approving files and publishing versions need an Owner or Admin.
 
 **CLI**
 
-```sh
+```plaintext
 caplo knowledge create "Returns policy" --owner "Support operations" --description "Returns, exchanges and refunds"
 caplo knowledge sync "Returns policy" ./docs/returns --dry-run
 caplo knowledge sync "Returns policy" ./docs/returns
@@ -39,7 +41,7 @@ caplo knowledge get "Returns policy"
 
 `caplo knowledge get` lists each document with its extraction and review state. Review the extracted text in the console, then approve and publish:
 
-```sh
+```plaintext
 caplo knowledge approve "Returns policy"
 caplo knowledge publish "Returns policy"
 ```
@@ -52,7 +54,7 @@ Approving with the CLI skips reading the extracted text. Do it when you trust th
 
 `caplo knowledge sync` makes a knowledge base’s documents match a directory tree, so you can keep the source files in a repository and publish from CI:
 
-```sh
+```plaintext
 caplo knowledge sync "Returns policy" ./docs/returns --approve --publish --yes
 ```
 
@@ -107,6 +109,8 @@ Rules:
 
 ## Attach a knowledge base to an agent
 
+![The Knowledge tab of an agent with a ready knowledge base attached](/_astro/agent-knowledge.fCCTNhVU_ZVThjG.webp)
+
 **Console**
 
 Open the agent, select the **Knowledge** tab, check each knowledge base the agent should use, and select **Save draft**. Only bases that show **Ready** can be selected.
@@ -115,7 +119,7 @@ Open the agent, select the **Knowledge** tab, check each knowledge base the agen
 
 List knowledge bases by name or ID under `knowledgeBases` in the agent file, then push it:
 
-```yaml
+```plaintext
 knowledgeBases:
   - Returns policy
 ```

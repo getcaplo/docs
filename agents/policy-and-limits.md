@@ -6,7 +6,7 @@ An agent’s `policy` controls how its loop runs on each turn: how many model ca
 
 In the console, these settings are under **Setup > Advanced settings > Agent loop**. In an agent file they are the `policy` block:
 
-```yaml
+```plaintext
 policy:
   maxModelCalls: 12
   maxReads: 6

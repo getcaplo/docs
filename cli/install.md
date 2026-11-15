@@ -12,13 +12,13 @@ Running tool package fixtures on your machine (`caplo test` and `caplo tool test
 
 With [Homebrew](https://brew.sh):
 
-```sh
+```plaintext
 brew install getcaplo/tap/caplo
 ```
 
 Or with the install script, which needs no Homebrew and no `sudo`:
 
-```sh
+```plaintext
 curl -fsSL https://cli.caplo.si/install.sh | sh
 export PATH="$HOME/.local/bin:$PATH"
 ```
@@ -29,13 +29,13 @@ Add the `export` line to your shell profile (for example `~/.zshrc`) so `caplo` 
 
 With [Homebrew](https://brew.sh):
 
-```sh
+```plaintext
 brew install getcaplo/tap/caplo
 ```
 
 Or with the install script. It needs `curl`, `tar` and `sha256sum`; on Ubuntu or Debian install them first with `sudo apt-get install curl ca-certificates tar coreutils`.
 
-```sh
+```plaintext
 curl -fsSL https://cli.caplo.si/install.sh | sh
 export PATH="$HOME/.local/bin:$PATH"
 ```
@@ -52,7 +52,7 @@ Windows has no installer. Download the archive and put `caplo.exe` on your `PATH
 
 3. Extract `caplo.exe` to a folder of your own and add that folder to your user `PATH`. In PowerShell, from the download folder:
 
-   ```powershell
+   ```plaintext
    $dir = "$env:LOCALAPPDATA\Programs\caplo"
    Expand-Archive .\caplo_<VERSION>_windows_amd64.zip -DestinationPath $dir
    $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
@@ -65,7 +65,7 @@ Use one installation method. If you install with both Homebrew and the script, t
 
 ## Check the installation
 
-```sh
+```plaintext
 caplo version
 ```
 
@@ -82,7 +82,7 @@ The script detects your operating system and architecture, downloads the matchin
 
 To pin both the script and the CLI to one release, fetch the script from that release’s tag:
 
-```sh
+```plaintext
 curl -fsSL https://raw.githubusercontent.com/getcaplo/homebrew-tap/v0.4.0/install.sh \
   | CAPLO_VERSION=v0.4.0 CAPLO_INSTALL_DIR="$HOME/bin" sh
 ```
@@ -95,19 +95,19 @@ The install script and Homebrew check the SHA-256 hash for you. When you downloa
 
 **macOS**
 
-```sh
+```plaintext
 shasum -a 256 --ignore-missing -c checksums.txt
 ```
 
 **Linux**
 
-```sh
+```plaintext
 sha256sum --ignore-missing -c checksums.txt
 ```
 
 **Windows**
 
-```powershell
+```plaintext
 (Get-FileHash .\caplo_<VERSION>_windows_amd64.zip -Algorithm SHA256).Hash.ToLower()
 Select-String "windows_amd64.zip" .\checksums.txt
 ```
@@ -120,7 +120,7 @@ A matching line ends in `OK`. If the hash does not match, delete the archive and
 
 Each release also signs `checksums.txt` with a keyless [Sigstore](https://www.sigstore.dev) signature, so you can confirm that Caplo published the checksums and not someone else. Download `checksums.txt.sigstore.json` from the release and verify it with [cosign](https://docs.sigstore.dev/cosign/system_config/installation/):
 
-```sh
+```plaintext
 cosign verify-blob checksums.txt \
   --bundle checksums.txt.sigstore.json \
   --certificate-identity-regexp '@getcaplo\.com$' \
@@ -133,7 +133,7 @@ It prints `Verified OK`. A verified `checksums.txt` plus a matching hash means t
 
 **macOS**
 
-```sh
+```plaintext
 brew update && brew upgrade getcaplo/tap/caplo
 ```
 
@@ -141,7 +141,7 @@ If you used the install script, run it again. It installs the latest release ove
 
 **Linux**
 
-```sh
+```plaintext
 brew update && brew upgrade getcaplo/tap/caplo
 ```
 
@@ -157,7 +157,7 @@ Your login, settings and selected workspace are kept across updates.
 
 1. End your session so it stops working on the server too:
 
-   ```sh
+   ```plaintext
    caplo auth logout
    ```
 

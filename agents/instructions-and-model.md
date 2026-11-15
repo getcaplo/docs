@@ -14,13 +14,15 @@ Every agent starts with the same core: a name, instructions that define its beha
 4. Expand **Advanced settings** and choose a **Model**. Adjust **Temperature** and **Response limit** if you need to.
 5. Select **Save draft**.
 
+![The agent editor: the Setup tab with the Live test panel beside it](/_astro/agent-editor.DyjJ5xJN_cRmx2.webp)
+
 You need a role that can build agents (Owner, Admin or Builder) to edit a draft. Only Owners and Admins can publish it.
 
 **CLI**
 
 Write a starter agent file, edit it, then save it as the agent’s draft:
 
-```sh
+```plaintext
 caplo agent init -f support.yaml --name "Support Desk"
 caplo agent validate -f support.yaml
 caplo agent push -f support.yaml
@@ -28,7 +30,7 @@ caplo agent push -f support.yaml
 
 `caplo agent push` creates the agent when the workspace has no agent with that name, and otherwise replaces its draft. The basics look like this in the file:
 
-```yaml
+```plaintext
 name: Support Desk
 description: Answers order and returns questions.
 instructions: |-
@@ -101,7 +103,7 @@ Some models can reason before they reply. Reasoning can improve answers to multi
 | **Reasoning effort** | `policy.reasoning.effort`               | `low`, `medium`, `high` (console: **Off**, **Low**, **Medium**, **High**) | Models that take a reasoning effort. Other models ignore it.                    |
 | **Thinking budget**  | `policy.reasoning.thinkingBudgetTokens` | 1,024 to 32,000 tokens                                                    | Extended thinking on Anthropic models. Must be smaller than the response limit. |
 
-```yaml
+```plaintext
 policy:
   reasoning:
     thinkingBudgetTokens: 2048

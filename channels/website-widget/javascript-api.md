@@ -6,7 +6,7 @@ The widget loader adds a small API to your page so your own code can open the wi
 
 ## Get the widget control
 
-```js
+```plaintext
 const chat = window.CaploWidget.get('<WIDGET_ID>');
 ```
 
@@ -16,7 +16,7 @@ The control is available as soon as the loader runs, before the widget has finis
 
 Because the loader script is `async`, run your code after it loads:
 
-```js
+```plaintext
 function withCaplo(widgetId, callback) {
   const chat = window.CaploWidget?.get(widgetId);
   if (chat) return callback(chat);
@@ -40,7 +40,7 @@ function withCaplo(widgetId, callback) {
 
 ### Open the widget from your own button
 
-```js
+```plaintext
 withCaplo('<WIDGET_ID>', (chat) => {
   document.querySelector('#help-button').addEventListener('click', () => chat.open());
 });
@@ -50,7 +50,7 @@ withCaplo('<WIDGET_ID>', (chat) => {
 
 Hints give the agent context it would otherwise have to ask for. They are never treated as identity: a visitor’s name in a hint does not let tools act on that person’s account.
 
-```js
+```plaintext
 chat.setVisitorHints({
   name: 'Ada',
   locale: 'en-GB',
@@ -75,7 +75,7 @@ If visitors are already signed in to your site, your page can sign them in to th
 
 Your backend signs a short-lived assertion for the signed-in user; the browser never holds your signing key. See [Website widget settings](/channels/website-widget/settings/#customer-verification).
 
-```js
+```plaintext
 chat.identity.configure({
   when: 'open',
   getToken: async ({ nonce, requirement }) => {
@@ -130,7 +130,7 @@ Listen to identity events on the control:
 
 `state` is `anonymous`, `verified`, `reauthenticate` (the visitor must verify again) or `ended` (the verified conversation ended). `level` is present when `state` is `verified`. `reason` explains the change when there is one, for example `signed_in`, `stepped_up`, `signed_out` or `host_signed_out`.
 
-```js
+```plaintext
 document.addEventListener('caplo:error', (event) => {
   console.warn('Caplo widget unavailable', event.detail);
 });

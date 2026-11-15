@@ -20,9 +20,13 @@ Who answers, which modes are offered and how visitors verify are not part of the
 
 You can also create a design while creating a website channel, with **Create a design here**.
 
+![The Widget designs page](/_astro/designs.BqQtj2Vw_ZW4xEk.webp)
+
 ## Design sections
 
 The editor groups settings into sections. The preview beside them updates as you edit. Select **Save draft** to keep your changes; **Discard** returns to the last saved draft.
+
+![The design editor with its sections and the live preview](/_astro/design-editor.CdnTLsy2_ZOqvk1.webp)
 
 ### Brand and colours
 
@@ -80,6 +84,8 @@ A published revision is immutable. Publishing does not change any website.
 ## Apply a revision to a website
 
 You can apply from the design or from the channel. Either way, the change takes effect right away; you do not need to save anything else.
+
+![The Appearance card of a website entry point with the live design revision](/_astro/entry-appearance.CIEPBGVD_1rvsOP.webp)
 
 From the design:
 

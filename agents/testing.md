@@ -22,18 +22,20 @@ The **Live test** panel sits beside the agent editor.
 
 A live test follows the confirmation rules of the agent’s tools, and the agent may treat a plain “yes” typed in the chat as confirmation of a write it asked about. Use the buttons when you want an explicit decision.
 
+![The Live test panel before live testing is enabled](/_astro/agent-live-test.BxSfDutx_Z2rYcEB.webp)
+
 ## Test with the CLI
 
 `caplo agent chat` starts a private test conversation with the agent’s saved draft and reads one message per line:
 
-```sh
+```plaintext
 caplo agent push -f support.yaml
 caplo agent chat "Support Desk"
 ```
 
 It tests the draft as last saved, so push or save your edits first. To test a release instead:
 
-```sh
+```plaintext
 caplo agent chat "Support Desk" --release 2.1.0
 ```
 
@@ -53,7 +55,7 @@ Some writes can only be declined here: one that has no review in the CLI, or one
 
 You can script a test by piping input:
 
-```sh
+```plaintext
 printf 'Return the boots from order 1042\n/confirm\n' | caplo agent chat "Support Desk"
 ```
 
@@ -63,7 +65,7 @@ The command exits with status 1 if a message or decision could not be sent, and,
 
 Each test chat holds a test session, and a workspace has limited test capacity. A chat closes its session when it ends. If a chat stops abruptly or capacity runs out, `caplo agent chat` reports that no test session is free. List and close your open sessions:
 
-```sh
+```plaintext
 caplo agent test list
 caplo agent test close 4d2f8b1e-6c3a-4f7e-9d05-1a2b3c4d5e6f
 ```

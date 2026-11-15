@@ -8,7 +8,7 @@ Generated from `caplo` v0.4.1, the latest release. `caplo agent --help` prints t
 
 Build, test, evaluate, and publish one agent.
 
-```sh
+```plaintext
 caplo agent
 ```
 
@@ -16,7 +16,7 @@ Commands for a single agent file or workspace agent. A workspace agent is named 
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent init -f support.yaml
 caplo agent push -f support.yaml
 caplo agent chat "Support"
@@ -41,7 +41,7 @@ caplo agent publish "Support"
 
 Chat with the agent’s saved draft, or a release, in a private test conversation.
 
-```sh
+```plaintext
 caplo agent chat <agent> [flags]
 ```
 
@@ -53,7 +53,7 @@ Replies arrive on the agent-test event stream. It resumes after the last event w
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent chat "Shop Concierge"
 caplo agent chat "Shop Concierge" --release 2.1.0
 printf 'Where is order 1042?\n/confirm\n' | caplo agent chat "Shop Concierge"
@@ -69,13 +69,13 @@ printf 'Where is order 1042?\n/confirm\n' | caplo agent chat "Shop Concierge"
 
 Run and inspect an agent’s evaluations.
 
-```sh
+```plaintext
 caplo agent eval
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent eval run "Shop Concierge"
 caplo agent eval list "Shop Concierge"
 ```
@@ -90,13 +90,13 @@ caplo agent eval list "Shop Concierge"
 
 Show an evaluation run and its cases.
 
-```sh
+```plaintext
 caplo agent eval get <agent> <run> [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent eval get "Shop Concierge" 0c9e7a52-1d4b-4e8f-a3c6-5b2d9f0e1a47
 ```
 
@@ -110,13 +110,13 @@ caplo agent eval get "Shop Concierge" 0c9e7a52-1d4b-4e8f-a3c6-5b2d9f0e1a47
 
 List the agent’s evaluation runs, newest first.
 
-```sh
+```plaintext
 caplo agent eval list <agent> [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent eval list "Shop Concierge"
 caplo agent eval list "Shop Concierge" -n 5 -o json
 ```
@@ -132,7 +132,7 @@ caplo agent eval list "Shop Concierge" -n 5 -o json
 
 Run the agent’s eval cases against its saved draft.
 
-```sh
+```plaintext
 caplo agent eval run <agent>
 ```
 
@@ -140,7 +140,7 @@ Runs every case of the agent’s eval suite against its saved draft in isolated 
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent eval run "Shop Concierge"
 ```
 
@@ -148,13 +148,13 @@ caplo agent eval run "Shop Concierge"
 
 Show an agent: draft, model, tools, sub-agents, and latest release.
 
-```sh
+```plaintext
 caplo agent get <agent> [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent get "Shop Concierge"
 caplo agent get 6f1d2c3b-8a4e-4f0a-9b7c-2d1e0f3a4b5c -o yaml
 ```
@@ -169,7 +169,7 @@ caplo agent get 6f1d2c3b-8a4e-4f0a-9b7c-2d1e0f3a4b5c -o yaml
 
 Write a new agent file to edit, validate, and push.
 
-```sh
+```plaintext
 caplo agent init [flags]
 ```
 
@@ -177,7 +177,7 @@ Writes a starter agent file with one eval case. The file must not exist. Without
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent init
 caplo agent init -f agents/help-desk.yaml
 caplo agent init -f support.yaml --name "Support Desk"
@@ -194,7 +194,7 @@ caplo agent init -f support.yaml --name "Support Desk"
 
 List the workspace’s agents.
 
-```sh
+```plaintext
 caplo agent list [flags]
 ```
 
@@ -202,7 +202,7 @@ Lists the workspace’s agents with their latest release, draft revision, and st
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent list
 caplo agent list --archived -o json
 ```
@@ -218,7 +218,7 @@ caplo agent list --archived -o json
 
 Pin tools, run the evals, and publish the agent’s saved draft as a release.
 
-```sh
+```plaintext
 caplo agent publish <agent> [flags]
 ```
 
@@ -230,7 +230,7 @@ Without –bump the version follows the console: a first release, or a change of
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent publish "Shop Concierge"
 caplo agent publish "Shop Concierge" --bump minor --yes
 ```
@@ -246,7 +246,7 @@ caplo agent publish "Shop Concierge" --bump minor --yes
 
 Write an agent’s draft as the console’s Export YAML, to –file or standard output.
 
-```sh
+```plaintext
 caplo agent pull <agent> [flags]
 ```
 
@@ -254,7 +254,7 @@ Writes the agent’s draft byte for byte as the console’s Export YAML. Sub-age
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent pull "Shop Concierge"
 caplo agent pull "Shop Concierge" -f concierge.yaml
 ```
@@ -269,7 +269,7 @@ caplo agent pull "Shop Concierge" -f concierge.yaml
 
 Save an agent file as the agent’s draft, creating the agent if needed, and its evals as the eval suite.
 
-```sh
+```plaintext
 caplo agent push [flags]
 ```
 
@@ -277,7 +277,7 @@ Saves the file as the draft of the workspace agent with its name, creating the a
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent push -f agent.yaml
 caplo agent push -f agent.yaml --dry-run
 ```
@@ -293,7 +293,7 @@ caplo agent push -f agent.yaml --dry-run
 
 List, show, and revoke an agent’s releases.
 
-```sh
+```plaintext
 caplo agent release
 ```
 
@@ -301,7 +301,7 @@ A release is a published draft revision with its tool versions and sub-agent rel
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent release list "Shop Concierge"
 caplo agent release revoke "Shop Concierge" 2.1.0 --reason "wrong refund policy"
 ```
@@ -316,13 +316,13 @@ caplo agent release revoke "Shop Concierge" 2.1.0 --reason "wrong refund policy"
 
 Show a release: version, tools, sub-agent releases, and eval gate.
 
-```sh
+```plaintext
 caplo agent release get <agent> <release> [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent release get "Shop Concierge" 2.1.0
 caplo agent release get "Shop Concierge" 7 -o json
 ```
@@ -337,13 +337,13 @@ caplo agent release get "Shop Concierge" 7 -o json
 
 List the agent’s releases, newest first.
 
-```sh
+```plaintext
 caplo agent release list <agent> [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent release list "Shop Concierge"
 ```
 
@@ -357,7 +357,7 @@ caplo agent release list "Shop Concierge"
 
 Permanently revoke a release, so channels and parents can no longer run it.
 
-```sh
+```plaintext
 caplo agent release revoke <agent> <release> [flags]
 ```
 
@@ -365,7 +365,7 @@ Revokes a release permanently; it cannot be undone. Channels that serve it and p
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent release revoke "Shop Concierge" 2.1.0 --reason "wrong refund policy"
 ```
 
@@ -380,7 +380,7 @@ caplo agent release revoke "Shop Concierge" 2.1.0 --reason "wrong refund policy"
 
 Manage your private test sessions.
 
-```sh
+```plaintext
 caplo agent test
 ```
 
@@ -388,7 +388,7 @@ Each caplo agent chat runs in a private test session, which holds test capacity 
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent test list
 caplo agent test close 4d2f8b1e-6c3a-4f7e-9d05-1a2b3c4d5e6f
 ```
@@ -402,13 +402,13 @@ caplo agent test close 4d2f8b1e-6c3a-4f7e-9d05-1a2b3c4d5e6f
 
 Close one of your private test sessions and release its capacity.
 
-```sh
+```plaintext
 caplo agent test close <session-id>
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent test close 4d2f8b1e-6c3a-4f7e-9d05-1a2b3c4d5e6f
 ```
 
@@ -416,13 +416,13 @@ caplo agent test close 4d2f8b1e-6c3a-4f7e-9d05-1a2b3c4d5e6f
 
 List your open test sessions across agents in this workspace.
 
-```sh
+```plaintext
 caplo agent test list
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent test list
 ```
 
@@ -430,7 +430,7 @@ caplo agent test list
 
 Check an agent file offline: schema, references, and link policies.
 
-```sh
+```plaintext
 caplo agent validate [flags]
 ```
 
@@ -438,7 +438,7 @@ Checks the file against the agent schema and its references without calling the 
 
 **Examples**
 
-```sh
+```plaintext
 caplo agent validate -f agent.yaml
 caplo agent validate -f agents/orders.yaml
 ```

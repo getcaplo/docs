@@ -15,13 +15,15 @@ An agent can call other agents in the workspace. Each sub-agent is an ordinary a
 5. Choose how the sub-agent **Works as** (see [Modes](#modes)), then select **Add agent**.
 6. Select **Save draft**.
 
+![The Sub-agents tab of a parent agent with fast routing and four linked agents](/_astro/sub-agents.CsV8GDWX_7Hso8.webp)
+
 A link shows **Needs release** while its child has no release. When the child publishes a newer release, the link shows it and offers a **Use** button with that version **in draft**; the parent keeps its fixed release until you adopt the new one and publish the parent. **View agent graph** shows the whole tree.
 
 **CLI**
 
 Add `subAgents` to the parent’s agent file. In a project, link another project agent by its file key with `local`; link any workspace agent by ID with `agentId`:
 
-```yaml
+```plaintext
 subAgents:
   - local: orders
     release: latest
@@ -83,7 +85,7 @@ Routing decides how a parent picks a sub-agent for each customer message.
 | `model` (default) | **The model decides** | The parent’s model reads the conversation and calls a sub-agent or answers itself. Takes about 2 seconds.                                 |
 | `fast`            | **Fast routing**      | A separate decision call picks a sub-agent in about 0.3 seconds. When its confidence is below `minConfidence`, the model decides instead. |
 
-```yaml
+```plaintext
 routing:
   mode: fast
   minConfidence: 0.85

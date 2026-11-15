@@ -8,7 +8,7 @@ Generated from the schema in `caplo` v0.4.1. Guide: [Agent YAML](/agents/agent-y
 
 For validation and completion in your editor, add this first line to the file (YAML language server, used by VS Code and others):
 
-```yaml
+```plaintext
 # yaml-language-server: $schema=https://docs.caplo.si/schemas/agent-2.0.0.json
 ```
 

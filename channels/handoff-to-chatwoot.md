@@ -49,6 +49,8 @@ Verification uses the token to confirm the inbox is an API inbox, creates or upd
 
 If the token cannot read the webhook secrets, the destination shows **Needs attention** with “Chatwoot did not reveal the webhook secrets to this token; enter them from Chatwoot.” Copy the secrets from the account webhook and the API inbox settings in Chatwoot into **Account webhook secret** and **API inbox webhook secret**, then save again. Any later edit returns the destination to unverified until it is verified again; use **Verify** to check it at any time.
 
+![A Chatwoot handoff destination on the Handoff destinations page](/_astro/handoff-destinations.C4oCtRt1_Z1SyYkw.webp)
+
 ## Use it for agent handoffs
 
 An agent hands off only when both the agent and the website entry point allow it:

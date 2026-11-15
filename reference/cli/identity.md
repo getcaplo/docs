@@ -8,7 +8,7 @@ Generated from `caplo` v0.4.1, the latest release. `caplo identity --help` print
 
 Generate keys and sign or check host sign-in assertions locally.
 
-```sh
+```plaintext
 caplo identity
 ```
 
@@ -16,7 +16,7 @@ Local helpers for a host that signs its customers in to Caplo with signed assert
 
 **Examples**
 
-```sh
+```plaintext
 caplo identity keygen --out keys
 caplo identity sign-assertion --key keys/<kid>.private.jwk.json --iss https://shop.example.com \
   --aud urn:caplo:customer-identity:<id> --sub cust-1042 --nonce <nonce> > assertion.jwt
@@ -34,7 +34,7 @@ caplo identity verify-assertion --jwks keys/<kid>.public.jwk.json --iss https://
 
 Write a new signing key: private JWK and PEM, and the public JWK to give the connection; nothing is sent.
 
-```sh
+```plaintext
 caplo identity keygen [flags]
 ```
 
@@ -42,7 +42,7 @@ Writes \<kid>.private.jwk.json and \<kid>.private.pem, readable only by you, and
 
 **Examples**
 
-```sh
+```plaintext
 caplo identity keygen
 caplo identity keygen --alg EdDSA --kid shop-2026 --out keys
 ```
@@ -59,7 +59,7 @@ caplo identity keygen --alg EdDSA --kid shop-2026 --out keys
 
 Print a signed caplo-customer+jwt assertion, as a host backend would make one, for local tests.
 
-```sh
+```plaintext
 caplo identity sign-assertion [flags]
 ```
 
@@ -67,7 +67,7 @@ Signs a caplo-customer+jwt assertion with a private JWK or PEM key and prints it
 
 **Examples**
 
-```sh
+```plaintext
 caplo identity sign-assertion --key keys/shop-2026.private.jwk.json --iss https://shop.example.com \
   --aud urn:caplo:customer-identity:<id> --sub cust-1042 --nonce <nonce>
 caplo identity sign-assertion --key key.pem --alg PS256 --kid shop-rsa --iss https://shop.example.com \
@@ -99,7 +99,7 @@ caplo identity sign-assertion --key key.pem --alg PS256 --kid shop-rsa --iss htt
 
 Run Identity’s assertion checks locally and print each; challenge state and connection policy are skipped.
 
-```sh
+```plaintext
 caplo identity verify-assertion <token|-> [flags]
 ```
 
@@ -107,7 +107,7 @@ Runs Identity’s checks on an assertion, given as an argument or read from stan
 
 **Examples**
 
-```sh
+```plaintext
 caplo identity verify-assertion --jwks keys/shop-2026.public.jwk.json --iss https://shop.example.com \
   --aud urn:caplo:customer-identity:<id> "$ASSERTION"
 caplo identity sign-assertion ... | caplo identity verify-assertion --jwks https://shop.example.com/jwks.json \

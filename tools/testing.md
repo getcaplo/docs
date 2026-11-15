@@ -8,7 +8,7 @@ A fixture is one tool call and what you expect back. Fixtures live in your packa
 
 Each file in `tests/` (or the glob `tests` sets in `caplo.yaml`) holds one fixture:
 
-```json
+```plaintext
 {
   "name": "looks up a shipped order",
   "tool": "get_order",
@@ -50,13 +50,13 @@ Tips:
 
 ## Run fixtures locally
 
-```sh
+```plaintext
 caplo tool test
 ```
 
 `caplo tool test` bundles the package with the builder’s exact settings, loads it from an empty directory with no environment variables, checks `caplo.yaml` against the tools the code lists, and runs each fixture in Node 24 with the tool’s timeout. Run `npm install` first.
 
-```txt
+```plaintext
 bundle 8.1 KB (5be0c2d41a7e, esbuild 0.28.2)
 tool order_lookup__get_order (read, 5s)
 capabilities subject-context/1 effect-outcome/1 operation-status/1
@@ -75,7 +75,7 @@ FAIL tests/unknown-order.json (refuses an unknown order)
 
 ## Run fixtures on Caplo
 
-```sh
+```plaintext
 caplo tool test --remote
 ```
 
@@ -94,7 +94,7 @@ In Tool Studio, **Run Fixture Tests** in the **Tools** view does the same for th
 
 In a [project](/cli/projects/), `caplo test` runs the selected packages’ fixtures locally, like `caplo tool test`. `caplo publish` goes further: for each package it publishes, it pushes, builds and runs the fixtures on Caplo, and stops the publish if any fixture fails. Agents that use the package are not published either.
 
-```sh
+```plaintext
 caplo test tool/orders
 caplo publish tool/orders
 ```

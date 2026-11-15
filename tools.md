@@ -30,6 +30,8 @@ Publishing a new tool version does not change running agents. They keep calling 
 
 The model sees each tool as `<package>__<tool>` (hyphens in the package name become underscores), so tools from different packages never collide.
 
+![The Tools page of the Caplo console with the workspace tool packages](/_astro/tools.Ctd_J_ds_ZRAkaT.webp)
+
 ## Guides
 
 [Build your first tool](/tools/first-tool/)Create, test, push and publish a function package with the CLI or in Tool Studio.

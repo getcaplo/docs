@@ -21,7 +21,7 @@ In order:
 
 1. **Generate a signing key.** Run this where your backend’s secrets live:
 
-   ```sh
+   ```plaintext
    caplo identity keygen --alg ES256 --kid 2026-11 --out ./caplo-keys
    ```
 
@@ -48,7 +48,7 @@ In order:
 
 5. **Register a token provider on your page** with the widget’s JavaScript API:
 
-   ```js
+   ```plaintext
    window.CaploWidget.get('<WIDGET_ID>').identity.configure({
      when: 'open',
      getToken: async ({ nonce, requirement }) => {
@@ -81,7 +81,7 @@ The endpoint is yours, on your own domain. It must:
 * Sign only the `nonce` and `requirement` it is given.
 * Answer `Cache-Control: no-store`, and `401` when nobody is signed in.
 
-```js
+```plaintext
 // npm install jose
 import { SignJWT, importPKCS8 } from "jose";
 
@@ -158,7 +158,7 @@ Before you put it on a live site, test your assertions with the CLI and in the c
 
 1. Sign an assertion locally, as your backend would:
 
-   ```sh
+   ```plaintext
    caplo identity sign-assertion --key ./caplo-keys/2026-11.private.pem --kid 2026-11 \
      --iss https://www.example.com --aud urn:caplo:customer-identity:<CONNECTION_ID> \
      --sub cus_1234 --nonce test-nonce-0123456789 --acr mfa --auth-time now --ttl 60
@@ -166,7 +166,7 @@ Before you put it on a live site, test your assertions with the CLI and in the c
 
 2. Check an assertion, from the CLI or from your own endpoint, against your public key:
 
-   ```sh
+   ```plaintext
    caplo identity verify-assertion - --jwks ./caplo-keys/2026-11.public.jwk.json \
      --iss https://www.example.com --aud urn:caplo:customer-identity:<CONNECTION_ID> \
      --nonce test-nonce-0123456789 < assertion.txt

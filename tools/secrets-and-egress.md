@@ -8,7 +8,7 @@ A tool package gets nothing it does not declare. It reads only the secrets named
 
 List each secret by name in `caplo.yaml`. Names are upper case: a letter, then letters, digits or underscores, up to 64 characters, and at most 50 per package.
 
-```yaml
+```plaintext
 secrets:
   - SHOP_API_KEY
   - SHOP_WEBHOOK_SECRET
@@ -16,7 +16,7 @@ secrets:
 
 Read a value from the [call context](/tools/define-tool-and-context/#the-call-context):
 
-```ts
+```plaintext
 const apiKey = secrets.get("SHOP_API_KEY");
 ```
 
@@ -55,7 +55,7 @@ Open **Settings**, then **Secrets**, and select **Create secret**. Names are low
 
 Run these in the package folder, or pass `-p <package>`. Values are read from a hidden prompt, or from standard input when it is not a terminal, so they never appear in your shell history.
 
-```sh
+```plaintext
 # A value for this package only
 caplo tool secret set SHOP_API_KEY
 
@@ -94,7 +94,7 @@ See the [`caplo tool secret`](/reference/cli/tool/#caplo-tool-secret) and [`capl
 
 A package can make outbound requests only to the hosts in its `egress` list. Without the list, or with an empty one, it has no network access at all.
 
-```yaml
+```plaintext
 egress:
   - api.shop.example
   - "*.payments.example"

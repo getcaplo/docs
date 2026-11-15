@@ -16,7 +16,7 @@ Paths are JSON pointers to one direct property: `/orderId`, `/products`. Labels 
 
 `progress` shows a status line while the tool runs. It is fixed text: it cannot include values from the call.
 
-```yaml
+```plaintext
 tools:
   - name: search_products
     effect: read
@@ -33,7 +33,7 @@ tools:
 
 For a [write tool](/tools/write-tools/), `fields` chooses which input arguments the review card shows, and `receipt` chooses which properties of the result to show once the write succeeds.
 
-```yaml
+```plaintext
 tools:
   - name: cancel_order
     effect: write
@@ -80,6 +80,10 @@ tools:
 * On a voice call, the title and each field are read aloud as “Label: value”. A `last4` value is read as “ending in” its last four characters, and an absent value as “not provided”.
 * `receipt.fields` (up to 12) come from the structured result, so the tool needs an `outputSchema`. A receipt only displays values; it never decides whether the write succeeded.
 
+![A confirmation card for a booking tool in the website widget](/_astro/widget-confirm.Bm7Gk4UV_Z1dIOgl.webp)
+
+![The receipt the widget shows after the booking succeeded](/_astro/widget-receipt.BT2d0xh0_1P4Fqz.webp)
+
 ## Show a result
 
 `result` shows items from the tool’s structured result with the agent’s reply. The tool needs an `outputSchema`, and `path` names a direct array property of it (or, for a detail, an object).
@@ -97,7 +101,7 @@ Columns are direct primitive properties of an item. A result that does not fit t
 
 ### Cards
 
-```yaml
+```plaintext
     presentation:
       schemaVersion: 1
       title: Product search
@@ -139,6 +143,8 @@ Columns are direct primitive properties of an item. A result that does not fit t
 
 Here the output schema has a `products` array whose items have `imageUrl`, `name`, `price`, `currency` and `url`.
 
+![A cards result in the website widget: two products with image, status, price and actions](/_astro/widget-cards.JIqOSjeC_1jNFij.webp)
+
 ### Column roles
 
 | Role                      | Property type                             | Layouts                                                            | Shows                                                                                                                        |
@@ -162,7 +168,7 @@ Each role can be used by one column only, and a column with a role uses `display
 
 ### Choices
 
-```yaml
+```plaintext
       result:
         path: /slots
         layout: choices
@@ -180,9 +186,11 @@ Each role can be used by one column only, and a column with a role uses `display
 
 Each choice sends its filled-in reply. Columns without a role must appear in the template.
 
+![A choices result in the website widget: delivery windows the customer taps to reply](/_astro/widget-choices.BKbyZL30_Z13FGYe.webp)
+
 ### Detail
 
-```yaml
+```plaintext
       result:
         layout: detail
         title: Your order
@@ -209,9 +217,11 @@ Each choice sends its filled-in reply. Columns without a role must appear in the
 
 Without `path`, a detail shows the result object itself.
 
+![A detail result in the website widget: one product with its specification rows](/_astro/widget-detail.BT92E4bY_21Ns5v.webp)
+
 ### Comparison
 
-```yaml
+```plaintext
       result:
         path: /plans
         layout: comparison
@@ -235,9 +245,11 @@ Without `path`, a detail shows the result object itself.
             display: plain
 ```
 
+![A comparison result in the website widget: two products side by side](/_astro/widget-comparison.CxW_VEfP_2ttxR3.webp)
+
 ### Timeline
 
-```yaml
+```plaintext
       result:
         path: /steps
         layout: timeline
@@ -263,11 +275,13 @@ Without `path`, a detail shows the result object itself.
 
 The `state` property’s schema is `{ "type": "string", "enum": ["complete", "in_progress", "not_started"] }`, and `at` is a string with `format: date-time`.
 
+![A timeline result in the website widget: the delivery progress of an order](/_astro/widget-timeline.D_vEPE6B_2po6Wf.webp)
+
 ## Return files
 
 A read tool can hand the customer up to three files per call, such as an invoice PDF or a floor plan. Declare the types and the largest size:
 
-```yaml
+```plaintext
 tools:
   - name: get_invoice
     effect: read
@@ -289,7 +303,7 @@ tools:
 
 Return each file as an MCP embedded resource with base64 content. The last part of `uri` is the file name the customer sees:
 
-```ts
+```plaintext
 return {
   content: [
     { type: "text", text: `Invoice ${invoice.number} for order ${orderId}` },
@@ -300,11 +314,13 @@ return {
 
 Embedded resources are written with the MCP SDK, so files need an MCP package. Caplo takes the files out of the result before the model sees it, checks that each file’s content matches its type, scans it, and shows it with the reply as a download where the channel can. A file of an undeclared type, over `maxBytes`, or a fourth file fails the call. Where the channel cannot deliver files, such as a phone call, the agent is told the file was not delivered, so also return the essentials as text.
 
+![A PDF invoice the visitor can download from the website widget](/_astro/widget-file.bJQwGIN5_29tq3k.webp)
+
 ## Ask for missing details
 
 A read tool can ask the visitor for details it needs while it runs, with an MCP form. Declare every field the tool may ask for:
 
-```yaml
+```plaintext
 tools:
   - name: find_store
     effect: read
@@ -316,7 +332,7 @@ tools:
 
 Then ask from the code. In a function package, use `ctx.canElicit` and `ctx.elicit`:
 
-```ts
+```plaintext
 async handler(args, ctx) {
   let city = args.city;
   if (!city) {
@@ -343,3 +359,5 @@ In an MCP package, check `server.server.getClientCapabilities()?.elicitation` an
 Caution
 
 Never ask for a password, card number, one-time code or other credential. Caplo refuses fields and forms whose names, titles or options name one, and the build rejects such field names.
+
+![A form in the website widget asking for a delivery address and window](/_astro/widget-form.Bd9RWIXH_1CHdww.webp)

@@ -8,11 +8,13 @@ Two optional agent settings shape what visitors see under the agent’s replies:
 
 Suggested replies are short next messages, such as “Track my order” or “Talk to a person”, offered under a reply the agent writes. A visitor taps one to send it.
 
+![An agent reply in the website widget followed by three suggested replies](/_astro/widget-suggestions.Bce5GyCd_2wj5Gf.webp)
+
 **Console:** open the agent, go to **Setup > Advanced settings > Suggested replies**, turn on **Offer suggested replies**, and set **Most suggestions** (1 to 4). Select **Save draft**.
 
 **Agent YAML:**
 
-```yaml
+```plaintext
 suggestedReplies:
   maxCount: 3
 ```
@@ -35,7 +37,7 @@ With ratings on, the website widget shows a thumbs up and a thumbs down under th
 
 **Agent YAML:**
 
-```yaml
+```plaintext
 visitorFeedback: true
 ```
 

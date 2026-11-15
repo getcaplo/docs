@@ -16,20 +16,22 @@ Publishing needs an Owner or Admin, or an API key with the `agents:publish` and 
 4. Under **Agent evals**, select **Run tests** and wait for the cases to pass. For a fast-routing agent, the **Fast routing** section lists what it still needs.
 5. Select **Publish version**.
 
+![The Releases tab with Release readiness and the published releases](/_astro/agent-releases.BYRy7G2F_ZExWsE.webp)
+
 **Publish agent** is available when the saved draft has unpublished changes and the YAML editor has no unapplied edits.
 
 **CLI**
 
 Publish one agent’s saved draft:
 
-```sh
+```plaintext
 caplo agent push -f support.yaml
 caplo agent publish "Support Desk"
 ```
 
 Or publish a whole project, packages and agents together:
 
-```sh
+```plaintext
 caplo publish --dry-run
 caplo publish
 ```
@@ -76,7 +78,7 @@ Open the agent’s **Channels** tab. A channel serving an older release offers a
 
 **CLI**
 
-```sh
+```plaintext
 caplo channel deploy Website
 caplo channel deploy whatsapp/Support --agent "Support Desk@1.2.0"
 ```
@@ -91,7 +93,7 @@ A deploy affects new conversations only. Conversations already open keep the rel
 
 To return channels to the release before the one they serve:
 
-```sh
+```plaintext
 caplo channel rollback Website
 ```
 
@@ -101,7 +103,7 @@ It points each channel at its agent’s newest release that is older than the cu
 
 Revoking marks a release as unusable, for example one that gives wrong refund advice:
 
-```sh
+```plaintext
 caplo agent release revoke "Support Desk" 1.2.0 --reason "wrong refund policy"
 ```
 

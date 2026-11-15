@@ -8,7 +8,7 @@ Generated from `caplo` v0.4.1, the latest release. `caplo tool --help` prints th
 
 Build, test, publish, and run tool packages.
 
-```sh
+```plaintext
 caplo tool
 ```
 
@@ -18,7 +18,7 @@ Commands that act on a workspace package take its name, or read caplo.yaml in �
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool init orders --type mcp
 cd orders && npm install
 caplo tool test
@@ -47,7 +47,7 @@ caplo tool push && caplo tool publish
 
 Archive a package: no more pushes, builds, or publishes; its versions stay live until revoked.
 
-```sh
+```plaintext
 caplo tool archive [package] [flags]
 ```
 
@@ -55,7 +55,7 @@ Archives a package: it can no longer be pushed, built, or published. Its publish
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool archive orders --yes
 ```
 
@@ -70,7 +70,7 @@ caplo tool archive orders --yes
 
 Show, follow, and cancel builds.
 
-```sh
+```plaintext
 caplo tool build
 ```
 
@@ -78,7 +78,7 @@ A build is named by its ID; \[package] defaults to the one caplo.yaml in –dir 
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool build list orders
 caplo tool build logs orders 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f
 ```
@@ -94,13 +94,13 @@ caplo tool build logs orders 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f
 
 Cancel a queued or running build.
 
-```sh
+```plaintext
 caplo tool build cancel [package] <build> [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool build cancel orders 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f
 ```
 
@@ -114,13 +114,13 @@ caplo tool build cancel orders 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f
 
 Show a build: status, bundle, tools, and diagnostics.
 
-```sh
+```plaintext
 caplo tool build get [package] <build> [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool build get orders 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f
 ```
 
@@ -135,13 +135,13 @@ caplo tool build get orders 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f
 
 List a package’s builds, newest first.
 
-```sh
+```plaintext
 caplo tool build list [package] [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool build list orders
 caplo tool build list orders --status failed -n 5
 ```
@@ -159,13 +159,13 @@ caplo tool build list orders --status failed -n 5
 
 Print a build’s log, following it until the build finishes.
 
-```sh
+```plaintext
 caplo tool build logs [package] <build> [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool build logs orders 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f
 ```
 
@@ -179,7 +179,7 @@ caplo tool build logs orders 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f
 
 Delete a package that was never published; archive a published one instead.
 
-```sh
+```plaintext
 caplo tool delete [package] [flags]
 ```
 
@@ -187,7 +187,7 @@ Deletes a package that has never published a version, with its draft and builds.
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool delete orders-draft --yes
 ```
 
@@ -202,7 +202,7 @@ caplo tool delete orders-draft --yes
 
 Run the package over stdio in MCP Inspector, or for another MCP client with –no-inspector.
 
-```sh
+```plaintext
 caplo tool dev [flags]
 ```
 
@@ -210,7 +210,7 @@ Runs the package’s src/stdio.ts with Node 24 in MCP Inspector, started with np
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool dev
 ORDERS_API_KEY=test caplo tool dev --no-inspector --dir ~/src/orders
 ```
@@ -226,13 +226,13 @@ ORDERS_API_KEY=test caplo tool dev --no-inspector --dir ~/src/orders
 
 Show a package, its latest build, and the tools of its latest active version.
 
-```sh
+```plaintext
 caplo tool get [package] [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool get orders
 caplo tool get -o json
 ```
@@ -248,7 +248,7 @@ caplo tool get -o json
 
 Create a function or mcp package from the SDK templates.
 
-```sh
+```plaintext
 caplo tool init <directory> [flags]
 ```
 
@@ -256,7 +256,7 @@ Creates a package in directory, which must be missing or empty, from the functio
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool init orders --type mcp
 caplo tool init tools/weather --type function
 ```
@@ -272,7 +272,7 @@ caplo tool init tools/weather --type function
 
 List the workspace’s tool packages.
 
-```sh
+```plaintext
 caplo tool list [flags]
 ```
 
@@ -280,7 +280,7 @@ Lists the packages with their type, latest active version, latest build, and dra
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool list
 caplo tool list --type mcp --archived
 ```
@@ -297,7 +297,7 @@ caplo tool list --type mcp --archived
 
 Show recent live invocations of the package with their log lines; the runners keep the last hour.
 
-```sh
+```plaintext
 caplo tool logs [package] [flags]
 ```
 
@@ -305,7 +305,7 @@ Prints the package’s recent live invocations with each tool’s status, timing
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool logs orders
 caplo tool logs orders -n 50 -f
 ```
@@ -322,7 +322,7 @@ caplo tool logs orders -n 50 -f
 
 Publish the latest succeeded build, or –build \<id>, as a new version.
 
-```sh
+```plaintext
 caplo tool publish [package] [flags]
 ```
 
@@ -330,7 +330,7 @@ Publishes the package’s latest succeeded build, or the build –build names, a
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool publish
 caplo tool publish orders --build 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f
 ```
@@ -346,7 +346,7 @@ caplo tool publish orders --build 5e0c8a3d-7b21-4f6e-8c90-3a1d2b4c5e6f
 
 Download the draft, or the exact source of a published version, to run it locally.
 
-```sh
+```plaintext
 caplo tool pull <package>[@version] [flags]
 ```
 
@@ -354,7 +354,7 @@ Writes the package’s draft, or with @version the exact source of the build tha
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool pull orders
 caplo tool pull orders@3 --dir /tmp/orders-v3
 ```
@@ -369,7 +369,7 @@ caplo tool pull orders@3 --dir /tmp/orders-v3
 
 Upload the package as the workspace draft, build it, and stream the build log.
 
-```sh
+```plaintext
 caplo tool push [flags]
 ```
 
@@ -377,7 +377,7 @@ Uploads the package directory as its workspace draft, creating the package on it
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool push
 caplo tool push --dir tools/orders
 ```
@@ -392,7 +392,7 @@ caplo tool push --dir tools/orders
 
 Restore an archived package.
 
-```sh
+```plaintext
 caplo tool restore [package] [flags]
 ```
 
@@ -400,7 +400,7 @@ Restores an archived package, so it can be pushed, built, and published again.
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool restore orders
 ```
 
@@ -414,7 +414,7 @@ caplo tool restore orders
 
 Manage the secret values live calls receive.
 
-```sh
+```plaintext
 caplo tool secret
 ```
 
@@ -422,7 +422,7 @@ A package’s live calls receive the secrets its caplo.yaml declares, by name. E
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool secret list orders
 caplo tool secret bind ORDERS_API_KEY orders-api-key -p orders
 ```
@@ -439,13 +439,13 @@ caplo tool secret bind ORDERS_API_KEY orders-api-key -p orders
 
 Fill a secret from a workspace secret, replacing the package’s own value.
 
-```sh
+```plaintext
 caplo tool secret bind <NAME> <workspace-secret> [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool secret bind ORDERS_API_KEY orders-api-key -p orders
 ```
 
@@ -460,7 +460,7 @@ caplo tool secret bind ORDERS_API_KEY orders-api-key -p orders
 
 List the secrets the latest active version declares and where each value comes from.
 
-```sh
+```plaintext
 caplo tool secret list [package] [flags]
 ```
 
@@ -468,7 +468,7 @@ Lists the names the package’s latest active version declares, and any other na
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool secret list orders
 ```
 
@@ -483,7 +483,7 @@ caplo tool secret list orders
 
 Set a secret from a hidden prompt, or from stdin when it is not a terminal.
 
-```sh
+```plaintext
 caplo tool secret set <NAME> [flags]
 ```
 
@@ -491,7 +491,7 @@ Sets the package’s own value of a secret for live calls. The value comes from 
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool secret set ORDERS_API_KEY -p orders
 printf %s "$ORDERS_API_KEY" | caplo tool secret set ORDERS_API_KEY -p orders
 ```
@@ -507,7 +507,7 @@ printf %s "$ORDERS_API_KEY" | caplo tool secret set ORDERS_API_KEY -p orders
 
 Remove a secret’s workspace secret binding; live calls that need it fail until it is bound or set.
 
-```sh
+```plaintext
 caplo tool secret unbind <NAME> [flags]
 ```
 
@@ -515,7 +515,7 @@ Removes the binding and leaves the secret unset. It asks first; –yes skips the
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool secret unbind ORDERS_API_KEY -p orders
 ```
 
@@ -531,7 +531,7 @@ caplo tool secret unbind ORDERS_API_KEY -p orders
 
 Remove a secret; live calls that need it fail.
 
-```sh
+```plaintext
 caplo tool secret unset <NAME> [flags]
 ```
 
@@ -539,7 +539,7 @@ Removes the package’s own value of a secret. It asks first; –yes skips the q
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool secret unset ORDERS_API_KEY -p orders --yes
 ```
 
@@ -555,7 +555,7 @@ caplo tool secret unset ORDERS_API_KEY -p orders --yes
 
 Bundle the package like the builder and run its fixtures in local Node 24, or with –remote on Caplo’s test runner.
 
-```sh
+```plaintext
 caplo tool test [flags]
 ```
 
@@ -565,7 +565,7 @@ Bundles the package with the builder’s esbuild version, options, and rejection
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool test
 caplo tool test -v
 caplo tool test --remote
@@ -583,13 +583,13 @@ caplo tool test --remote
 
 Show and revoke published versions.
 
-```sh
+```plaintext
 caplo tool version
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool version list orders
 caplo tool version revoke orders@3 --reason "leaks order notes"
 ```
@@ -604,7 +604,7 @@ caplo tool version revoke orders@3 --reason "leaks order notes"
 
 Show a published version and its tools.
 
-```sh
+```plaintext
 caplo tool version get [<package>@]<version> [flags]
 ```
 
@@ -612,7 +612,7 @@ Shows a published version: its status, build, bundle digest, egress, declared se
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool version get orders@3
 caplo tool version get 3 --dir tools/orders
 ```
@@ -628,13 +628,13 @@ caplo tool version get 3 --dir tools/orders
 
 List a package’s published versions.
 
-```sh
+```plaintext
 caplo tool version list [package] [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool version list orders
 caplo tool version list -o json
 ```
@@ -650,7 +650,7 @@ caplo tool version list -o json
 
 Revoke a published version so agents stop resolving it.
 
-```sh
+```plaintext
 caplo tool version revoke [<package>@]<version> [flags]
 ```
 
@@ -658,7 +658,7 @@ Revokes a published version so agents stop resolving it. It needs –reason and 
 
 **Examples**
 
-```sh
+```plaintext
 caplo tool version revoke orders@3 --reason "leaks order notes"
 ```
 

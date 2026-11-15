@@ -15,12 +15,16 @@ This walkthrough takes you from a new account to an agent answering on your webs
 
 2. **Create an agent.** In the sidebar, open **Agents** (under **Build**) and select **Create agent**. Enter an **Agent name**, such as `Customer support`, and optionally a **Description**, then select **Create draft**. The agent opens on its **Setup** tab.
 
+   ![The Agents page in the Caplo console, with Create agent at the top right](/_astro/agents.MAl6A_DA_Z11MVwv.webp)
+
 3. **Write the instructions and greeting.** Under **Instructions**:
 
    * In **Agent instructions**, describe who the agent is, what it helps with, its tone, and what it must not do. For example: “You are the support assistant for Example Outfitters. Answer questions about our products, shipping and returns. Keep answers short. If you do not know something, say so and offer to connect the customer with our team.”
    * In **Greeting message**, write the first message customers see, such as “Hi, I’m the Example Outfitters assistant. How can I help?” A greeting is required before you can test or publish.
 
    Open **Advanced settings** to check the **Model**. A new agent starts with a model your workspace can use; see [Instructions and model](/agents/instructions-and-model/) to change it.
+
+   ![The Instructions section of an agent, with the agent instructions and greeting message](/_astro/agent-instructions.CASLaqy5_2blT4u.webp)
 
 4. **Save the draft.** Select **Save draft** at the top of the page. Testing works on unsaved edits, but publishing uses the saved draft.
 
@@ -67,6 +71,8 @@ A website channel needs a published widget design, a channel that serves your re
 4. **Apply the design.** Caplo opens the channel’s website entry point. (To come back to it later, open the channel and select **Configure & install**.) On the **General** tab, under **Appearance**, choose the design and its revision, then select **Apply revision 1**.
 
 5. **Copy the embed code.** On the **Install** tab, select **Copy embed code**. If the button is unavailable, the tab tells you what to do first, such as applying a design or saving your edits with **Save entry point**. Paste the code into your site’s HTML, just before the closing `</body>` tag, on every page where the widget should appear.
+
+   ![The Install tab of a website entry point, with the embed code and Copy embed code](/_astro/entry-embed.Dt2VK7nq_NALOk.webp)
 
 6. **Check it.** Open your site. The chat launcher appears; open it and the agent greets you.
 

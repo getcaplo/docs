@@ -8,7 +8,7 @@ Generated from `caplo` v0.4.1, the latest release. `caplo mcp --help` prints the
 
 Connect remote MCP servers and publish their reviewed tools.
 
-```sh
+```plaintext
 caplo mcp
 ```
 
@@ -16,7 +16,7 @@ A remote MCP server is an MCP server reachable over HTTPS whose tools agents can
 
 **Examples**
 
-```sh
+```plaintext
 caplo mcp check https://mcp.example.com/mcp
 caplo mcp add crm --url https://mcp.example.com/mcp --auth oauth
 caplo mcp connect crm --open
@@ -41,7 +41,7 @@ caplo mcp review crm --enable search_contacts=read && caplo mcp publish crm
 
 Add a remote MCP server; its name prefixes every tool’s model name.
 
-```sh
+```plaintext
 caplo mcp add <name> [flags]
 ```
 
@@ -51,7 +51,7 @@ With –auth oauth the client is registered through a Client ID Metadata Documen
 
 **Examples**
 
-```sh
+```plaintext
 caplo mcp add crm --url https://mcp.example.com/mcp --auth oauth
 CRM_TOKEN=... caplo mcp add crm --url https://mcp.example.com/mcp --auth bearer --secret-env CRM_TOKEN
 caplo mcp add erp --url https://erp.example.com/mcp --auth header --header-name X-Api-Key --secret-stdin
@@ -80,7 +80,7 @@ caplo mcp add erp --url https://erp.example.com/mcp --auth header --header-name 
 
 Check a remote MCP server without saving it: transport, protocol, tools, and OAuth discovery.
 
-```sh
+```plaintext
 caplo mcp check <url> [flags]
 ```
 
@@ -88,7 +88,7 @@ Has Caplo probe a server URL without saving anything: whether it is reachable, i
 
 **Examples**
 
-```sh
+```plaintext
 caplo mcp check https://mcp.example.com/mcp
 printf %s "$CRM_TOKEN" | caplo mcp check https://mcp.example.com/mcp --bearer-stdin
 ```
@@ -107,7 +107,7 @@ printf %s "$CRM_TOKEN" | caplo mcp check https://mcp.example.com/mcp --bearer-st
 
 Authorize a remote MCP server that uses OAuth.
 
-```sh
+```plaintext
 caplo mcp connect <name|id> [flags]
 ```
 
@@ -115,7 +115,7 @@ Authorize a remote MCP server that uses OAuth. For the authorization code grant,
 
 **Examples**
 
-```sh
+```plaintext
 caplo mcp connect crm --open
 caplo mcp connect crm --wait 0
 ```
@@ -131,7 +131,7 @@ caplo mcp connect crm --wait 0
 
 Show a remote MCP server: status, authentication, last error, and its discovered tools.
 
-```sh
+```plaintext
 caplo mcp get <name|id> [flags]
 ```
 
@@ -139,7 +139,7 @@ Shows the server’s status, transport and protocol, authentication without secr
 
 **Examples**
 
-```sh
+```plaintext
 caplo mcp get crm
 caplo mcp get crm -o json
 ```
@@ -154,13 +154,13 @@ caplo mcp get crm -o json
 
 List the workspace’s remote MCP servers.
 
-```sh
+```plaintext
 caplo mcp list [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo mcp list
 ```
 
@@ -174,7 +174,7 @@ caplo mcp list
 
 Pin the enabled tools of the latest tool list as a new version that agents can use.
 
-```sh
+```plaintext
 caplo mcp publish <name|id>
 ```
 
@@ -182,7 +182,7 @@ Pins the enabled tools of the latest tool list, as reviewed, as a new version. I
 
 **Examples**
 
-```sh
+```plaintext
 caplo mcp publish crm
 ```
 
@@ -190,7 +190,7 @@ caplo mcp publish crm
 
 Test a remote MCP server and refresh its tool list against the published version.
 
-```sh
+```plaintext
 caplo mcp refresh <name|id>
 ```
 
@@ -198,7 +198,7 @@ Connects to the server, lists its tools again, and marks each new, changed, or r
 
 **Examples**
 
-```sh
+```plaintext
 caplo mcp refresh crm
 ```
 
@@ -206,7 +206,7 @@ caplo mcp refresh crm
 
 Remove a remote MCP server: its published tools stop working and its credentials are deleted.
 
-```sh
+```plaintext
 caplo mcp remove <name|id> [flags]
 ```
 
@@ -214,7 +214,7 @@ Removes a remote MCP server. Its published tools stop working for every agent th
 
 **Examples**
 
-```sh
+```plaintext
 caplo mcp remove crm --yes
 ```
 
@@ -228,7 +228,7 @@ caplo mcp remove crm --yes
 
 Enable, classify, and configure discovered tools; nothing reaches agents until caplo mcp publish.
 
-```sh
+```plaintext
 caplo mcp review <name|id> [flags]
 ```
 
@@ -236,7 +236,7 @@ Enable, classify, and configure discovered tools by their remote name. –enable
 
 **Examples**
 
-```sh
+```plaintext
 caplo mcp review crm --enable search_contacts=read --enable create_note=write
 caplo mcp review crm --confirmation create_note=none --timeout create_note=20
 caplo mcp review crm --disable delete_contact
@@ -255,13 +255,13 @@ caplo mcp review crm --disable delete_contact
 
 List a remote MCP server’s discovered tools with their review and publish state.
 
-```sh
+```plaintext
 caplo mcp tools <name|id> [flags]
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo mcp tools crm
 ```
 
@@ -275,7 +275,7 @@ caplo mcp tools crm
 
 Change a remote MCP server’s endpoint, transport, or authentication.
 
-```sh
+```plaintext
 caplo mcp update <name|id> [flags]
 ```
 
@@ -283,7 +283,7 @@ Change a remote MCP server’s endpoint, transport, or authentication. Authentic
 
 **Examples**
 
-```sh
+```plaintext
 caplo mcp update crm --url https://mcp.example.com/v2/mcp
 caplo mcp update crm --scope contacts.read --scope contacts.write
 printf %s "$NEW_TOKEN" | caplo mcp update erp --secret-stdin

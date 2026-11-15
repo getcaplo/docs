@@ -8,7 +8,7 @@ Generated from `caplo` v0.4.1, the latest release. `caplo config --help` prints 
 
 Show and change CLI settings.
 
-```sh
+```plaintext
 caplo config
 ```
 
@@ -16,7 +16,7 @@ Settings are saved in config.yaml in the configuration directory: CAPLO_CONFIG_D
 
 **Examples**
 
-```sh
+```plaintext
 caplo config list
 caplo config set credential-storage file
 ```
@@ -31,13 +31,13 @@ caplo config set credential-storage file
 
 Show one setting.
 
-```sh
+```plaintext
 caplo config get <key>
 ```
 
 **Examples**
 
-```sh
+```plaintext
 caplo config get api-url
 ```
 
@@ -45,7 +45,7 @@ caplo config get api-url
 
 Show every setting.
 
-```sh
+```plaintext
 caplo config list [flags]
 ```
 
@@ -53,7 +53,7 @@ Shows the saved settings, the production defaults for those not saved, and the s
 
 **Examples**
 
-```sh
+```plaintext
 caplo config list
 caplo config list -o json
 ```
@@ -68,7 +68,7 @@ caplo config list -o json
 
 Change one setting: api-url, issuer, client-id, credential-storage.
 
-```sh
+```plaintext
 caplo config set <key> <value>
 ```
 
@@ -76,7 +76,7 @@ Changes a saved setting: api-url, issuer, client-id (the OAuth client, caplo-cli
 
 **Examples**
 
-```sh
+```plaintext
 caplo config set credential-storage file
 caplo config set api-url https://api.staging.example.com
 ```

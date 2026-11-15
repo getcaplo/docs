@@ -8,7 +8,7 @@ Everything on an agent’s **Setup**, **Tools & actions**, **Knowledge** and **S
 
 An agent file is one YAML document with `apiVersion: "v2.0.0"` (`v2` and `v2.0` also work; `v1` files are refused), `kind: Agent`, and the agent’s fields. This file defines a support agent with two tools, a knowledge base, a returns sub-agent and human handoff:
 
-```yaml
+```plaintext
 apiVersion: "v2.0.0"
 kind: Agent
 name: Support Desk
@@ -62,7 +62,7 @@ Voice settings are set in the console and are not part of the file; applying or 
 
 For validation and completion in your editor, add this first line to the file:
 
-```yaml
+```plaintext
 # yaml-language-server: $schema=https://docs.caplo.si/schemas/agent-2.0.0.json
 ```
 
@@ -79,7 +79,7 @@ The console’s YAML includes the agent’s eval cases as `evals: {cases: [...]}
 
 ## Work with agent files in the CLI
 
-```sh
+```plaintext
 caplo agent init -f support.yaml --name "Support Desk"
 caplo agent validate -f support.yaml
 caplo agent push -f support.yaml --dry-run
@@ -113,7 +113,7 @@ The CLI accepts both forms. A console export keeps its case IDs when you push it
 
 `caplo pull` writes a workspace agent, every sub-agent it links, their eval cases, and the tool packages they use into a project:
 
-```sh
+```plaintext
 caplo pull "agent/Support Desk" ./support
 cd support
 caplo validate

@@ -8,6 +8,8 @@ Workspace-wide settings live under **Settings**. Every member can read **General
 
 **Settings** > **General** has three panels.
 
+![Workspace details in Settings, General](/_astro/settings-general.BlLkjf05_VLahS.webp)
+
 **Workspace details**
 
 | Field                  | Notes                                                                                                                                                                                                                                                                                               |

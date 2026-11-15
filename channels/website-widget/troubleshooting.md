@@ -8,7 +8,7 @@ Start with the browser’s developer tools on the page that should show the widg
 
 When the widget cannot load, the loader replaces it with a **Chat unavailable · Try again** button in the bottom right corner and dispatches a `caplo:error` event. Log it to confirm which widget failed:
 
-```js
+```plaintext
 document.addEventListener('caplo:error', (event) => {
   console.warn('Caplo widget unavailable', event.detail);
 });
@@ -47,7 +47,7 @@ A staging, preview or test site is a different origin. Either add it as an allow
 
 If your site sends a `Content-Security-Policy`, the browser console shows messages such as “Refused to load the script” or “Refused to connect”. Add the sources the widget needs and keep your existing ones:
 
-```text
+```plaintext
 script-src https://api.caplo.si;
 connect-src https://api.caplo.si;
 font-src https://api.caplo.si;
