@@ -4146,6 +4146,8 @@ withCaplo('<WIDGET_ID>', (chat) => {
 
 Hints give the agent context it would otherwise have to ask for. They are never treated as identity: a visitor’s name in a hint does not let tools act on that person’s account.
 
+The widget always sends the browser’s language as `locale` and its time zone as `timeZone`, so the agent knows the visitor’s local date and can offer times in their zone without asking. Values you set replace the browser’s.
+
 ```plaintext
 chat.setVisitorHints({
   name: 'Ada',
@@ -4154,13 +4156,14 @@ chat.setVisitorHints({
 });
 ```
 
-| Field    | Rules                                                                           |
-| -------- | ------------------------------------------------------------------------------- |
-| `name`   | 1 to 80 characters, no control characters.                                      |
-| `locale` | A BCP 47 language tag, such as `en-GB` or `fr`, up to 35 characters.            |
-| `page`   | An `http` or `https` URL without a user name or password, up to 512 characters. |
+| Field      | Rules                                                                           |
+| ---------- | ------------------------------------------------------------------------------- |
+| `name`     | 1 to 80 characters, no control characters.                                      |
+| `locale`   | A BCP 47 language tag, such as `en-GB` or `fr`, up to 35 characters.            |
+| `page`     | An `http` or `https` URL without a user name or password, up to 512 characters. |
+| `timeZone` | An IANA time zone, such as `Europe/London`.                                     |
 
-Other fields are ignored. A value that breaks these rules throws a `TypeError`; if you set it before the widget has loaded, the widget fails to load and shows **Chat unavailable · Try again**. Check values before you pass them, and leave a field out rather than sending an empty string. Each call replaces the previous hints. Hints travel with the visitor’s messages, so call `setVisitorHints` again when the page changes in a single page app.
+Any other field throws a `TypeError`. A value that breaks these rules throws a `TypeError`; if you set it before the widget has loaded, the widget fails to load and shows **Chat unavailable · Try again**. Check values before you pass them, and leave a field out rather than sending an empty string. Each call replaces the previous hints. Hints travel with the visitor’s messages, so call `setVisitorHints` again when the page changes in a single page app.
 
 ## Sign visitors in from your page
 
