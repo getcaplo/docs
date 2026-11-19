@@ -2,7 +2,7 @@
   "versions": {
     "agent-registry": "1.1.62",
     "agent-runtime": "1.4.55",
-    "agent-runtime-voice": "1.4.51",
+    "agent-runtime-voice": "1.4.55",
     "caplo-cli": "0.4.1",
     "channel-deployment": "1.3.25",
     "conversation-orchestrator": "1.3.68",
