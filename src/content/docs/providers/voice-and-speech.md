@@ -36,7 +36,7 @@ Voice settings belong to the agent, so every channel serving a release uses the 
 | **Speech recognition** | The model that transcribes callers. Models are grouped by provider, and each shows the key source its calls use. |
 | **Voice model** and **Voice** | The model and voice that speak replies. Play a preview of a voice, optionally with your own **Preview sentence**, before you choose. |
 | **Realtime model** and **Realtime voice** | Optional. A realtime model and one of its provider's voices. |
-| Fixed lines | What the agent says when it cannot take the call, a turn fails, the call is transferred, the caller is silent or the time limit is near. Leave a line empty to use the platform's. |
+| Fixed lines | What the agent says when it cannot take the call, a turn fails, the call is transferred, the caller is silent or the time limit is near. Leave a line empty to use the platform's, which Caplo speaks in the voice language: English, or Urdu on Urdu + English calls (the transfer briefing your team hears stays in English). |
 | **Transcript script** | Rewrites the caller's transcript into another script, such as Urdu script, before the agent reads it. |
 | **Start replies early** | Starts the reply while the caller may still be finishing, to answer sooner. |
 | **Silence check after** and **End call after** | Seconds of caller silence before the silence check line, and before the call ends. 5 to 300 seconds each; the platform defaults are 15 and 10. |

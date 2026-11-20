@@ -59,17 +59,20 @@ A `reasoning` block needs at least one of the two fields. Leave it out to use th
 
 ## Platform text
 
-Caplo adds up to two blocks of text after your instructions on each turn: guidance, and a reply style for the kind of turn (chat or voice). In the console each has a switch (**Platform guidance**, **Platform chat reply style**, **Platform voice reply style**). Turn the switch off to write your own text.
+Caplo adds up to three blocks of text after your instructions on each turn: guidance, the reply language, and a reply style for the kind of turn (chat or voice). In the console each has a switch (**Platform guidance**, **Platform reply language**, **Platform chat reply style**, **Platform voice reply style**). Turn the switch off to write your own text.
 
 | Field | Max length | Default text |
 | --- | --- | --- |
 | `guidance` | 4,000 characters | "Use your tools to look up what you need before you answer. Answer questions about the business only from your instructions, this conversation and what your tools returned; when they do not cover a question, say so." |
+| `language` | 2,000 characters | "Reply in the language the visitor writes in, using the same writing system they use: for example, answer Roman Urdu (Urdu written in Latin letters) in Roman Urdu, and Urdu script in Urdu script. Change language only when the visitor changes it or asks you to." |
 | `chatStyle` | 2,000 characters | "You are replying in a chat: use short paragraphs, and a short list when it helps." |
 | `voiceStyle` | 2,000 characters | "You are speaking on a voice call: use brief, natural spoken sentences without Markdown, lists or visual references. Before you call tools to look something up, first say one short sentence telling the caller what you are checking, without stating any result. When you can answer right away, just answer." |
 
 - Leave a field out to use the default.
 - Set your own text to replace the default.
 - Set an empty string (`guidance: ""`) to send no block at all.
+
+You don't need language rules in your instructions: with the reply language block on, Caplo reads the language and writing system each visitor writes in from their own messages (not from suggestions or buttons they tap), and when the conversation's last reply used another script it reminds the agent to answer in the visitor's. Suggested replies, tool questions and Caplo's own fixed messages, such as a write's confirmation text, follow the visitor's language too (Caplo's fixed messages come in English, Urdu and Roman Urdu). Turn the block off only when an agent must always answer in one language, and say which in your own text.
 
 Replace the guidance when your agent may answer from general knowledge, for example a writing assistant, since the default tells it to answer only from its instructions, the conversation and its tools. Replace the chat style when your brand needs a different format, for example no lists.
 
