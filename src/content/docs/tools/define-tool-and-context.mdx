@@ -130,6 +130,7 @@ A function handler receives the context as its second argument. In an MCP packag
 | `idempotencyKey` | Write tools only. The same key for every attempt of one confirmed action. See [Write tools safely](/tools/write-tools/#use-the-idempotency-key). |
 | `invocationId` | This call's ID, also shown in `caplo tool logs`. |
 | `conversationId`, `turnId` | The conversation and turn the call belongs to. |
+| `language` | The conversation's language as a BCP 47 tag, read from the visitor's own messages: for example `en`, `ur` (Urdu script), `ur-Latn` (Roman Urdu) or `und-Latn` (Latin script, language unknown). Use it to write questions, choices and notices the visitor reads in their language. Absent when Caplo does not know it yet. It describes the visitor; never use it to decide what they may do. From `@caplo/tools` 0.1.8. |
 | `workspaceId`, `packageVersionId` | The workspace and the package version running. |
 | `subject`, `requireSubject()` | The verified customer, for tools that declare `subject`. See [Build customer-aware tools](/tools/customer-aware-tools/). |
 | `canElicit`, `elicit()` | Function packages: ask the visitor for missing details. See [Ask for missing details](/tools/present-results/#ask-for-missing-details). |
