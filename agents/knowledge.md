@@ -128,6 +128,10 @@ A name resolves in the workspace the command acts on, so the same file works in 
 
 The agent searches attached knowledge with a built-in search tool. How many searches it may run per turn and how many passages each returns are set in its [policy](/agents/policy-and-limits/) (`maxSearches` and `knowledgePassages`).
 
+## Languages
+
+Upload files in any language. Caplo reads the language each file is written in, such as English, Urdu or Roman Urdu (Urdu written in Latin letters), and the **Language** column of the file list shows it. Visitors can ask in their own language: the agent writes its search in the language of the files, keeping names, numbers and codes exactly as given, and answers in the visitor’s language. Prices, codes, phone numbers and addresses in the reply are the ones in your files.
+
 ## Versions and agent releases
 
 Publishing an agent pins the knowledge version that is ready at that moment. Publishing a newer knowledge version does not change agents already published, so live answers never change without a release. To use the new version, publish a new release of the agent. A release is made from a new draft revision, so save a change to the agent first; see [Publish an agent](/agents/publishing/).
