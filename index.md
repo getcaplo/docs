@@ -16,7 +16,9 @@
 
 [Models and providers](/providers/)Choose models, bring your own provider keys, and set up voice.
 
-[Usage and billing](/usage/)Understand usage, read statements, and set spend budgets.
+[Plans and billing](/billing/)Compare plans, manage your balance and payments, and find receipts and invoices.
+
+[Usage and spend](/usage/)See what your agents used and what it cost, and set spend budgets.
 
 [CLI](/cli/install/)Install the caplo CLI and manage projects, environments and CI/CD.
 

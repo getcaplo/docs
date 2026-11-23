@@ -2,7 +2,7 @@
 
 > Let your team sign in through your identity provider with OIDC or SAML, verify your domains, require SSO, and provision members with SCIM 2.0.
 
-Workspace SSO lets members sign in to a workspace through your company identity provider instead of Google or an email and password. Everything here is under **Settings** > **Identity & SSO**, and only Owners and Admins can see or change it. SSO settings belong to one workspace; other workspaces your members belong to keep their own.
+Workspace SSO lets members sign in to a workspace through your company identity provider instead of Google or an email and password. Everything here is under **Settings** > **Identity & SSO**, and only Owners and Admins can see or change it. On a plan, SSO and SCIM need Enterprise; see [Plans](/billing/). SSO settings belong to one workspace; other workspaces your members belong to keep their own.
 
 The usual order is: verify a domain, add and test a connection, activate it, then choose a sign-in policy.
 

@@ -1,0 +1,78 @@
+# Change or cancel your plan
+
+> Upgrade, downgrade or cancel a plan, add phone calls at once, understand renewals and failed payments, and resume a paused workspace.
+
+Owners and Billing members change the plan on **Plan & billing**. Other members can compare plans but not change them. Enterprise contracts change only through your Caplo contact.
+
+## Choose or change a plan
+
+1. On **Plan & billing**, select **Change plan**, or **Choose a plan** on the Free trial or a paused workspace.
+2. On **Choose a plan**, select the plan’s button, such as **Upgrade to Pro**.
+3. In the dialog, choose **Monthly** or **Yearly** (not offered when switching to a lower plan), check the summary, and confirm.
+
+| Change                                                                     | When it starts                    | What you pay                                                                                                                                                                            |
+| -------------------------------------------------------------------------- | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Start** a plan, from the Free trial or a paused workspace                | Today, once the fee is paid.      | The full fee for a new period. Any trial credit left stays until it expires.                                                                                                            |
+| **Upgrade**: a higher plan, monthly to yearly, or more phone calls at once | Today. A new period starts now.   | The new fee less the unused part of the current fee, shown as **Unused … fee**. The current plan credit ends and the new plan’s credit is added now. Funds you added yourself are kept. |
+| **Switch** to a lower plan                                                 | At the end of the current period. | Nothing now. You keep the current plan and its credit until then; the lower fee is paid at renewal.                                                                                     |
+
+The fee is paid from funds you added. If they don’t cover it, the dialog says “Added funds do not cover the fee due now” and offers **Pay now**, which takes you to Safepay; the plan changes as soon as the payment is confirmed.
+
+### Before a downgrade
+
+The dialog lists what the lower plan changes on the day it starts:
+
+* **Features stop.** For example, call recording stops for new calls and providers set to **Your key** switch to Caplo-managed models and speech, charged at list price. Your keys stay saved and work again on a plan that includes them.
+* **History is shortened.** If the lower plan keeps fewer days of conversation history, conversations older than that are erased 7 days after the plan starts. Export what you need first.
+* **Limits apply to new things only.** Agents, channels and handoff destinations above the lower plan’s limits keep working, but you can’t add more until you are under the limit.
+
+A pending downgrade shows “Your plan changes to … on …” with **Keep** and the current plan’s name, which undoes it.
+
+## Add phone calls at once
+
+On Pro, select **Add phone calls at once** on the **Plan limits** card and set **Extra phone calls at once**. Each is $15 a month, prorated from today and added to the plan fee.
+
+## Cancel
+
+1. On **Plan & billing**, select **Cancel plan**.
+2. Read what happens, then select **Cancel on** with the period’s end date.
+
+You keep the plan and its credit until the end of the period you paid for. Then production conversations pause, and the workspace’s data is erased 60 days later unless you choose a plan. Added funds stay for 12 months.
+
+Until the period ends, **Plan & billing** shows “Your … plan ends on …” with **Keep** and the plan’s name, which undoes the cancellation.
+
+## Renewals and failed payments
+
+At the end of each period the plan renews: the next fee is paid from funds you added, and a saved card pays any part they don’t cover. If neither covers it, the payment is due:
+
+* **Plan & billing** shows **Payment due** with “Payment for … failed on …” and the date production will pause. Owners and Billing members are told.
+* Everything keeps working for 7 days, but the plan can’t be changed.
+* Select **Pay** with the fee, or add funds that cover it. The plan then renews from today.
+* After 7 days unpaid, the workspace pauses.
+
+## Paused workspaces
+
+A paused workspace stops production conversations on every channel. Building agents, live tests and evaluations keep working, and your agents, channels and settings stay.
+
+| Why it paused                            | How to resume                                                        |
+| ---------------------------------------- | -------------------------------------------------------------------- |
+| The Free trial ended                     | Choose a plan.                                                       |
+| The plan was cancelled                   | Choose a plan.                                                       |
+| A renewal fee was not paid               | **Pay** the fee, add funds that cover it, or choose a plan.          |
+| An Enterprise invoice is 15 days overdue | Pay the invoice; production resumes when Caplo records the transfer. |
+
+Website visitors see “This assistant isn’t available right now. Please try again later.” Messages on other channels still reach your inbox without an agent reply. Every page of the console shows the pause with **Open plan and billing**.
+
+Paused workspaces are erased
+
+A workspace paused for 60 days is erased. Owners and Billing members are warned 30, 7 and 1 days before, and **Plan & billing** shows the date. Choose a plan before then to keep the workspace.
+
+## Price changes
+
+Caplo announces changes to its own rates at least 30 days ahead. **Plan & billing** shows the new prices and the date they start; your current prices apply until then.
+
+## Related
+
+* [Plans](/billing/)
+* [Balance and payments](/billing/balance-and-payments/)
+* [Plan limits and errors](/billing/plan-limits/)

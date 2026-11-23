@@ -11,7 +11,7 @@ Open **Settings**, then **Data & privacy**, to choose how long Caplo keeps conve
 | **Transcripts**               | The messages between the customer, the agent and your team, internal notes, and the customer’s identity, which the console masks until someone [reveals](/operate/conversations-inbox/#reveal-a-participant) it.                             | **Transcript retention**                          |
 | **Traces**                    | What each turn did: steps, models, tools and sub-agents called, statuses, error codes, timings, token counts and cost estimates. The conversation list, its counts and the [analytics](/operate/monitor-and-analytics/) are built from them. | **Trace retention**                               |
 | **Test traces**               | The trace data of live tests and eval runs.                                                                                                                                                                                                  | 7 days                                            |
-| **Usage and billing records** | Quantities and charges for your [statements](/usage/usage-and-statements/).                                                                                                                                                                  | Kept for billing, separately from these settings  |
+| **Usage and billing records** | Quantities and charges for your [usage pages and statements](/billing/receipts-and-invoices/).                                                                                                                                               | Kept for billing, separately from these settings  |
 | **Audit log**                 | Administrative and sensitive actions.                                                                                                                                                                                                        | Append-only: entries cannot be changed or deleted |
 
 ## Retention
@@ -22,6 +22,8 @@ Open **Settings**, then **Data & privacy**, to choose how long Caplo keeps conve
 | ------------------------ | -------------------------------- | ------- | -------------------------------------------------------------------------------- |
 | **Transcript retention** | 7 days, 30 days, 90 days, 1 year | 30 days | Channel conversations, counted from their last message or from when they closed. |
 | **Trace retention**      | 7 days, 30 days, 90 days         | 90 days | Production execution timelines and analytics.                                    |
+
+On a plan, **Transcript retention** can’t be longer than the history the plan keeps: 7 days on the Free trial, 30 on Standard and 90 on Pro. Longer choices are marked as needing a higher plan. When a downgrade lowers the limit below your setting, the setting is kept for 7 more days, then lowered to the limit and older transcripts are deleted. See [Plan limits](/billing/plan-limits/).
 
 1. Open **Settings** > **Data & privacy**.
 2. Under **Retention & content**, choose **Transcript retention** and **Trace retention**.
@@ -39,7 +41,7 @@ When you shorten either period, everything older than the new period is permanen
 
 ## Maximum call duration
 
-Under **Voice calls**, **Maximum call duration (minutes)** limits every voice call in the workspace, on the phone and in the website widget. Enter a whole number from 5 to 240. Until you set one, the platform default of 60 minutes applies.
+Under **Voice calls**, **Maximum call duration (minutes)** limits every voice call in the workspace, on the phone and in the website widget. Enter a whole number from 5 to 240. Until you set one, the platform default of 60 minutes applies. On a plan, calls also stop at the plan’s longest call: 10 minutes on the Free trial, 30 on Standard and 60 on Pro.
 
 The caller hears a warning one minute before the limit and a goodbye when the call reaches it. The call then ends with the reason **Time limit reached** in the inbox. A change applies to calls that start after it; a call in progress keeps the limit it started with.
 

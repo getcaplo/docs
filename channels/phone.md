@@ -4,7 +4,7 @@
 
 A phone channel lets customers call an agent. You bring a phone number from your own Twilio or Telnyx account and point it at Caplo. When someone calls, your carrier sends the call to Caplo over SIP, and the agent release the channel serves answers it.
 
-Phone channels take **inbound calls only**. Caplo does not buy numbers, place outbound calls to customers, or change your carrier account beyond what you configure yourself.
+Phone channels take **inbound calls only**. Caplo does not buy numbers in your carrier account, place outbound calls to customers, or change your carrier account beyond what you configure yourself. On Standard, Pro and Enterprise you can instead buy a Caplo phone number in the console, with no carrier account; see [Phone numbers](/billing/how-billing-works/#phone-numbers).
 
 ## How a call reaches your agent
 
@@ -143,23 +143,25 @@ Fixed lines left empty use the platform’s wording, shown as placeholders in th
 
 A phone call is billed in two places:
 
-* **Caplo** charges **Voice minutes** for connected call time, billed by the second, plus speech recognition, spoken characters and model tokens for providers set to **Caplo Managed**. See [How Caplo charges](/usage/) and [what affects the cost of a call](/providers/voice-and-speech/#what-affects-cost).
+* **Caplo** charges **Voice minutes** for connected call time, billed by the second, plus speech recognition, spoken characters and model tokens for providers set to **Caplo Managed**. See [How your bill works](/billing/how-billing-works/) and [what affects the cost of a call](/providers/voice-and-speech/#what-affects-cost).
 * **Your carrier** bills your Twilio or Telnyx account directly for the number, the inbound call minutes, and any transferred calls. A warm transfer places an outbound call from your account, and the caller’s inbound call stays open while they talk to your team.
+
+On a Caplo phone number there is no carrier bill: incoming calls have no network charge, and the number’s own fee is in [Phone numbers](/billing/how-billing-works/#phone-numbers).
 
 Shorter silence timings, a lower maximum call duration and short spoken replies all reduce the cost of a call.
 
 ## Limits
 
-| Limit               | Value                                                                                                                                                                                                                                                  |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Call direction      | Inbound only. Caplo never calls customers.                                                                                                                                                                                                             |
-| Numbers per channel | One. A number can serve only one channel, and the provider and number cannot be changed after the channel is created.                                                                                                                                  |
-| Simultaneous calls  | Currently one call at a time per workspace, counting phone and website voice calls together; platform capacity is also limited. A call that arrives when no capacity is free is disconnected. Contact [support](/resources/support/) if you need more. |
-| Call length         | 5 to 240 minutes, set per workspace; 60 by default.                                                                                                                                                                                                    |
-| Write tools         | The caller confirms each change by saying yes or no. Writes that need a verified customer cannot run, because callers are anonymous.                                                                                                                   |
-| Caller identity     | Callers are anonymous. The caller’s number is not treated as a verified customer.                                                                                                                                                                      |
-| Transfer target     | One per channel. Warm transfers need a phone number; at most two warm transfer attempts per call.                                                                                                                                                      |
-| Deleting            | Phone channels can be paused but not deleted.                                                                                                                                                                                                          |
+| Limit               | Value                                                                                                                                                                                                                                                                                  |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Call direction      | Inbound only. Caplo never calls customers.                                                                                                                                                                                                                                             |
+| Numbers per channel | One. A number can serve only one channel, and the provider and number cannot be changed after the channel is created.                                                                                                                                                                  |
+| Simultaneous calls  | Your plan’s **Phone calls at once**: 1 on the Free trial, 3 on Standard and 10 on Pro, which can add more. A call over that limit is turned away as busy. Platform capacity is also limited, and a call that arrives when no capacity is free is disconnected. See [Plans](/billing/). |
+| Call length         | 5 to 240 minutes, set per workspace; 60 by default, and never longer than your plan’s longest call.                                                                                                                                                                                    |
+| Write tools         | The caller confirms each change by saying yes or no. Writes that need a verified customer cannot run, because callers are anonymous.                                                                                                                                                   |
+| Caller identity     | Callers are anonymous. The caller’s number is not treated as a verified customer.                                                                                                                                                                                                      |
+| Transfer target     | One per channel. Warm transfers need a phone number; at most two warm transfer attempts per call.                                                                                                                                                                                      |
+| Deleting            | Phone channels can be paused but not deleted.                                                                                                                                                                                                                                          |
 
 Before a write tool runs, the caller hears the change and says yes or no. For a tool with a [`presentation`](/tools/present-results/#confirmation-and-receipt), Caplo reads its title and each field aloud, then asks the caller to say yes to continue or no to cancel. Without one, the caller hears only “Before I go ahead, please confirm this request. Say yes to continue or no to cancel.”, so the agent has to say what will change. See [Write tools](/tools/write-tools/).
 

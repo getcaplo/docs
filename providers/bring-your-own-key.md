@@ -4,7 +4,7 @@
 
 With **Your key**, an agent’s calls to a provider run on your own account with that provider. The provider bills you directly, and Caplo adds no AI usage charge for those calls. Use it when you already have negotiated rates, need usage on your own account, or want a provider Caplo does not manage for you.
 
-You can bring your own key for Anthropic, OpenAI, Deepgram and ElevenLabs. Each provider has one key per workspace.
+You can bring your own key for Anthropic, OpenAI, Deepgram and ElevenLabs. Each provider has one key per workspace. Your own keys need the Standard plan or higher; on the Free trial, **Your key** shows which plans include it. After a downgrade to a plan without them, providers set to **Your key** run on Caplo-managed models and speech, charged at list price, and your saved keys work again once the plan includes them. See [Plan limits](/billing/plan-limits/#features).
 
 ## Who can manage keys
 
@@ -62,7 +62,7 @@ A realtime voice model writes and speaks a call’s replies itself. It belongs t
 ## Billing effect
 
 * Calls on your key add no AI usage charge to your Caplo bill. Your provider bills you for them.
-* Caplo’s platform fees still apply to every production conversation, whoever’s key it used: per connected voice minute and per completed AI reply.
-* The **Billing** page counts the requests that used your keys and notes that those providers bill you directly. The **Usage** page includes their token and speech quantities; filter **Keys** by **Your keys** to see them alone.
+* Caplo’s platform fees still apply to every production conversation, whoever’s key it used.
+* The **Usage** tab of **Usage** includes their token and speech quantities; filter **Keys** by **Your keys** to see them alone. On a price plan, the **Charges** tab counts the requests that used your keys.
 
-See [How Caplo charges](/usage/) and [Usage and statements](/usage/usage-and-statements/).
+See [How your bill works](/billing/how-billing-works/) and [Usage and charges pages](/usage/usage-and-statements/).

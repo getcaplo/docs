@@ -268,7 +268,7 @@ This walkthrough takes you from a new account to an agent answering on your webs
 
 [Section titled “Create and test the agent”](#create-and-test-the-agent)
 
-1. **Sign in.** Go to [app.caplo.si](https://app.caplo.si) and sign in with your email, or with **Continue with company SSO** if your company uses single sign-on. The first time you sign in, Caplo creates a workspace for you and makes you its Owner. If a colleague invited you, open the invitation link instead and you join their workspace.
+1. **Sign in.** Go to [app.caplo.si](https://app.caplo.si) and sign in with your email, or with **Continue with company SSO** if your company uses single sign-on. The first time you sign in, Caplo creates a workspace for you and makes you its Owner. If a colleague invited you, open the invitation link instead and you join their workspace. If the console asks you to **Choose how to start**, select **Start free trial**; see [Plans](/billing/).
 
 2. **Create an agent.** In the sidebar, open **Agents** (under **Build**) and select **Create agent**. Enter an **Agent name**, such as `Customer support`, and optionally a **Description**, then select **Create draft**. The agent opens on its **Setup** tab.
 
@@ -850,7 +850,7 @@ Each member has exactly one role in a workspace. Owners and Admins invite people
 | Read conversations                                                                         | Yes   | Yes   | Yes     |           | Yes        | Yes     | Yes    |         |
 | Take over conversations, add notes, reveal participants                                    | Yes   | Yes   |         |           | Yes        |         |        |         |
 | View usage                                                                                 | Yes   | Yes   |         |           |            | Yes     |        | Yes     |
-| Manage billing and spend budgets                                                           | Yes   |       |         |           |            |         |        | Yes     |
+| Manage the plan, payments, billing details and spend budgets                               | Yes   |       |         |           |            |         |        | Yes     |
 | Invite and manage members                                                                  | Yes   | Yes   |         |           |            |         |        |         |
 | Workspace settings, SSO, customer identity, data retention                                 | Yes   | Yes   |         |           |            |         |        |         |
 | Create API clients for CI and scripts                                                      | Yes   | Yes   |         | Yes       |            |         |        |         |
@@ -887,7 +887,7 @@ See [Workspaces in the CLI](/cli/workspaces/) for details.
 
 * [Agents and releases](/concepts/agents-and-releases/): what Builders and Admins create and publish.
 * [Conversations and handoff](/concepts/conversations-and-handoff/): what Supervisors do in the inbox.
-* [Spend budgets](/usage/spend-budgets/): what the Billing role manages.
+* [Plans](/billing/) and [spend budgets](/usage/spend-budgets/): what the Billing role manages.
 
 # Manage API keys
 
@@ -1174,7 +1174,7 @@ The value is removed for good. Unbinding a package secret first means live calls
 
 > Let your team sign in through your identity provider with OIDC or SAML, verify your domains, require SSO, and provision members with SCIM 2.0.
 
-Workspace SSO lets members sign in to a workspace through your company identity provider instead of Google or an email and password. Everything here is under **Settings** > **Identity & SSO**, and only Owners and Admins can see or change it. SSO settings belong to one workspace; other workspaces your members belong to keep their own.
+Workspace SSO lets members sign in to a workspace through your company identity provider instead of Google or an email and password. Everything here is under **Settings** > **Identity & SSO**, and only Owners and Admins can see or change it. On a plan, SSO and SCIM need Enterprise; see [Plans](/billing/). SSO settings belong to one workspace; other workspaces your members belong to keep their own.
 
 The usual order is: verify a domain, add and test a connection, activate it, then choose a sign-in policy.
 
@@ -2244,7 +2244,7 @@ Replace the guidance when your agent may answer from general knowledge, for exam
 [Section titled “See also”](#see-also)
 
 * [Agent YAML reference](/reference/agent-yaml/) for the schema.
-* [Usage and statements](/usage/usage-and-statements/) to see what model calls cost.
+* [Usage and charges pages](/usage/usage-and-statements/) to see what model calls cost.
 
 # Publish an agent
 
@@ -2743,6 +2743,523 @@ The **Tools & actions** tab also holds the agent’s conversation actions: trans
 * [Write a tool package](/tools/first-tool/).
 * [Add eval cases](/agents/evals/) that check the agent calls the right tool (`tool` in a case).
 
+# Plans
+
+> Compare the Free trial, Standard, Pro and Enterprise plans, see what each includes, and choose how your workspace starts.
+
+Every workspace is on a plan. The plan sets the monthly fee, the usage credit it adds to your balance, the platform fees for conversations and voice minutes, and what the workspace can do at once and in total. AI models and speech are charged at each provider’s list price on every plan, with no markup.
+
+Your plan, balance, payments and documents are on **Plan & billing**, under **Usage & billing** in the console. Prices are in US dollars and exclude tax.
+
+## Compare plans
+
+[Section titled “Compare plans”](#compare-plans)
+
+|                               | Free trial            | Standard                   | Pro                                 | Enterprise                        |
+| ----------------------------- | --------------------- | -------------------------- | ----------------------------------- | --------------------------------- |
+| Fee                           | Free for 30 days      | $10 a month or $100 a year | $39 a month or $390 a year          | Contract, from $500 a month       |
+| Usage credit                  | $5 once, for 30 days  | $5 a month                 | $20 a month                         | Committed spend                   |
+| Platform fee per conversation | $0.006                | $0.006                     | $0.004                              | Contract rate                     |
+| Platform fee per voice minute | $0.02                 | $0.02                      | $0.015                              | Contract rate                     |
+| AI models and speech          | List price, no markup | List price, no markup      | List price, no markup               | List price or negotiated          |
+| Phone calls at once           | 1, on your own number | 3                          | 10, plus $15 a month for each extra | By contract                       |
+| Caplo phone numbers           | Not included          | $18 a month each           | $18 a month each                    | By contract                       |
+| Published agents              | 1                     | Unlimited                  | Unlimited                           | Unlimited                         |
+| Channels of each type         | 1                     | Unlimited                  | Unlimited                           | Unlimited                         |
+| Handoff destinations          | None                  | Unlimited                  | Unlimited                           | Unlimited                         |
+| Knowledge storage             | 50 MB                 | 1 GB                       | 10 GB                               | By contract                       |
+| Longest call                  | 10 minutes            | 30 minutes                 | 60 minutes                          | 240 minutes                       |
+| Conversation history kept     | 7 days                | 30 days                    | 90 days                             | Your choice                       |
+| Billing                       | Prepaid balance       | Prepaid balance            | Prepaid balance                     | Monthly invoice, by bank transfer |
+
+Features that depend on the plan:
+
+| Feature                                   | Free trial | Standard | Pro | Enterprise |
+| ----------------------------------------- | ---------- | -------- | --- | ---------- |
+| Caplo phone numbers                       |            | Yes      | Yes | Yes        |
+| Your own model and speech keys            |            | Yes      | Yes | Yes        |
+| Call recording                            |            |          | Yes | Yes        |
+| Customer memory                           |            |          | Yes | Yes        |
+| Remove “Powered by Caplo” from the widget |            |          | Yes | Yes        |
+| Single sign-on and SCIM                   |            |          |     | Yes        |
+| Dedicated tool runner                     |            |          |     | Yes        |
+
+A yearly plan costs ten months’ fees, so two months are free, and still adds its usage credit every month. Every plan can use every channel type; the Free trial allows one channel of each.
+
+See [How your bill works](/billing/how-billing-works/) for what each charge covers, and [Plan limits and errors](/billing/plan-limits/) for what happens at a limit.
+
+## Choose how to start
+
+[Section titled “Choose how to start”](#choose-how-to-start)
+
+A new workspace starts on the Free trial. The first time you sign in, the console shows **Choose how to start**:
+
+* **Start free trial** starts the 30-day trial with $5 of usage credit. No card is needed.
+* **Choose Standard** or **Choose Pro** starts that plan now. Choose **Monthly** or **Yearly** under **Billing interval** first. The plan starts when its fee is paid; see [Balance and payments](/billing/balance-and-payments/).
+* **Talk to us** asks Caplo about Enterprise.
+
+Until someone chooses, the console keeps returning to this page. Only Owners and Billing members can choose; other members see the plans and a note that an Owner or Billing member chooses.
+
+When the trial ends without a plan, production conversations pause until you choose one. Your agents and data stay. See [Paused workspaces](/billing/change-or-cancel/#paused-workspaces).
+
+## Who can see and change billing
+
+[Section titled “Who can see and change billing”](#who-can-see-and-change-billing)
+
+| Role           | Can                                                                                                                    |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Owner, Billing | Choose and change the plan, add funds, save a card, set auto-recharge, edit billing details, and see everything below. |
+| Admin, Auditor | See the plan, balance, activity, receipts, statements and invoices, and the **Usage** page.                            |
+| Other roles    | See plan limits where they apply, for example when publishing an agent.                                                |
+
+Owners and Billing members also get the billing notifications in the console’s bell and by email: low balance, balance used up, trial ending (3 days and 1 day before), payment due, workspace paused, data erasure warnings, plan changed, auto-recharge, and Enterprise invoices issued or overdue. Billing emails are on until a member turns them off.
+
+## Related
+
+[Section titled “Related”](#related)
+
+* [How your bill works](/billing/how-billing-works/)
+* [Change or cancel your plan](/billing/change-or-cancel/)
+* [Usage and charges](/usage/usage-and-statements/)
+* [Workspaces and roles](/concepts/workspaces-and-roles/)
+
+# Balance and payments
+
+> How the prepaid balance works, which credit is spent first, what happens at zero, and how to add funds, save a card and turn on auto-recharge.
+
+On the Free trial, Standard and Pro, usage is charged to one prepaid balance as it is recorded. The **Usage balance** card on **Plan & billing** shows what is left, about how many conversations or voice minutes that buys at your recent average, and each credit in the order it will be spent. The top bar shows the balance too.
+
+## Kinds of credit
+
+[Section titled “Kinds of credit”](#kinds-of-credit)
+
+| Credit                 | Comes from                                                                                | Lasts                                                 |
+| ---------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| **Trial credit**       | $5 when the Free trial starts.                                                            | Until the trial ends, 30 days.                        |
+| **Plan credit**        | Standard and Pro, each month of the plan, including on yearly plans.                      | Until the next month’s credit. It does not roll over. |
+| **Added funds**        | Payments you make with **Add funds**.                                                     | 12 months.                                            |
+| **Auto-recharge**      | Automatic payments from your saved card.                                                  | 12 months.                                            |
+| **Promotional credit** | Granted by Caplo.                                                                         | The expiry shown with it.                             |
+| **Adjustment**         | Unused plan fee returned when an upgrade costs less than what is left of the current fee. | Does not expire.                                      |
+
+Only added funds and auto-recharge pay plan fees. Trial and plan credit pay usage only.
+
+## Spending order
+
+[Section titled “Spending order”](#spending-order)
+
+Usage spends the credit that expires soonest first. Credits that expire together are spent free credit first, then added funds. The **Spent in this order** list on the **Usage balance** card shows the order for your balance.
+
+## When the balance reaches zero
+
+[Section titled “When the balance reaches zero”](#when-the-balance-reaches-zero)
+
+Caution
+
+At a balance of $0.00, new production conversations stop on every channel.
+
+* Conversations already running get 15 more minutes. Their usage can take the balance below zero, down to −$1 on the Free trial, −$2 on Standard or −$5 on Pro. Your next payment covers it first.
+* After the 15 minutes, the agent stops replying in those conversations, and a call in progress ends with the agent’s time-limit warning and goodbye.
+* Website visitors see “This assistant isn’t available right now. Please try again later.” Messages on WhatsApp, Messenger and Instagram still reach your inbox, but the agent doesn’t reply.
+* Building, live tests and evaluations keep working.
+* Adding funds resumes new conversations within about a minute.
+
+On the Free trial, an empty balance means choosing a plan. Owners and Billing members are told when the balance falls below $2, or below the auto-recharge threshold, and again when it runs out.
+
+## Add funds
+
+[Section titled “Add funds”](#add-funds)
+
+You need billing details first: open **Billing details** and add the business or person billed and the billing country. See [Billing details](/billing/receipts-and-invoices/#billing-details).
+
+1. On **Plan & billing**, select **Add funds**. It is available once you are on Standard or Pro.
+2. Choose an amount or enter another, from $10 to $500.
+3. Select **Add** with the amount. You go to Safepay’s secure page and pay by card, JazzCash or Easypaisa, in US dollars.
+4. Back on **Plan & billing**, the console confirms the payment. Funds reach your balance as soon as Safepay confirms it, usually at once.
+
+Added funds can be used for 12 months. Unused funds can be refunded within 14 days of adding them; contact [support](/resources/support/) with the receipt number.
+
+Caplo takes payments through Safepay for billing accounts in Pakistan. For other billing countries, **Payment method** shows that payments are not available yet; contact [support](/resources/support/).
+
+## Save a card
+
+[Section titled “Save a card”](#save-a-card)
+
+A saved Visa or Mastercard pays plan renewals that added funds don’t cover, and is needed for auto-recharge.
+
+1. On the **Payment method** card, select **Save a card**.
+2. Enter the cardholder’s first and last name and phone number with its country code, such as `+923001234567`. Safepay needs the phone number to save a card.
+3. Select **Continue to Safepay** and enter the card on Safepay’s page. Saving a card charges nothing.
+
+**Replace card** saves a different one. The billing country can’t change once a card is saved.
+
+## Auto-recharge
+
+[Section titled “Auto-recharge”](#auto-recharge)
+
+Auto-recharge adds funds from your saved card when the balance falls below a threshold, so agents keep answering. It is available on Standard and Pro with a saved card.
+
+1. On the **Auto-recharge** card, select **Set up**.
+2. Turn on **Recharge automatically**.
+3. Set **When balance falls below (USD)**, at least $5, and **Add (USD)**, from $10 to $500 and more than the threshold.
+4. Optionally set a **Monthly recharge limit (USD)**. Recharging stops for the rest of the calendar month once it is reached. Leave it empty for no limit.
+5. Save.
+
+The balance is checked about once a minute, after charges are recorded. Each fall below the threshold is recharged once; if the charge fails, Owners and Billing members are told and it is not retried until the balance falls below the threshold again. Each recharge gets a receipt.
+
+## After a payment
+
+[Section titled “After a payment”](#after-a-payment)
+
+Safepay returns you to **Plan & billing**, which shows the outcome:
+
+| Message                                            | Meaning                                                                                 |
+| -------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| **Confirming your payment…**                       | Caplo is waiting for Safepay’s confirmation.                                            |
+| **Payment received. … is in your balance.**        | The funds are added.                                                                    |
+| **Payment received. Your plan has changed.**       | A plan fee was paid and the plan changed.                                               |
+| **Payment received, but the plan did not change**  | The plan change was no longer allowed. The amount stays in your balance as added funds. |
+| **Your payment is still being confirmed.**         | Safepay hasn’t confirmed yet. The balance updates as soon as it does.                   |
+| **The payment did not go through.**                | Try again, or pay another way.                                                          |
+| **The payment was cancelled, so nothing changed.** | You left Safepay’s page without paying.                                                 |
+
+## Balance activity
+
+[Section titled “Balance activity”](#balance-activity)
+
+**Balance activity** on **Plan & billing** lists credits added and usage charged, with one line per UTC day of usage. **See charge details** opens the **Charges** tab of [Usage](/usage/usage-and-statements/).
+
+## Related
+
+[Section titled “Related”](#related)
+
+* [How your bill works](/billing/how-billing-works/)
+* [Change or cancel your plan](/billing/change-or-cancel/)
+* [Receipts, statements and invoices](/billing/receipts-and-invoices/)
+
+# Change or cancel your plan
+
+> Upgrade, downgrade or cancel a plan, add phone calls at once, understand renewals and failed payments, and resume a paused workspace.
+
+Owners and Billing members change the plan on **Plan & billing**. Other members can compare plans but not change them. Enterprise contracts change only through your Caplo contact.
+
+## Choose or change a plan
+
+[Section titled “Choose or change a plan”](#choose-or-change-a-plan)
+
+1. On **Plan & billing**, select **Change plan**, or **Choose a plan** on the Free trial or a paused workspace.
+2. On **Choose a plan**, select the plan’s button, such as **Upgrade to Pro**.
+3. In the dialog, choose **Monthly** or **Yearly** (not offered when switching to a lower plan), check the summary, and confirm.
+
+| Change                                                                     | When it starts                    | What you pay                                                                                                                                                                            |
+| -------------------------------------------------------------------------- | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Start** a plan, from the Free trial or a paused workspace                | Today, once the fee is paid.      | The full fee for a new period. Any trial credit left stays until it expires.                                                                                                            |
+| **Upgrade**: a higher plan, monthly to yearly, or more phone calls at once | Today. A new period starts now.   | The new fee less the unused part of the current fee, shown as **Unused … fee**. The current plan credit ends and the new plan’s credit is added now. Funds you added yourself are kept. |
+| **Switch** to a lower plan                                                 | At the end of the current period. | Nothing now. You keep the current plan and its credit until then; the lower fee is paid at renewal.                                                                                     |
+
+The fee is paid from funds you added. If they don’t cover it, the dialog says “Added funds do not cover the fee due now” and offers **Pay now**, which takes you to Safepay; the plan changes as soon as the payment is confirmed.
+
+### Before a downgrade
+
+[Section titled “Before a downgrade”](#before-a-downgrade)
+
+The dialog lists what the lower plan changes on the day it starts:
+
+* **Features stop.** For example, call recording stops for new calls and providers set to **Your key** switch to Caplo-managed models and speech, charged at list price. Your keys stay saved and work again on a plan that includes them.
+* **History is shortened.** If the lower plan keeps fewer days of conversation history, conversations older than that are erased 7 days after the plan starts. Export what you need first.
+* **Limits apply to new things only.** Agents, channels and handoff destinations above the lower plan’s limits keep working, but you can’t add more until you are under the limit.
+
+A pending downgrade shows “Your plan changes to … on …” with **Keep** and the current plan’s name, which undoes it.
+
+## Add phone calls at once
+
+[Section titled “Add phone calls at once”](#add-phone-calls-at-once)
+
+On Pro, select **Add phone calls at once** on the **Plan limits** card and set **Extra phone calls at once**. Each is $15 a month, prorated from today and added to the plan fee.
+
+## Cancel
+
+[Section titled “Cancel”](#cancel)
+
+1. On **Plan & billing**, select **Cancel plan**.
+2. Read what happens, then select **Cancel on** with the period’s end date.
+
+You keep the plan and its credit until the end of the period you paid for. Then production conversations pause, and the workspace’s data is erased 60 days later unless you choose a plan. Added funds stay for 12 months.
+
+Until the period ends, **Plan & billing** shows “Your … plan ends on …” with **Keep** and the plan’s name, which undoes the cancellation.
+
+## Renewals and failed payments
+
+[Section titled “Renewals and failed payments”](#renewals-and-failed-payments)
+
+At the end of each period the plan renews: the next fee is paid from funds you added, and a saved card pays any part they don’t cover. If neither covers it, the payment is due:
+
+* **Plan & billing** shows **Payment due** with “Payment for … failed on …” and the date production will pause. Owners and Billing members are told.
+* Everything keeps working for 7 days, but the plan can’t be changed.
+* Select **Pay** with the fee, or add funds that cover it. The plan then renews from today.
+* After 7 days unpaid, the workspace pauses.
+
+## Paused workspaces
+
+[Section titled “Paused workspaces”](#paused-workspaces)
+
+A paused workspace stops production conversations on every channel. Building agents, live tests and evaluations keep working, and your agents, channels and settings stay.
+
+| Why it paused                            | How to resume                                                        |
+| ---------------------------------------- | -------------------------------------------------------------------- |
+| The Free trial ended                     | Choose a plan.                                                       |
+| The plan was cancelled                   | Choose a plan.                                                       |
+| A renewal fee was not paid               | **Pay** the fee, add funds that cover it, or choose a plan.          |
+| An Enterprise invoice is 15 days overdue | Pay the invoice; production resumes when Caplo records the transfer. |
+
+Website visitors see “This assistant isn’t available right now. Please try again later.” Messages on other channels still reach your inbox without an agent reply. Every page of the console shows the pause with **Open plan and billing**.
+
+Paused workspaces are erased
+
+A workspace paused for 60 days is erased. Owners and Billing members are warned 30, 7 and 1 days before, and **Plan & billing** shows the date. Choose a plan before then to keep the workspace.
+
+## Price changes
+
+[Section titled “Price changes”](#price-changes)
+
+Caplo announces changes to its own rates at least 30 days ahead. **Plan & billing** shows the new prices and the date they start; your current prices apply until then.
+
+## Related
+
+[Section titled “Related”](#related)
+
+* [Plans](/billing/)
+* [Balance and payments](/billing/balance-and-payments/)
+* [Plan limits and errors](/billing/plan-limits/)
+
+# How your bill works
+
+> What Caplo charges on a plan, from the plan fee and platform fees to AI and speech at cost, what is free, and what other providers bill you directly.
+
+On a Free trial, Standard or Pro plan, everything Caplo charges comes out of one prepaid balance. Enterprise works the same way, except that usage is invoiced monthly instead; see [Enterprise invoices](/billing/receipts-and-invoices/#enterprise-invoices).
+
+A bill has three parts:
+
+| Part              | What it is                                                                                                         | Paid from                                                                         |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
+| **Plan fee**      | The monthly or yearly price of Standard or Pro, plus any extra phone calls at once on Pro.                         | Funds you added, then your saved card. Never from trial or plan credit.           |
+| **Platform fees** | Caplo’s fee for each production conversation and each voice minute.                                                | Your balance, in [spending order](/billing/balance-and-payments/#spending-order). |
+| **AI and speech** | The models, speech to text and text to speech your agents used on Caplo’s accounts, at each provider’s list price. | Your balance.                                                                     |
+
+Caplo phone numbers add a monthly fee per number, also charged to your balance; see [Phone numbers](#phone-numbers).
+
+## Platform fees
+
+[Section titled “Platform fees”](#platform-fees)
+
+**Conversations.** A conversation is one customer’s thread on one text channel, such as website chat, WhatsApp, Messenger or Instagram. It covers up to 20 agent replies within 24 hours of its first reply. A thread that goes on longer, or past 24 hours, counts as another conversation. The fee is charged when the agent’s first reply of each conversation is sent.
+
+**Voice minutes.** Connected time on voice calls, by phone or in the website widget, charged by the second. Voice calls pay per minute, not per conversation.
+
+|                  | Free trial | Standard | Pro    |
+| ---------------- | ---------- | -------- | ------ |
+| Per conversation | $0.006     | $0.006   | $0.004 |
+| Per voice minute | $0.02      | $0.02    | $0.015 |
+
+Platform fees apply to every production conversation, whoever’s keys paid for the models.
+
+## AI and speech
+
+[Section titled “AI and speech”](#ai-and-speech)
+
+Language model tokens, speech recognition and spoken characters are charged at the provider’s published list price, with no markup, when the provider is set to **Caplo Managed**. When a provider is set to **Your key**, its calls run on your provider account: that provider bills you, and Caplo charges nothing for them. Your own keys need Standard or higher; see [Bring your own key](/providers/bring-your-own-key/).
+
+A cost is charged once the provider has reported it, usually within a minute of the call.
+
+## What is free
+
+[Section titled “What is free”](#what-is-free)
+
+* **Building agents.** Editing, publishing and the console’s assistance cost nothing.
+* **Live tests and evaluations** pay only for the AI and speech they use. They have no platform fee.
+
+## Phone numbers
+
+[Section titled “Phone numbers”](#phone-numbers)
+
+* **Your own Twilio or Telnyx number:** Twilio or Telnyx bills you for the number and its calls. Caplo charges the voice minutes and any Caplo-managed speech and AI.
+* **Caplo phone number:** $18 a month for each number on Standard and Pro, charged to your balance for each day the workspace holds it. You buy one in the console when you create a phone channel, and release it when you no longer need it. The Free trial can’t buy one. Incoming calls on it have no network charge, only the same voice minutes as any other call; outgoing calls aren’t available yet.
+* **Extra phone calls at once** on Pro are $15 a month each, added to the plan fee and prorated from the day you add them.
+
+## WhatsApp charges
+
+[Section titled “WhatsApp charges”](#whatsapp-charges)
+
+Meta bills WhatsApp messages to your own WhatsApp Business account, not to Caplo, and Caplo adds no markup. Templates your agents or team send to start or reopen a conversation are charged by Meta per delivered message, by category and the customer’s country. Replies inside the customer’s 24-hour window are free for the first 1,000 a number each month, then charged at Meta’s rate. The conversation itself carries the usual platform fee.
+
+## Where to see it
+
+[Section titled “Where to see it”](#where-to-see-it)
+
+What was charged each day is in **Balance activity** on **Plan & billing**, and each month’s total in its [statement](/billing/receipts-and-invoices/). The [Usage](/usage/usage-and-statements/) page shows the quantities behind it, by source, agent, channel and model, including live tests and evaluations.
+
+## An example month
+
+[Section titled “An example month”](#an-example-month)
+
+A workspace on Standard, paying monthly, with 1,000 chat conversations and 200 voice minutes, all on Caplo-managed models:
+
+| Line                                        | Amount     |
+| ------------------------------------------- | ---------- |
+| Standard plan fee                           | $10.00     |
+| Platform fee, 1,000 conversations at $0.006 | $6.00      |
+| Platform fee, 200 voice minutes at $0.02    | $4.00      |
+| AI and speech at list price, for example    | $8.00      |
+| Usage credit included with Standard         | −$5.00     |
+| **Total for the month**                     | **$23.00** |
+
+The AI and speech line depends on the models and voices your agents use; larger models cost more per reply. The plan fee is paid from funds you added; the usage is charged to your balance, which spends the plan credit first.
+
+## Taxes and currency
+
+[Section titled “Taxes and currency”](#taxes-and-currency)
+
+All prices and balances are in US dollars. Receipts and invoices show any sales tax separately, at the rate in effect when they were issued.
+
+## Related
+
+[Section titled “Related”](#related)
+
+* [Plans](/billing/)
+* [Balance and payments](/billing/balance-and-payments/)
+* [Spend budgets](/usage/spend-budgets/)
+* [Cost reports](/usage/cost-reports/)
+
+# Plan limits and errors
+
+> What each plan limit counts, what happens when you reach one, and the messages your team and your customers may see.
+
+The **Plan limits** card on **Plan & billing** shows what your plan allows. Limits apply across every agent in the workspace, and a limit only refuses something new: what you already have keeps working, also after a downgrade.
+
+## Limits
+
+[Section titled “Limits”](#limits)
+
+| Limit                         | What counts                                                                                                                                                          | At the limit                                                                                                                                                                                      |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Phone calls at once**       | Calls in progress at the same moment across all phone channels. Website chat and browser voice are not limited by plan.                                              | The next caller is turned away as busy.                                                                                                                                                           |
+| **Published agents**          | Agents with a release that no other agent uses as a sub-agent. Sub-agents don’t count.                                                                               | Publishing another agent’s first release, or restoring an archived one, is refused. New releases of published agents are not.                                                                     |
+| **Channels of each type**     | Website, phone (Twilio, Telnyx and Caplo numbers together), WhatsApp, Messenger, Instagram and Outlook channels, each type separately. Removed channels don’t count. | Creating another channel of that type is refused.                                                                                                                                                 |
+| **Handoff destinations**      | Destinations that pass conversations to your team.                                                                                                                   | Adding another is refused. The Free trial has none.                                                                                                                                               |
+| **Knowledge storage**         | Files stored in all knowledge bases.                                                                                                                                 | Uploading or replacing a file that adds to the total is refused.                                                                                                                                  |
+| **Longest call**              | Each voice call, by phone or in the widget.                                                                                                                          | The caller hears a warning a minute before and a goodbye at the limit. A shorter **Maximum call duration** in [Data and privacy](/operate/data-and-privacy/#maximum-call-duration) still applies. |
+| **Conversation history kept** | How long transcripts are kept.                                                                                                                                       | Longer **Transcript retention** choices are refused.                                                                                                                                              |
+
+## Features
+
+[Section titled “Features”](#features)
+
+A feature your plan leaves out shows which plans include it, where you would use it: for example “Call recording is available on Pro and Enterprise.” The control stays unavailable until you change the plan.
+
+| Feature                        | Without it                                                                                                                                                                                    |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Caplo phone numbers            | You can’t search for or add a Caplo number. Numbers you already have keep working.                                                                                                            |
+| Your own model and speech keys | You can’t save a key or choose **Your key**. After a downgrade, providers set to **Your key** use Caplo-managed models and speech, charged at list price, until the plan includes keys again. |
+| Call recording                 | Calls are not recorded, whatever the setting says. You can still turn recording off.                                                                                                          |
+| Customer memory                | Agents don’t remember customers between conversations.                                                                                                                                        |
+| Remove “Powered by Caplo”      | The website widget shows a small “Powered by Caplo” link.                                                                                                                                     |
+| Single sign-on and SCIM        | Company sign-in and provisioning can’t be set up.                                                                                                                                             |
+
+## Messages your team may see
+
+[Section titled “Messages your team may see”](#messages-your-team-may-see)
+
+| Message                                                                                         | What to do                                                                         |
+| ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Your plan allows a number of published agents, channels or handoff destinations                 | Archive or remove one, or [change the plan](/billing/change-or-cancel/).           |
+| “This file would take the workspace past the … of stored files its plan includes.”              | Delete knowledge files you no longer need, or change the plan.                     |
+| Your plan does not include Caplo phone numbers, your own keys or call recording                 | Change the plan.                                                                   |
+| A longer history than the plan keeps                                                            | Choose fewer days, or change the plan.                                             |
+| “Added funds do not cover the fee due now.”                                                     | [Add funds](/billing/balance-and-payments/#add-funds) or select **Pay now**.       |
+| A payment needs billing details                                                                 | Add them under [Billing details](/billing/receipts-and-invoices/#billing-details). |
+| “The payment provider did not complete the request.” or “Payments are not available right now.” | Try again in a few minutes.                                                        |
+| “Your workspace role does not allow this.”                                                      | Ask an Owner or Billing member.                                                    |
+
+## What customers may see
+
+[Section titled “What customers may see”](#what-customers-may-see)
+
+When the balance is used up, the workspace is paused or a [spend budget](/usage/spend-budgets/) pauses new conversations:
+
+* New conversations are refused. The website widget answers “This assistant isn’t available right now. Please try again later.” Visitors never see why.
+* Messages on WhatsApp, Messenger and Instagram reach your [inbox](/operate/conversations-inbox/), but the agent doesn’t reply.
+* New phone calls are refused.
+* A budget pause lets conversations in progress finish. When the balance is used up or the workspace is paused, they get 15 more minutes; then the agent stops replying and calls end with the time-limit goodbye.
+
+Live tests and evaluations are never held back.
+
+## Related
+
+[Section titled “Related”](#related)
+
+* [Plans](/billing/)
+* [Change or cancel your plan](/billing/change-or-cancel/)
+* [Balance and payments](/billing/balance-and-payments/#when-the-balance-reaches-zero)
+
+# Receipts, statements and invoices
+
+> Find receipts for payments, monthly statements and Enterprise invoices, set the billing details they show, and pay an Enterprise invoice.
+
+Billing documents are on **Plan & billing**, under **Invoices & receipts**, newest first. Open one with **View** to see it and download it as a PDF.
+
+| Document      | Issued for                                                    | Shows                                                                               |
+| ------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| **Receipt**   | Every payment: a plan fee, funds you added, an auto-recharge. | What was paid, sales tax and how it was paid.                                       |
+| **Statement** | Every UTC month with balance activity.                        | Plan fees paid, funds added, trial and plan credit, and usage charged in the month. |
+| **Invoice**   | Every month of an Enterprise contract.                        | The contract’s charges, tax, the total and how to pay.                              |
+
+Amounts are in US dollars, with any sales tax shown separately at the rate in effect when the document was issued.
+
+## Billing details
+
+[Section titled “Billing details”](#billing-details)
+
+Receipts, statements and invoices show the billing details saved when they were issued. Owners and Billing members set them under **Billing details**, with **Add** or **Edit**:
+
+| Field                                          | Notes                                                                                                                  |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **Business or person billed**                  | Required.                                                                                                              |
+| **Receipts email**                             | Required.                                                                                                              |
+| **Address**                                    | Optional.                                                                                                              |
+| **Billing country**                            | Required. It decides how you pay and can’t change once a card is saved.                                                |
+| **NTN**, **Sales tax number** and **Province** | Pakistan only. The NTN has 8 digits, such as `1234567-8`; the sales tax registration number has 13. Both are optional. |
+
+Payments need billing details first. Without them, a payment shows **Add billing details**.
+
+## Enterprise invoices
+
+[Section titled “Enterprise invoices”](#enterprise-invoices)
+
+An Enterprise workspace has no prepaid balance. Caplo invoices each month on the 1st, for the month before:
+
+* the monthly commitment, invoiced even when usage is lower;
+* platform fees above the commitment, at your contract rates;
+* AI and speech at list price;
+* Caplo phone numbers at the contract’s monthly fee, for the days you held each;
+* sales tax.
+
+Invoice numbers look like `INV-2026-0001`. Usage recorded after an invoice was prepared falls into the next one.
+
+### Pay an invoice
+
+[Section titled “Pay an invoice”](#pay-an-invoice)
+
+Pay by bank transfer to the account printed on the PDF invoice, quoting the invoice number. Caplo marks the invoice paid when the transfer arrives, usually within two working days.
+
+An invoice is due the number of days after issue that your contract sets. Owners and Billing members are told when an invoice is issued and when it becomes overdue. If an invoice is still unpaid 15 days after its due date, production conversations pause until Caplo records the payment; see [Paused workspaces](/billing/change-or-cancel/#paused-workspaces).
+
+## Related
+
+[Section titled “Related”](#related)
+
+* [Balance and payments](/billing/balance-and-payments/)
+* [How your bill works](/billing/how-billing-works/)
+
 # Channels
 
 > Connect a website, phone number or messaging account to a published agent release, then update or roll back the release it serves.
@@ -3146,7 +3663,7 @@ Select **Check connection** on the account under **Integrations**. The **Deliver
 
 A phone channel lets customers call an agent. You bring a phone number from your own Twilio or Telnyx account and point it at Caplo. When someone calls, your carrier sends the call to Caplo over SIP, and the agent release the channel serves answers it.
 
-Phone channels take **inbound calls only**. Caplo does not buy numbers, place outbound calls to customers, or change your carrier account beyond what you configure yourself.
+Phone channels take **inbound calls only**. Caplo does not buy numbers in your carrier account, place outbound calls to customers, or change your carrier account beyond what you configure yourself. On Standard, Pro and Enterprise you can instead buy a Caplo phone number in the console, with no carrier account; see [Phone numbers](/billing/how-billing-works/#phone-numbers).
 
 ## How a call reaches your agent
 
@@ -3305,8 +3822,10 @@ Fixed lines left empty use the platform’s wording, shown as placeholders in th
 
 A phone call is billed in two places:
 
-* **Caplo** charges **Voice minutes** for connected call time, billed by the second, plus speech recognition, spoken characters and model tokens for providers set to **Caplo Managed**. See [How Caplo charges](/usage/) and [what affects the cost of a call](/providers/voice-and-speech/#what-affects-cost).
+* **Caplo** charges **Voice minutes** for connected call time, billed by the second, plus speech recognition, spoken characters and model tokens for providers set to **Caplo Managed**. See [How your bill works](/billing/how-billing-works/) and [what affects the cost of a call](/providers/voice-and-speech/#what-affects-cost).
 * **Your carrier** bills your Twilio or Telnyx account directly for the number, the inbound call minutes, and any transferred calls. A warm transfer places an outbound call from your account, and the caller’s inbound call stays open while they talk to your team.
+
+On a Caplo phone number there is no carrier bill: incoming calls have no network charge, and the number’s own fee is in [Phone numbers](/billing/how-billing-works/#phone-numbers).
 
 Shorter silence timings, a lower maximum call duration and short spoken replies all reduce the cost of a call.
 
@@ -3314,16 +3833,16 @@ Shorter silence timings, a lower maximum call duration and short spoken replies 
 
 [Section titled “Limits”](#limits)
 
-| Limit               | Value                                                                                                                                                                                                                                                  |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Call direction      | Inbound only. Caplo never calls customers.                                                                                                                                                                                                             |
-| Numbers per channel | One. A number can serve only one channel, and the provider and number cannot be changed after the channel is created.                                                                                                                                  |
-| Simultaneous calls  | Currently one call at a time per workspace, counting phone and website voice calls together; platform capacity is also limited. A call that arrives when no capacity is free is disconnected. Contact [support](/resources/support/) if you need more. |
-| Call length         | 5 to 240 minutes, set per workspace; 60 by default.                                                                                                                                                                                                    |
-| Write tools         | The caller confirms each change by saying yes or no. Writes that need a verified customer cannot run, because callers are anonymous.                                                                                                                   |
-| Caller identity     | Callers are anonymous. The caller’s number is not treated as a verified customer.                                                                                                                                                                      |
-| Transfer target     | One per channel. Warm transfers need a phone number; at most two warm transfer attempts per call.                                                                                                                                                      |
-| Deleting            | Phone channels can be paused but not deleted.                                                                                                                                                                                                          |
+| Limit               | Value                                                                                                                                                                                                                                                                                  |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Call direction      | Inbound only. Caplo never calls customers.                                                                                                                                                                                                                                             |
+| Numbers per channel | One. A number can serve only one channel, and the provider and number cannot be changed after the channel is created.                                                                                                                                                                  |
+| Simultaneous calls  | Your plan’s **Phone calls at once**: 1 on the Free trial, 3 on Standard and 10 on Pro, which can add more. A call over that limit is turned away as busy. Platform capacity is also limited, and a call that arrives when no capacity is free is disconnected. See [Plans](/billing/). |
+| Call length         | 5 to 240 minutes, set per workspace; 60 by default, and never longer than your plan’s longest call.                                                                                                                                                                                    |
+| Write tools         | The caller confirms each change by saying yes or no. Writes that need a verified customer cannot run, because callers are anonymous.                                                                                                                                                   |
+| Caller identity     | Callers are anonymous. The caller’s number is not treated as a verified customer.                                                                                                                                                                                                      |
+| Transfer target     | One per channel. Warm transfers need a phone number; at most two warm transfer attempts per call.                                                                                                                                                                                      |
+| Deleting            | Phone channels can be paused but not deleted.                                                                                                                                                                                                                                          |
 
 Before a write tool runs, the caller hears the change and says yes or no. For a tool with a [`presentation`](/tools/present-results/#confirmation-and-receipt), Caplo reads its title and each field aloud, then asks the caller to say yes to continue or no to cancel. Without one, the caller hears only “Before I go ahead, please confirm this request. Say yes to continue or no to cancel.”, so the agent has to say what will change. See [Write tools](/tools/write-tools/).
 
@@ -7090,7 +7609,9 @@ Rules:
 
 [Models and providers](/providers/)Choose models, bring your own provider keys, and set up voice.
 
-[Usage and billing](/usage/)Understand usage, read statements, and set spend budgets.
+[Plans and billing](/billing/)Compare plans, manage your balance and payments, and find receipts and invoices.
+
+[Usage and spend](/usage/)See what your agents used and what it cost, and set spend budgets.
 
 [CLI](/cli/install/)Install the caplo CLI and manage projects, environments and CI/CD.
 
@@ -7290,7 +7811,7 @@ Open **Settings**, then **Data & privacy**, to choose how long Caplo keeps conve
 | **Transcripts**               | The messages between the customer, the agent and your team, internal notes, and the customer’s identity, which the console masks until someone [reveals](/operate/conversations-inbox/#reveal-a-participant) it.                             | **Transcript retention**                          |
 | **Traces**                    | What each turn did: steps, models, tools and sub-agents called, statuses, error codes, timings, token counts and cost estimates. The conversation list, its counts and the [analytics](/operate/monitor-and-analytics/) are built from them. | **Trace retention**                               |
 | **Test traces**               | The trace data of live tests and eval runs.                                                                                                                                                                                                  | 7 days                                            |
-| **Usage and billing records** | Quantities and charges for your [statements](/usage/usage-and-statements/).                                                                                                                                                                  | Kept for billing, separately from these settings  |
+| **Usage and billing records** | Quantities and charges for your [usage pages and statements](/billing/receipts-and-invoices/).                                                                                                                                               | Kept for billing, separately from these settings  |
 | **Audit log**                 | Administrative and sensitive actions.                                                                                                                                                                                                        | Append-only: entries cannot be changed or deleted |
 
 ## Retention
@@ -7303,6 +7824,8 @@ Open **Settings**, then **Data & privacy**, to choose how long Caplo keeps conve
 | ------------------------ | -------------------------------- | ------- | -------------------------------------------------------------------------------- |
 | **Transcript retention** | 7 days, 30 days, 90 days, 1 year | 30 days | Channel conversations, counted from their last message or from when they closed. |
 | **Trace retention**      | 7 days, 30 days, 90 days         | 90 days | Production execution timelines and analytics.                                    |
+
+On a plan, **Transcript retention** can’t be longer than the history the plan keeps: 7 days on the Free trial, 30 on Standard and 90 on Pro. Longer choices are marked as needing a higher plan. When a downgrade lowers the limit below your setting, the setting is kept for 7 more days, then lowered to the limit and older transcripts are deleted. See [Plan limits](/billing/plan-limits/).
 
 1. Open **Settings** > **Data & privacy**.
 2. Under **Retention & content**, choose **Transcript retention** and **Trace retention**.
@@ -7322,7 +7845,7 @@ When you shorten either period, everything older than the new period is permanen
 
 [Section titled “Maximum call duration”](#maximum-call-duration)
 
-Under **Voice calls**, **Maximum call duration (minutes)** limits every voice call in the workspace, on the phone and in the website widget. Enter a whole number from 5 to 240. Until you set one, the platform default of 60 minutes applies.
+Under **Voice calls**, **Maximum call duration (minutes)** limits every voice call in the workspace, on the phone and in the website widget. Enter a whole number from 5 to 240. Until you set one, the platform default of 60 minutes applies. On a plan, calls also stop at the plan’s longest call: 10 minutes on the Free trial, 30 on Standard and 60 on Pro.
 
 The caller hears a warning one minute before the limit and a goodbye when the call reaches it. The call then ends with the reason **Time limit reached** in the inbox. A change applies to calls that start after it; a call in progress keeps the limit it started with.
 
@@ -7386,7 +7909,7 @@ Only some of the **Overview** page reads live traffic:
 * Built from your configuration, not from traffic: the **Agents** and **Channels** tiles, the **Preview setup checklist** and **Channel readiness**. Badges such as **Sample connection state**, **Provider unverified** and **Live health unavailable** mark figures that do not come from live provider or health checks.
 * **Helpful feedback** under **Operational outcomes** shows **Unavailable**. To read ratings, open the rated conversations in **Conversations**.
 
-**Estimated cost** figures, on **Overview** and on each conversation, come from Caplo’s rate card for model calls. They can be marked partial when a model has no price, and they are not what you are charged. Charges are on the [Billing](/usage/usage-and-statements/) page.
+**Estimated cost** figures, on **Overview** and on each conversation, come from Caplo’s rate card for model calls. They can be marked partial when a model has no price, and they are not what you are charged. What you are charged is on **Plan & billing**; see [How your bill works](/billing/how-billing-works/).
 
 Outcomes and conversation lists are built from trace data, so they reach back only as far as the workspace’s **Trace retention**. See [Data and privacy](/operate/data-and-privacy/).
 
@@ -7431,7 +7954,7 @@ Tool call details are visible to Owners, Admins and Supervisors. Builders, Audit
 [Section titled “Related”](#related)
 
 * [Work in the Conversations inbox](/operate/conversations-inbox/)
-* [Usage and statements](/usage/usage-and-statements/)
+* [Usage and charges pages](/usage/usage-and-statements/)
 * [Write and run evals](/agents/evals/)
 
 # Models and providers
@@ -7503,10 +8026,10 @@ Owners, Admins and Developers can change key sources and manage keys. Other role
 
 [Section titled “Billing effect”](#billing-effect)
 
-* **Caplo Managed** usage appears on your Caplo bill at the provider’s list price plus your plan’s markup.
-* **Your key** usage is billed to you by the provider and adds no AI usage charge from Caplo. Caplo’s platform fees (per voice minute and per AI reply) still apply.
+* **Caplo Managed** usage appears on your Caplo bill at the provider’s list price, with no markup on a plan.
+* **Your key** usage is billed to you by the provider and adds no AI usage charge from Caplo. Caplo’s platform fees still apply. Your own keys need the Standard plan or higher.
 
-See [How Caplo charges](/usage/).
+See [How your bill works](/billing/how-billing-works/).
 
 ## Related
 
@@ -7522,7 +8045,7 @@ See [How Caplo charges](/usage/).
 
 With **Your key**, an agent’s calls to a provider run on your own account with that provider. The provider bills you directly, and Caplo adds no AI usage charge for those calls. Use it when you already have negotiated rates, need usage on your own account, or want a provider Caplo does not manage for you.
 
-You can bring your own key for Anthropic, OpenAI, Deepgram and ElevenLabs. Each provider has one key per workspace.
+You can bring your own key for Anthropic, OpenAI, Deepgram and ElevenLabs. Each provider has one key per workspace. Your own keys need the Standard plan or higher; on the Free trial, **Your key** shows which plans include it. After a downgrade to a plan without them, providers set to **Your key** run on Caplo-managed models and speech, charged at list price, and your saved keys work again once the plan includes them. See [Plan limits](/billing/plan-limits/#features).
 
 ## Who can manage keys
 
@@ -7596,10 +8119,10 @@ A realtime voice model writes and speaks a call’s replies itself. It belongs t
 [Section titled “Billing effect”](#billing-effect)
 
 * Calls on your key add no AI usage charge to your Caplo bill. Your provider bills you for them.
-* Caplo’s platform fees still apply to every production conversation, whoever’s key it used: per connected voice minute and per completed AI reply.
-* The **Billing** page counts the requests that used your keys and notes that those providers bill you directly. The **Usage** page includes their token and speech quantities; filter **Keys** by **Your keys** to see them alone.
+* Caplo’s platform fees still apply to every production conversation, whoever’s key it used.
+* The **Usage** tab of **Usage** includes their token and speech quantities; filter **Keys** by **Your keys** to see them alone. On a price plan, the **Charges** tab counts the requests that used your keys.
 
-See [How Caplo charges](/usage/) and [Usage and statements](/usage/usage-and-statements/).
+See [How your bill works](/billing/how-billing-works/) and [Usage and charges pages](/usage/usage-and-statements/).
 
 # Fast decisions
 
@@ -7732,7 +8255,7 @@ Deepgram limits how long the terms are in total, so the console shows how much r
 
 [Section titled “What affects cost”](#what-affects-cost)
 
-A voice conversation can add these charges. See [How Caplo charges](/usage/) for how each is billed.
+A voice conversation can add these charges. See [How your bill works](/billing/how-billing-works/) for how each is billed.
 
 | What                             | Measured in                                    | Billed by                                                                                             |
 | -------------------------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
@@ -7750,7 +8273,7 @@ What makes a call cost more:
 * **Realtime models**: they bill audio tokens for what they hear and say, on top of the pipeline’s speech recognition.
 * **Key terms**: Deepgram on your own key and ElevenLabs add a small charge per audio minute while terms are set. Pronunciations are counted as the characters actually spoken.
 
-The **Usage** page shows speech to text minutes, text to speech characters and voice minutes by provider, agent or channel. See [Usage and statements](/usage/usage-and-statements/).
+The **Usage** page shows speech to text minutes, text to speech characters and voice minutes by provider, agent or channel. See [Usage and charges pages](/usage/usage-and-statements/).
 
 # Build tools
 
@@ -9815,95 +10338,47 @@ if (stepUp) return stepUp;
 * A `presentation` shows the customer what they are confirming. See [Show results to customers](/tools/present-results/).
 * Local fixtures for the tool point at a test environment: `caplo tool test` runs write fixtures for real on your machine. See [Test tools with fixtures](/tools/testing/).
 
-# How Caplo charges
+# Usage and charges
 
-> What Caplo charges for, what is free, how the monthly allowance and your own provider keys change the bill, and where to find your prices.
+> Where the console shows what your agents used and what it cost, who can see it, and how charges work for a workspace billed by a price plan.
 
-Caplo charges for production conversations: the ones your customers have with your agents on live channels. Building and testing agents is free.
+**Usage & billing** in the console has three pages:
 
-Your prices come from your workspace’s price plan, which the console shows on the **Billing** page under **Your rates**. This page explains what each charge is for; it does not list prices.
+| Page               | Answers                                                                                                                                               |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Plan & billing** | Which plan are we on, what is left in the balance, and what did we pay? See [Plans and billing](/billing/).                                           |
+| **Usage**          | What did our agents use (the **Usage** tab), and what did it cost (the **Charges** tab)? See [Usage and charges pages](/usage/usage-and-statements/). |
+| **Spend controls** | Are we within our monthly budgets? See [Spend budgets](/usage/spend-budgets/).                                                                        |
 
-## What is charged
-
-[Section titled “What is charged”](#what-is-charged)
-
-Charges come in two kinds.
-
-**Platform fees** apply to every production conversation, whichever key paid for the models:
-
-| Charge            | What counts                                                                                |
-| ----------------- | ------------------------------------------------------------------------------------------ |
-| **Voice minutes** | Connected time on voice calls, by phone or in the website widget, billed by the second.    |
-| **AI replies**    | Each completed agent reply in a text channel, such as the website widget chat or WhatsApp. |
-
-**AI usage** applies only to providers set to **Caplo Managed**. It is the provider’s list price for what your agents used, plus your plan’s markup percentage, if it has one:
-
-| Charge              | What counts                                                                             |
-| ------------------- | --------------------------------------------------------------------------------------- |
-| **Language models** | Input, cached input and output tokens, including audio tokens of realtime voice models. |
-| **Speech to text**  | Audio transcribed on voice calls.                                                       |
-| **Text to speech**  | Characters spoken on voice calls.                                                       |
-
-The **Your rates** card lists the platform fee rates and the list rates of the Caplo-managed models your workspace used in the selected period.
-
-## What is free
-
-[Section titled “What is free”](#what-is-free)
-
-These are never charged:
-
-* Live tests from the agent builder.
-* Evaluation runs.
-* Agent building assistance and other platform work in the background.
-
-They still appear on the **Usage** page, under the matching **Source** filter, so you can see how much they use.
-
-## Monthly allowance
-
-[Section titled “Monthly allowance”](#monthly-allowance)
-
-Your price plan can include an amount each month (**Included each month**). It is credited against all of that month’s charges, platform fees and AI usage alike. The **Billing** page shows how much of it is used, and **Estimated amount due** is the month’s charges after the allowance.
-
-Months are UTC calendar months, and days on the usage and billing pages are UTC days.
-
-## Using your own keys
-
-[Section titled “Using your own keys”](#using-your-own-keys)
-
-When a provider is set to **Your key**, its calls run on your provider account:
-
-* They add no AI usage charge. The provider bills you directly at your rates with them.
-* Platform fees still apply to those conversations.
-* The **Billing** page counts the requests that used your keys, so you can see why a conversation has a platform fee but no AI usage.
-
-See [Bring your own key](/providers/bring-your-own-key/).
-
-## When no price plan applies
-
-[Section titled “When no price plan applies”](#when-no-price-plan-applies)
-
-If no price plan covers a period, the **Billing** page shows “No price plan applies to this period yet, so its usage is recorded but not charged.” Usage is still recorded on the **Usage** page. If a plan started partway through the period, the page notes that usage before the plan started is not charged.
-
-A new price plan is announced on the **Billing** page before it takes effect, with its date and new rates. Prices change only with notice, and each charge uses the plan in effect when the usage happened.
-
-## Estimates, invoices and payment
-
-[Section titled “Estimates, invoices and payment”](#estimates-invoices-and-payment)
-
-Charges on the **Billing** page are estimates until the month closes. The console does not show subscriptions, taxes, invoices or payment collection; under **Settings** then **Billing & limits**, the **Invoices** section reads “No invoices yet”.
+Building agents is free. What production conversations, live tests and evaluations cost depends on your plan: see [How your bill works](/billing/how-billing-works/).
 
 ## Who can see charges
 
 [Section titled “Who can see charges”](#who-can-see-charges)
 
-Owners, Admins, Billing members and Auditors can see the **Usage** and **Billing** pages and spend budgets. Other roles see a message that their workspace role does not allow viewing usage or billing. Only Owners and Billing members can change budgets. See [Spend budgets](/usage/spend-budgets/).
+Owners, Admins, Billing members and Auditors can see **Usage**, **Plan & billing** and spend budgets. Other roles see a message that their workspace role does not allow viewing usage or billing. Only Owners and Billing members can change the plan, pay, or change budgets.
+
+Days and months on these pages are UTC.
+
+## Workspaces billed by a price plan
+
+[Section titled “Workspaces billed by a price plan”](#workspaces-billed-by-a-price-plan)
+
+Some workspaces are billed by a price plan instead of a [plan](/billing/) with a prepaid balance. For them, **Plan & billing** shows “Plans are not available here yet”, and the **Charges** tab prices usage with the price plan:
+
+* **Platform fees**: **Voice minutes**, for connected time on voice calls, and **AI replies**, for each completed agent reply in a text channel. They apply whichever key paid for the models.
+* **AI usage**: language models, speech to text and text to speech on providers set to **Caplo Managed**, at list price plus the price plan’s markup, if it has one. Calls on your own keys add no AI usage charge.
+* **Monthly allowance**: an amount included each month and credited against all of that month’s charges.
+* Live tests, evaluations and agent building are not charged.
+
+Without a price plan for a period, the **Charges** tab shows “No price plan applies to this period yet, so its usage is recorded but not charged.” A new price plan is announced on the **Charges** tab before it takes effect. Charges are estimates until the month closes.
 
 ## Related
 
 [Section titled “Related”](#related)
 
-* [Usage and statements](/usage/usage-and-statements/)
-* [Spend budgets](/usage/spend-budgets/)
+* [Plans](/billing/)
+* [Usage and charges pages](/usage/usage-and-statements/)
 * [Cost reports](/usage/cost-reports/)
 * [Models and providers](/providers/)
 
@@ -9913,11 +10388,12 @@ Owners, Admins, Billing members and Auditors can see the **Usage** and **Billing
 
 The console shows cost in more than one place, and the figures answer different questions. Use this page to pick the right one and to understand why two figures can differ.
 
-| Figure                        | Where                                                 | Answers                                                                  | Is it what you pay Caplo?                   |
-| ----------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------- |
-| **Estimated cost**            | **Overview**, and **Conversations** under **Monitor** | Roughly what did the model calls in these conversations cost?            | No.                                         |
-| **AI usage** and **Platform** | **Usage & billing** then **Billing**                  | What will Caplo charge, by charge type, agent, channel and model?        | Yes, as an estimate until the month closes. |
-| Quantities                    | **Usage & billing** then **Usage**                    | How many tokens, audio minutes, characters and voice minutes did we use? | No prices are shown.                        |
+| Figure                                        | Where                                                 | Answers                                                                  | Is it what you pay Caplo?                                                           |
+| --------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| **Estimated cost**                            | **Overview**, and **Conversations** under **Monitor** | Roughly what did the model calls in these conversations cost?            | No.                                                                                 |
+| **Balance activity**, statements and receipts | **Usage & billing** then **Plan & billing**           | What was charged to our balance and what did we pay?                     | Yes, on a plan with a prepaid balance.                                              |
+| **AI usage** and **Platform**                 | **Usage & billing** then **Usage**, **Charges** tab   | What does a price plan charge, by charge type, agent, channel and model? | Yes, for a workspace billed by a price plan, as an estimate until the month closes. |
+| Quantities                                    | **Usage & billing** then **Usage**, **Usage** tab     | How many tokens, audio minutes, characters and voice minutes did we use? | No prices are shown.                                                                |
 
 ## Monitor cost estimates
 
@@ -9927,7 +10403,7 @@ The **Overview** page has an **Estimated cost** tile, and **Conversations** show
 
 * They estimate model calls only, priced from a rate card whose version the tile shows (for example “rate card 2026-10”).
 * They price every model call the same way, whether it ran on **Caplo Managed** or **Your key**. Each model call in a turn shows which key source it used.
-* They do not include platform fees, speech, your plan’s markup or the monthly allowance.
+* They do not include platform fees, speech or plan credit.
 * **Partial estimate, some models have no price** means some calls used a model the rate card has no price for. The real cost is higher than shown.
 * The **Overview** tile is not estimated per channel. Clear the channel filter to see it.
 
@@ -9937,18 +10413,20 @@ The tile says “not billing” for a reason: never reconcile an invoice against
 
 [Section titled “Billed cost”](#billed-cost)
 
-The **Billing** page is the figure that matters for your bill. See [Usage and statements](/usage/usage-and-statements/). It separates:
+On a plan, what you pay is what was charged to your balance: **Balance activity** on **Plan & billing**, one line per day, and the month’s statement. It covers platform fees for conversations and voice minutes, and Caplo-managed AI and speech at list price with no markup. See [How your bill works](/billing/how-billing-works/).
+
+For a workspace billed by a price plan, the **Charges** tab of **Usage** is the figure that matters. See [Usage and charges pages](/usage/usage-and-statements/#charges-tab). It separates:
 
 * **Platform**: voice minutes and AI replies, charged whichever key was used.
-* **AI usage**: Caplo-managed language models and speech, at list price plus your plan’s markup.
+* **AI usage**: Caplo-managed language models and speech, at list price plus the price plan’s markup.
 
-Calls on your own keys add no AI usage charge. The page counts how many requests used your keys and which providers, and those providers bill you directly. Group the **Charge breakdown** by **Model** or **Provider** to see where AI usage comes from.
+Calls on your own keys add no AI usage charge. The **Charges** tab counts how many requests used your keys and which providers, and those providers bill you directly. Group the **Charge breakdown** by **Model** or **Provider** to see where AI usage comes from.
 
 ## Caplo-managed and your-key usage
 
 [Section titled “Caplo-managed and your-key usage”](#caplo-managed-and-your-key-usage)
 
-To compare what runs on Caplo’s accounts with what runs on yours, use the **Usage** page and set **Keys** to **Caplo-managed** or **Your keys**. Quantities come from what each provider reports, so you can compare your-key usage with the provider’s own usage dashboard.
+To compare what runs on Caplo’s accounts with what runs on yours, use the **Usage** tab and set **Keys** to **Caplo-managed** or **Your keys**. Quantities come from what each provider reports, so you can compare your-key usage with the provider’s own usage dashboard.
 
 Caplo does not show prices for usage on your keys: your provider’s invoice is the source of truth for that cost.
 
@@ -9958,8 +10436,8 @@ Caplo does not show prices for usage on your keys: your provider’s invoice is 
 
 Caplo counts cost from what each provider reports for each request. Sometimes a report is incomplete:
 
-* On the **Usage** page, a note says how many requests have partial or missing usage from the provider. Their known quantities are included, so totals can rise as reports arrive.
-* On the **Billing** page, a note says when Caplo-managed requests used a meter that has no list price yet. Those requests are charged for their priced part only.
+* On the **Usage** tab, a note says how many requests have partial or missing usage from the provider. Their known quantities are included, so totals can rise as reports arrive.
+* On the **Charges** tab, a note says when Caplo-managed requests used a meter that has no list price yet. Those requests are charged for their priced part only.
 * In Monitor, a partial estimate means some models have no price.
 
 In each case the figure shown is the cost Caplo knows, not more. Treat it as a minimum, and select **Refresh** later for updated numbers.
@@ -9968,18 +10446,17 @@ In each case the figure shown is the cost Caplo knows, not more. Treat it as a m
 
 [Section titled “Why the figures differ”](#why-the-figures-differ)
 
-If **Estimated cost** in Monitor and **AI usage** on the Billing page disagree, the usual reasons are:
+If **Estimated cost** in Monitor and what you were charged disagree, the usual reasons are:
 
-* Monitor includes calls on your own keys; Billing charges only Caplo-managed calls.
-* Billing adds platform fees, speech and your plan’s markup; Monitor does not.
-* The two use different price sources: a rate card for Monitor, your price plan and list prices for Billing.
-* Usage before your price plan started is recorded but not charged.
+* Monitor includes calls on your own keys; Caplo charges only Caplo-managed calls.
+* Charges add platform fees and speech, and on a price plan its markup; Monitor does not.
+* The two use different price sources: a rate card for Monitor, list prices (and a price plan, where one applies) for charges.
 
 ## Related
 
 [Section titled “Related”](#related)
 
-* [How Caplo charges](/usage/)
+* [How your bill works](/billing/how-billing-works/)
 * [Spend budgets](/usage/spend-budgets/)
 * [Bring your own key](/providers/bring-your-own-key/)
 
@@ -9995,9 +10472,9 @@ Budgets live on the **Spend controls** page, under **Usage & billing** in the co
 
 [Section titled “What a budget counts”](#what-a-budget-counts)
 
-* Caplo’s charges for production conversations in the current UTC calendar month: platform fees and Caplo-managed AI usage. See [How Caplo charges](/usage/).
-* Charges before the monthly allowance is subtracted, so a budget fills from the first charge of the month.
-* Not live tests, evaluations or agent building, which are free.
+* Caplo’s charges for production conversations in the current UTC calendar month: platform fees and Caplo-managed AI and speech. See [How your bill works](/billing/how-billing-works/).
+* Charges before any plan credit or monthly allowance is subtracted, so a budget fills from the first charge of the month.
+* Not plan fees, Caplo phone number fees, live tests, evaluations or agent building.
 * Not what your providers bill you for usage on your own keys.
 
 Budgets reset on the first day of each UTC month.
@@ -10075,39 +10552,37 @@ To resume conversations a budget paused, open it with **Edit** and raise the **M
 
 To remove a budget, open it with **Edit** and select **Remove budget**. Its alerts stay in the history, and any conversations it paused are allowed again.
 
-Note
+A budget pause is separate from your balance. On a plan with a prepaid balance, new conversations also stop when the balance is used up or the workspace is paused, whatever your budgets say; see [Balance and payments](/billing/balance-and-payments/#when-the-balance-reaches-zero).
 
-**Settings** then **Billing & limits** links to **Spend controls**, where budgets are set.
+# Usage and charges pages
 
-# Usage and statements
+> Read the Usage page's Usage and Charges tabs, filter by source, keys, agent and channel, and export the data as CSV.
 
-> Read the Usage and Billing pages, follow daily charges, check the month's estimated amount due, and export the data as CSV.
-
-Two console pages, both under **Usage & billing**, show what your agents use and what you are charged:
+The **Usage** page, under **Usage & billing**, shows what your agents used and what it cost, on two tabs:
 
 * **Usage**: raw quantities from the models and speech services your agents call, with no prices.
-* **Billing**: what you pay Caplo, by day, with the month’s statement.
+* **Charges**: what Caplo charges for that usage, by day, with the month’s estimate.
 
-Both need a role that can view financial data: Owner, Admin, Billing or Auditor. Days and months are UTC.
+Your plan, balance, payments, receipts and monthly statements are on **Plan & billing**; see [Plans and billing](/billing/). Both pages need a role that can view financial data: Owner, Admin, Billing or Auditor. Days and months are UTC.
 
-## Usage page
+## Usage tab
 
-[Section titled “Usage page”](#usage-page)
+[Section titled “Usage tab”](#usage-tab)
 
-The **Usage** page answers “how much did our agents use, and where?”.
+The **Usage** tab answers “how much did our agents use, and where?”.
 
 ![The Usage page with totals, filters and usage by channel](/_astro/usage.B4y1xVp4_22kqBl.webp)
 
-**Filters** at the top apply to everything on the page:
+**Filters** at the top apply to everything on the tab:
 
 | Filter                    | Options                                                                                                    |
 | ------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | **Source**                | **Production** (the default), **Live tests**, **Evals**, **Background**, **Authoring** or **All sources**. |
 | **Keys**                  | **All keys**, **Caplo-managed** or **Your keys**.                                                          |
 | **Agent** and **Channel** | One agent or channel, or all.                                                                              |
-| Dates                     | Last 7 or 30 days, or any range within the last 400 days.                                                  |
+| **Usage dates**           | Last 7 or 30 days, or any range within the last 400 days.                                                  |
 
-**Tiles** show the totals for the range: **Language model tokens**, **Speech to text** (audio minutes), **Text to speech** (characters), **Voice minutes** and **Conversations**. Voice minutes and conversations are not paid with a provider key, so they show no value when you filter by keys.
+**Tiles** show the totals for the range: **Language model tokens**, **Speech to text** (audio minutes), **Text to speech** (characters), **Voice minutes** and **Conversations**. Voice minutes and conversations are not paid with a provider key, so they show **Not split by key** when you filter by keys.
 
 **Usage by channel** shows how language model tokens or voice minutes split across your channels.
 
@@ -10115,64 +10590,59 @@ The **Usage** page answers “how much did our agents use, and where?”.
 
 **Voice** charts **Speech to text**, **Text to speech** or **Voice minutes**, grouped the same way.
 
-Usage on your own keys is included on this page. Those providers bill you, not Caplo.
+Usage on your own keys is included on this tab. Those providers bill you, not Caplo.
 
 If a provider has not reported full usage for some requests yet, a note under the table says how many; their known quantities are included. Quantities update as providers report them, and each request counts once at its latest report.
 
-## Billing page
+## Charges tab
 
-[Section titled “Billing page”](#billing-page)
+[Section titled “Charges tab”](#charges-tab)
 
-The **Billing** page answers “what will Caplo charge us?”.
+The **Charges** tab answers “what does this usage cost?”. It prices usage for workspaces billed by a [price plan](/usage/#workspaces-billed-by-a-price-plan). On a plan with a prepaid balance, what was charged each day is in **Balance activity** on **Plan & billing**, and each month’s total is in its statement; see [Balance and payments](/billing/balance-and-payments/#balance-activity).
 
-![The Billing page with the estimated amount due and charges over time](/_astro/billing.E0-1i4UH_3Tih2.webp)
+![The Charges tab with the estimated amount due and charges over time](/_astro/billing.E0-1i4UH_3Tih2.webp)
 
 **Filters**: **Charges** (**All charges**, **Voice**, **Text** or **Language models**), **Agent**, **Channel** and **Billing dates** (**This month**, **Last month**, **Last 30 days** or a custom range).
 
 **Tiles**:
 
-| Tile                     | What it shows                                                                                                                                                                                 |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Estimated amount due** | The statement for the month that contains the end of your date range: that month’s charges to date, after the included allowance. It always covers the whole workspace, whatever the filters. |
-| **Platform**             | Platform fees in the range, with the number of voice minutes and AI replies.                                                                                                                  |
-| **AI usage**             | Caplo-managed models and speech, at list price plus your plan’s markup.                                                                                                                       |
-| **Included allowance**   | How much of the month’s allowance is used, and how much is left.                                                                                                                              |
+| Tile                     | What it shows                                                                                                                                                               |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Estimated amount due** | The month that contains the end of your date range: that month’s charges to date, after the included allowance. It always covers the whole workspace, whatever the filters. |
+| **Platform**             | Platform fees in the range, with the number of voice minutes and AI replies.                                                                                                |
+| **AI usage**             | Caplo-managed models and speech.                                                                                                                                            |
+| **Included allowance**   | How much of the month’s allowance is used, and how much is left.                                                                                                            |
 
-**Charges over time** shows daily or weekly charges by type. **Charges by** splits them by channel, agent or charge type. **Charge breakdown** lists every charge in the range grouped by **Charge**, **Model**, **Provider**, **Agent** or **Channel**, with quantity, rate, amount and share.
+**Charges over time** shows daily or weekly charges by type. **Charge split** divides them by channel, agent or charge type. **Charge breakdown** lists every charge in the range grouped by **Charge**, **Model**, **Provider**, **Agent** or **Channel**, with quantity, rate, amount and share.
 
 Notes under the breakdown explain two cases:
 
 * How many requests used your own keys. Only the platform fee for those conversations appears.
 * Caplo-managed requests that used a meter without a list price yet. They are charged for their priced part only.
 
-### Daily charges and the monthly statement
-
-[Section titled “Daily charges and the monthly statement”](#daily-charges-and-the-monthly-statement)
-
-Each charge belongs to the UTC day the usage happened and is priced with the price plan in effect at that time. The monthly statement adds up the calendar month’s charges and subtracts the allowance. It is an estimate until the month closes.
-
-To follow a month as it goes, choose **This month**. To review a finished month, choose **Last month**. **Settings** then **Billing & limits** shows the same month-to-date summary: **Estimated amount due**, **Charges to date** and **Included each month**.
+Each charge belongs to the UTC day the usage happened. Only production conversations are charged here; charges are estimates until the month closes. To follow a month as it goes, choose **This month**; to review a finished month, choose **Last month**.
 
 ## Export
 
 [Section titled “Export”](#export)
 
-Both pages have **Export CSV**:
+Both tabs have **Export CSV**:
 
 * **Usage** exports exact quantities per UTC day, service, provider and model, with request counts and any usage Caplo cannot classify yet.
-* **Billing** exports every charge per UTC day, with its charge type, provider, model, agent, channel, quantity, unit, amount in USD and whether a price plan rated it.
+* **Charges** exports every charge per UTC day, with its charge type, provider, model, agent, channel, quantity, unit, amount in USD and whether a price plan rated it.
 
 ## Consistent numbers
 
 [Section titled “Consistent numbers”](#consistent-numbers)
 
-Each page reads all its charts and tables from one snapshot, shown at the bottom of the page with its time. Select **Refresh** to load a newer one. Exports use the same snapshot as the page, so a CSV matches what you see.
+Each tab reads all its charts and tables from one snapshot, shown at the bottom of the page with its time. Select **Refresh** to load a newer one. Exports use the same snapshot as the page, so a CSV matches what you see.
 
 ## Related
 
 [Section titled “Related”](#related)
 
-* [How Caplo charges](/usage/)
+* [Usage and charges](/usage/)
+* [How your bill works](/billing/how-billing-works/)
 * [Spend budgets](/usage/spend-budgets/)
 * [Cost reports](/usage/cost-reports/)
 

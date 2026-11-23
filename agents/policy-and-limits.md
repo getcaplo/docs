@@ -76,4 +76,4 @@ Replace the guidance when your agent may answer from general knowledge, for exam
 ## See also
 
 * [Agent YAML reference](/reference/agent-yaml/) for the schema.
-* [Usage and statements](/usage/usage-and-statements/) to see what model calls cost.
+* [Usage and charges pages](/usage/usage-and-statements/) to see what model calls cost.
