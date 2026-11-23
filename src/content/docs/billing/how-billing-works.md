@@ -11,7 +11,7 @@ A bill has three parts:
 
 | Part | What it is | Paid from |
 | --- | --- | --- |
-| **Plan fee** | The monthly or yearly price of Standard or Pro, plus any extra phone calls at once on Pro. | Funds you added, then your saved card. Never from trial or plan credit. |
+| **Plan fee** | The monthly or yearly price of Standard or Pro, plus any extra phone calls at once on Pro. | Your saved card; without one, or if it is declined, funds you added. Never from trial or plan credit. |
 | **Platform fees** | Caplo's fee for each production conversation and each voice minute. | Your balance, in [spending order](/billing/balance-and-payments/#spending-order). |
 | **AI and speech** | The models, speech to text and text to speech your agents used on Caplo's accounts, at each provider's list price. | Your balance. |
 
