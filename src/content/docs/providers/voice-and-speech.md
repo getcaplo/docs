@@ -67,7 +67,7 @@ Deepgram limits how long the terms are in total, so the console shows how much r
 
 ## What affects cost
 
-A voice conversation can add these charges. See [How Caplo charges](/usage/) for how each is billed.
+A voice conversation can add these charges. See [How your bill works](/billing/how-billing-works/) for how each is billed.
 
 | What | Measured in | Billed by |
 | --- | --- | --- |
@@ -85,4 +85,4 @@ What makes a call cost more:
 - **Realtime models**: they bill audio tokens for what they hear and say, on top of the pipeline's speech recognition.
 - **Key terms**: Deepgram on your own key and ElevenLabs add a small charge per audio minute while terms are set. Pronunciations are counted as the characters actually spoken.
 
-The **Usage** page shows speech to text minutes, text to speech characters and voice minutes by provider, agent or channel. See [Usage and statements](/usage/usage-and-statements/).
+The **Usage** page shows speech to text minutes, text to speech characters and voice minutes by provider, agent or channel. See [Usage and charges pages](/usage/usage-and-statements/).
