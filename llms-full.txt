@@ -2842,7 +2842,7 @@ On the Free trial, Standard and Pro, usage is charged to one prepaid balance as 
 | **Promotional credit** | Granted by Caplo.                                                                         | The expiry shown with it.                             |
 | **Adjustment**         | Unused plan fee returned when an upgrade costs less than what is left of the current fee. | Does not expire.                                      |
 
-Only added funds and auto-recharge pay plan fees. Trial and plan credit pay usage only.
+Plan fees are charged to your saved card. Without one, or when it is declined, only added funds and auto-recharge pay them. Trial and plan credit pay usage only.
 
 ## Spending order
 
@@ -2885,7 +2885,7 @@ Caplo takes payments through Safepay for billing accounts in Pakistan. For other
 
 [Section titled “Save a card”](#save-a-card)
 
-A saved Visa or Mastercard pays plan renewals that added funds don’t cover, and is needed for auto-recharge.
+A saved Visa or Mastercard pays plan fees, at renewal and when you start or upgrade a plan, and is needed for auto-recharge.
 
 1. On the **Payment method** card, select **Save a card**.
 2. Enter the cardholder’s first and last name and phone number with its country code, such as `+923001234567`. Safepay needs the phone number to save a card.
@@ -2957,7 +2957,7 @@ Owners and Billing members change the plan on **Plan & billing**. Other members 
 | **Upgrade**: a higher plan, monthly to yearly, or more phone calls at once | Today. A new period starts now.   | The new fee less the unused part of the current fee, shown as **Unused … fee**. The current plan credit ends and the new plan’s credit is added now. Funds you added yourself are kept. |
 | **Switch** to a lower plan                                                 | At the end of the current period. | Nothing now. You keep the current plan and its credit until then; the lower fee is paid at renewal.                                                                                     |
 
-The fee is paid from funds you added. If they don’t cover it, the dialog says “Added funds do not cover the fee due now” and offers **Pay now**, which takes you to Safepay; the plan changes as soon as the payment is confirmed.
+Select **Pay … and start**. The dialog says how the fee is paid: with a saved card it is charged to the card; without one it is paid from funds you added, or, if they don’t cover it, on Safepay’s page. A card or Safepay payment changes the plan as soon as it is confirmed, and **Plan & billing** shows the result.
 
 ### Before a downgrade
 
@@ -2992,7 +2992,7 @@ Until the period ends, **Plan & billing** shows “Your … plan ends on …” 
 
 [Section titled “Renewals and failed payments”](#renewals-and-failed-payments)
 
-At the end of each period the plan renews: the next fee is paid from funds you added, and a saved card pays any part they don’t cover. If neither covers it, the payment is due:
+At the end of each period the plan renews: the next fee is charged to your saved card. Without a card, or if the card is declined, it is paid from funds you added. If neither pays it, the payment is due:
 
 * **Plan & billing** shows **Payment due** with “Payment for … failed on …” and the date production will pause. Owners and Billing members are told.
 * Everything keeps working for 7 days, but the plan can’t be changed.
@@ -3040,11 +3040,11 @@ On a Free trial, Standard or Pro plan, everything Caplo charges comes out of one
 
 A bill has three parts:
 
-| Part              | What it is                                                                                                         | Paid from                                                                         |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
-| **Plan fee**      | The monthly or yearly price of Standard or Pro, plus any extra phone calls at once on Pro.                         | Funds you added, then your saved card. Never from trial or plan credit.           |
-| **Platform fees** | Caplo’s fee for each production conversation and each voice minute.                                                | Your balance, in [spending order](/billing/balance-and-payments/#spending-order). |
-| **AI and speech** | The models, speech to text and text to speech your agents used on Caplo’s accounts, at each provider’s list price. | Your balance.                                                                     |
+| Part              | What it is                                                                                                         | Paid from                                                                                             |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| **Plan fee**      | The monthly or yearly price of Standard or Pro, plus any extra phone calls at once on Pro.                         | Your saved card; without one, or if it is declined, funds you added. Never from trial or plan credit. |
+| **Platform fees** | Caplo’s fee for each production conversation and each voice minute.                                                | Your balance, in [spending order](/billing/balance-and-payments/#spending-order).                     |
+| **AI and speech** | The models, speech to text and text to speech your agents used on Caplo’s accounts, at each provider’s list price. | Your balance.                                                                                         |
 
 Caplo phone numbers add a monthly fee per number, also charged to your balance; see [Phone numbers](#phone-numbers).
 
