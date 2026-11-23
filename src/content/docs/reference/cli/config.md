@@ -3,12 +3,12 @@ title: "caplo config"
 description: "Show and change CLI settings."
 editUrl: false
 sidebar:
-  order: 5
+  order: 6
   label: "config"
 ---
 
 :::note[Generated reference]
-Generated from `caplo` v0.4.1, the latest release. `caplo config --help` prints the same text.
+Generated from `caplo` v0.5.1, the latest release. `caplo config --help` prints the same text.
 :::
 
 Show and change CLI settings.
