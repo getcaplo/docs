@@ -4,11 +4,11 @@
 
 Billing documents are on **Plan & billing**, under **Invoices & receipts**, newest first. Open one with **View** to see it and download it as a PDF.
 
-| Document      | Issued for                                                    | Shows                                                                               |
-| ------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| **Receipt**   | Every payment: a plan fee, funds you added, an auto-recharge. | What was paid, sales tax and how it was paid.                                       |
-| **Statement** | Every UTC month with balance activity.                        | Plan fees paid, funds added, trial and plan credit, and usage charged in the month. |
-| **Invoice**   | Every month of an Enterprise contract.                        | The contract’s charges, tax, the total and how to pay.                              |
+| Document      | Issued for                                                                                                                                                                                                                                                | Shows                                                                               |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| **Receipt**   | Every payment: funds you added, an auto-recharge, or a card or Safepay payment for a plan fee, which is added to your balance and pays the fee from there. A fee paid from funds you had already added has no receipt of its own; its statement lists it. | What was paid, sales tax and how it was paid.                                       |
+| **Statement** | Every UTC month with balance activity.                                                                                                                                                                                                                    | Plan fees paid, funds added, trial and plan credit, and usage charged in the month. |
+| **Invoice**   | Every month of an Enterprise contract.                                                                                                                                                                                                                    | The contract’s charges, tax, the total and how to pay.                              |
 
 Amounts are in US dollars, with any sales tax shown separately at the rate in effect when the document was issued.
 

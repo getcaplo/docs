@@ -30,7 +30,7 @@ At a balance of $0.00, new production conversations stop on every channel.
 * Conversations already running get 15 more minutes. Their usage can take the balance below zero, down to −$1 on the Free trial, −$2 on Standard or −$5 on Pro. Your next payment covers it first.
 * After the 15 minutes, the agent stops replying in those conversations, and a call in progress ends with the agent’s time-limit warning and goodbye.
 * Website visitors see “This assistant isn’t available right now. Please try again later.” Messages on WhatsApp, Messenger and Instagram still reach your inbox, but the agent doesn’t reply.
-* Building, live tests and evaluations keep working.
+* Building agents keeps working. Live tests and evaluations stop too, since they spend the balance on Caplo-managed models and speech; the live test says “Live tests are paused because the workspace’s balance is used up”, and evaluation cases are marked as not run. Publishing needs its evaluations, so it waits for funds as well.
 * Adding funds resumes new conversations within about a minute.
 
 On the Free trial, an empty balance means choosing a plan. Owners and Billing members are told when the balance falls below $2, or below the auto-recharge threshold, and again when it runs out.
