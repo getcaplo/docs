@@ -3,12 +3,12 @@ title: "caplo channel"
 description: "List channels and deploy agent releases to them."
 editUrl: false
 sidebar:
-  order: 4
+  order: 5
   label: "channel"
 ---
 
 :::note[Generated reference]
-Generated from `caplo` v0.4.1, the latest release. `caplo channel --help` prints the same text.
+Generated from `caplo` v0.5.1, the latest release. `caplo channel --help` prints the same text.
 :::
 
 List channels and deploy agent releases to them.
