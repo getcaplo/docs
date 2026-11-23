@@ -8,7 +8,7 @@ sidebar:
 ---
 
 :::note[Generated reference]
-Generated from `caplo` v0.4.1, the latest release. `caplo agent --help` prints the same text.
+Generated from `caplo` v0.5.0, the latest release. `caplo agent --help` prints the same text.
 :::
 
 Build, test, evaluate, and publish one agent.

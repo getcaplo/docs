@@ -1,16 +1,17 @@
 {
-  "version": "0.4.1",
+  "version": "0.5.0",
   "commands": [
     {
       "path": "caplo",
       "use": "caplo [flags]",
       "short": "Build, test, and publish Caplo agents and tool packages, and manage workspaces, remote MCP servers, secrets, and customer identity keys",
-      "long": "caplo builds, tests, and publishes Caplo agents and tool packages from a project folder, and manages a\nworkspace's agents, tool packages, remote MCP servers, secrets, knowledge bases, channels, API clients, and\ncustomer identity keys.\n\nA person logs in with caplo auth login. CI and automation set CAPLO_API_KEY to an API client's key and\nCAPLO_WORKSPACE to its workspace ID instead; see caplo workspace api-client. Commands act on the workspace that\n--workspace or CAPLO_WORKSPACE names, else the one selected with caplo workspace use.\n\nThe configuration directory is CAPLO_CONFIG_DIR, else ~/.config/caplo ($XDG_CONFIG_HOME/caplo), or %AppData%\\caplo\non Windows. It holds config.yaml: the API URL, issuer, OAuth client, credential storage, and selected workspace.\nUse a separate CAPLO_CONFIG_DIR for each Caplo installation you log in to.\n\nExit codes: 0 for success, 1 for an error, 2 for a usage error (including a confirmation that needs --yes when\nthere is no terminal), 3 when a check fails (validation, tool fixtures, eval cases, or assertion checks), 130 when\nCtrl-C interrupts a command or a prompt, and 143 for SIGTERM. A second Ctrl-C ends the process at once.",
+      "long": "caplo builds, tests, and publishes Caplo agents and tool packages from a project folder, and manages a\nworkspace's agents, tool packages, remote MCP servers, secrets, knowledge bases, channels, API clients,\ncustomer identity keys, and subscription billing.\n\nA person logs in with caplo auth login. CI and automation set CAPLO_API_KEY to an API client's key and\nCAPLO_WORKSPACE to its workspace ID instead; see caplo workspace api-client. Commands act on the workspace that\n--workspace or CAPLO_WORKSPACE names, else the one selected with caplo workspace use.\n\nThe configuration directory is CAPLO_CONFIG_DIR, else ~/.config/caplo ($XDG_CONFIG_HOME/caplo), or %AppData%\\caplo\non Windows. It holds config.yaml: the API URL, issuer, OAuth client, credential storage, and selected workspace.\nUse a separate CAPLO_CONFIG_DIR for each Caplo installation you log in to.\n\nExit codes: 0 for success, 1 for an error, 2 for a usage error (including a confirmation that needs --yes when\nthere is no terminal), 3 when a check fails (validation, tool fixtures, eval cases, or assertion checks), 130 when\nCtrl-C interrupts a command or a prompt, and 143 for SIGTERM. A second Ctrl-C ends the process at once.",
       "example": "caplo auth login\n  caplo init shop --template summit\n  caplo publish --env prod --yes",
       "runnable": false,
       "subcommands": [
         "caplo agent",
         "caplo auth",
+        "caplo billing",
         "caplo channel",
         "caplo completion",
         "caplo config",
@@ -608,6 +609,484 @@
       "short": "Show the logged-in user, API, and selected workspace",
       "long": "Shows the logged-in user, the API and issuer, where the credentials are stored, and the selected workspace. With\nCAPLO_API_KEY it shows the API client, its workspace, and its scopes instead.",
       "example": "caplo auth status\n  caplo auth status -o json",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo billing",
+      "use": "caplo billing",
+      "short": "See and change the workspace's plan, balance, billing details and documents",
+      "long": "Subscription billing: the workspace's plan, its prepaid balance and the credits in it, auto-recharge, the\nbilling details on receipts, and its receipts, statements and invoices. Amounts are USD. Reading needs usage.view\nand changing needs billing.manage, which Owners and Billing members have. A workspace without subscription billing\nkeeps price-plan billing, and these commands answer that it has no billing account; caplo billing plans works\nwithout a login.",
+      "example": "caplo billing status\n  caplo billing funds add 25 --open\n  caplo billing plan change --plan pro --interval month",
+      "group": "Account",
+      "runnable": false,
+      "subcommands": [
+        "caplo billing activity",
+        "caplo billing auto-recharge",
+        "caplo billing document",
+        "caplo billing documents",
+        "caplo billing funds",
+        "caplo billing invoice",
+        "caplo billing plan",
+        "caplo billing plans",
+        "caplo billing profile",
+        "caplo billing status"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo billing activity",
+      "use": "caplo billing activity [flags]",
+      "short": "List one month of the balance's activity: credits, fees, and usage one line per day",
+      "long": "Lists one UTC month of the balance's activity, newest first: each credit and fee is one line, and usage is one\nline per UTC day with its conversations and voice minutes. Credits are positive; fees, usage and refunds are negative.",
+      "example": "caplo billing activity\n  caplo billing activity --month 2026-10 -o json",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "month",
+          "type": "string",
+          "usage": "UTC month as YYYY-MM (default: the current month)"
+        },
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo billing auto-recharge",
+      "use": "caplo billing auto-recharge",
+      "short": "Recharge the balance from the saved card when it runs low",
+      "runnable": false,
+      "subcommands": [
+        "caplo billing auto-recharge off",
+        "caplo billing auto-recharge set"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo billing auto-recharge off",
+      "use": "caplo billing auto-recharge off",
+      "short": "Turn auto-recharge off",
+      "example": "caplo billing auto-recharge off",
+      "runnable": true,
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo billing auto-recharge set",
+      "use": "caplo billing auto-recharge set [flags]",
+      "short": "Turn on auto-recharge from the saved card",
+      "long": "Turns auto-recharge on: when the balance falls below --threshold, the saved card is charged --amount, at most\n--monthly-limit a month (no limit without it). The threshold is at least 5, the amount 10 to 500 and above the\nthreshold, and the limit at least the amount. It needs Standard or Pro and a saved card.",
+      "example": "caplo billing auto-recharge set --threshold 5 --amount 25 --monthly-limit 200",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "amount",
+          "type": "string",
+          "usage": "USD to charge each time"
+        },
+        {
+          "name": "monthly-limit",
+          "type": "string",
+          "usage": "the most USD to charge in a month (default: no limit)"
+        },
+        {
+          "name": "threshold",
+          "type": "string",
+          "usage": "recharge when the balance falls below this many USD"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo billing document",
+      "use": "caplo billing document",
+      "short": "Download a receipt, statement or invoice",
+      "runnable": false,
+      "subcommands": [
+        "caplo billing document download"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo billing document download",
+      "use": "caplo billing document download <id> [flags]",
+      "short": "Save a receipt, statement or invoice as PDF",
+      "long": "Saves a receipt (its ID), a monthly statement (statement-YYYY-MM) or an invoice (INV-YYYY-NNNN) as PDF, under the\nname Identity gives it in the current directory, or at --out. An existing file is never overwritten.",
+      "example": "caplo billing document download statement-2026-10\n  caplo billing document download INV-2026-0001 --out invoice.pdf",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "out",
+          "type": "string",
+          "usage": "file to write (default: the document's name in the current directory)"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo billing documents",
+      "use": "caplo billing documents [flags]",
+      "short": "List the workspace's receipts, monthly statements and invoices, newest first",
+      "long": "Lists a receipt for every plan fee and every payment of added funds, a statement for every past UTC month the\nbalance changed, and every Enterprise invoice, newest first. caplo billing document download <id> saves one as PDF.",
+      "example": "caplo billing documents",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo billing funds",
+      "use": "caplo billing funds",
+      "short": "Add funds to the prepaid balance",
+      "runnable": false,
+      "subcommands": [
+        "caplo billing funds add"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo billing funds add",
+      "use": "caplo billing funds add <amount> [flags]",
+      "short": "Add 10 to 500 USD to the balance on the payment provider's checkout page",
+      "long": "Starts a payment of the amount (10 to 500 USD) and prints the provider's checkout page to pay it on; --open opens\nit in the default browser. The funds are credited once the provider confirms the payment, last 12 months, and are\nthe only credit that pays plan fees. The billing country decides the provider, so set the billing details first\nwith caplo billing profile set.",
+      "example": "caplo billing funds add 25 --open",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "open",
+          "type": "bool",
+          "usage": "open the checkout page in the default browser"
+        },
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo billing invoice",
+      "use": "caplo billing invoice <id> [flags]",
+      "short": "Show an Enterprise invoice with its lines",
+      "example": "caplo billing invoice INV-2026-0001",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo billing plan",
+      "use": "caplo billing plan",
+      "short": "Change, cancel or keep the workspace's plan",
+      "runnable": false,
+      "subcommands": [
+        "caplo billing plan cancel",
+        "caplo billing plan change",
+        "caplo billing plan keep"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo billing plan cancel",
+      "use": "caplo billing plan cancel [flags]",
+      "short": "Cancel the plan at the end of the period",
+      "long": "Cancels the plan at the end of the period, replacing any pending downgrade. Production conversations then pause\nuntil a plan is chosen, and a paused workspace is erased 60 days later. caplo billing plan keep undoes the\ncancellation before the period ends. It asks first; --yes skips the question.",
+      "example": "caplo billing plan cancel",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "yes",
+          "shorthand": "y",
+          "type": "bool",
+          "usage": "do not ask for confirmation"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo billing plan change",
+      "use": "caplo billing plan change [flags]",
+      "short": "Choose Standard or Pro, or confirm the trial",
+      "long": "Starts or changes the plan. --plan standard or pro needs --interval month or year; --extra-phone-calls buys\nphone calls at once beyond Pro's limit. --plan trial confirms the trial a new workspace starts on, and takes neither.\n\nFrom a trial or a pause the plan starts now at full price. An upgrade (a higher plan, monthly to yearly, or more\nextra phone calls) starts a new period now: its fee, less the unused part of the current one, is paid from added\nfunds, and the new plan's credit replaces the current one. A downgrade waits for the period end; caplo billing plan\nkeep undoes it. When added funds do not cover the fee, add them with caplo billing funds add first. Choosing Standard\nor Pro asks first; --yes skips the question.",
+      "example": "caplo billing plan change --plan pro --interval year\n  caplo billing plan change --plan pro --interval month --extra-phone-calls 2 --yes\n  caplo billing plan change --plan trial",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "extra-phone-calls",
+          "type": "int",
+          "default": "0",
+          "usage": "phone calls at once beyond Pro's limit, 0 to 100"
+        },
+        {
+          "name": "interval",
+          "type": "string",
+          "usage": "month or year"
+        },
+        {
+          "name": "plan",
+          "type": "string",
+          "usage": "standard, pro, or trial to confirm the trial"
+        },
+        {
+          "name": "yes",
+          "shorthand": "y",
+          "type": "bool",
+          "usage": "do not ask for confirmation"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo billing plan keep",
+      "use": "caplo billing plan keep",
+      "short": "Keep the current plan: undo a pending downgrade or cancellation",
+      "example": "caplo billing plan keep",
+      "runnable": true,
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo billing plans",
+      "use": "caplo billing plans [flags]",
+      "short": "List the plans Caplo offers, with their prices, limits and features",
+      "long": "Lists the current version of every plan Caplo offers. AI and speech are charged at provider list price on every\nplan; the platform fees per conversation and per voice minute come on top. Needs no login.",
+      "example": "caplo billing plans\n  caplo billing plans -o json",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo billing profile",
+      "use": "caplo billing profile",
+      "short": "Set the business named on receipts",
+      "runnable": false,
+      "subcommands": [
+        "caplo billing profile set"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo billing profile set",
+      "use": "caplo billing profile set [flags]",
+      "short": "Set the business named on receipts, statements and invoices",
+      "long": "Replaces the billing details: --legal-name, --email (where receipts go) and --country (ISO 3166-1 alpha-2, or\nOTHER) are required. --ntn, --strn and --province apply only to Pakistan (PK), where --province is required. The\nbilling country decides the payment provider.",
+      "example": "caplo billing profile set --legal-name \"Acme Traders\" --email finance@acme.example --country PK --province Sindh\n  caplo billing profile set --legal-name \"Acme LLC\" --email ap@acme.example --country AE --address \"Dubai\"",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "address",
+          "type": "string",
+          "usage": "the postal address"
+        },
+        {
+          "name": "country",
+          "type": "string",
+          "usage": "ISO 3166-1 alpha-2 country code, or OTHER"
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "usage": "the email address receipts go to"
+        },
+        {
+          "name": "legal-name",
+          "type": "string",
+          "usage": "the business's legal name"
+        },
+        {
+          "name": "ntn",
+          "type": "string",
+          "usage": "Pakistani National Tax Number"
+        },
+        {
+          "name": "province",
+          "type": "string",
+          "usage": "Pakistani province: Punjab, Sindh, Khyber Pakhtunkhwa, Balochistan, Islamabad Capital Territory, Gilgit-Baltistan, Azad Jammu and Kashmir"
+        },
+        {
+          "name": "strn",
+          "type": "string",
+          "usage": "Pakistani Sales Tax Registration Number"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo billing status",
+      "use": "caplo billing status [flags]",
+      "short": "Show the plan, its status, the balance, credits and limits",
+      "example": "caplo billing status\n  caplo billing status -o json",
       "runnable": true,
       "flags": [
         {
@@ -1250,45 +1729,23 @@
     {
       "path": "caplo knowledge",
       "use": "caplo knowledge",
-      "short": "Manage knowledge bases and sync their documents from a directory",
-      "long": "A knowledge base holds documents an agent answers from. Each upload is extracted and waits for review; a\nperson approves it in the console, or caplo knowledge approve does. Publishing snapshots the approved documents into\na version, and an agent release pins the newest ready version. Agent files name knowledge bases by name or ID, and\nso do these commands.",
-      "example": "caplo knowledge create \"Returns policy\" --owner support\n  caplo knowledge sync \"Returns policy\" ./docs/returns --approve --publish --yes",
+      "short": "Manage knowledge bases and their files, and search them",
+      "long": "A knowledge base holds files an agent answers from. An uploaded file is published: it is read, cut into passages\nand indexed, and then goes live by itself, so from the next question on every agent using the knowledge base can find\nit. Unpublishing a file takes it out of agents' answers at once and keeps it stored and indexed, so publishing it again\nis instant. Replacing a file keeps its old content answering until the new content is live; if the new content cannot\nbe read, the old content stays live and the file says why. Deleting a file removes it from search at once. Agent files\nname knowledge bases by name or ID, and so do these commands.\n\nWhen the knowledge service refuses a change, such as deleting a knowledge base agents use or going over one of the\nworkspace's limits, the command prints the service's sentence saying what to do and exits 1.",
+      "example": "caplo knowledge create \"Returns policy\" --description \"Return and refund rules\"\n  caplo knowledge files upload \"Returns policy\" ./refunds.pdf --wait\n  caplo knowledge search \"Returns policy\" \"How long do I have to return a jacket?\"",
       "aliases": [
         "kb"
       ],
       "group": "Workspace resources",
       "runnable": false,
       "subcommands": [
-        "caplo knowledge approve",
         "caplo knowledge create",
+        "caplo knowledge delete",
+        "caplo knowledge files",
         "caplo knowledge get",
         "caplo knowledge list",
-        "caplo knowledge publish",
-        "caplo knowledge sync"
-      ],
-      "inheritedFlags": [
-        {
-          "name": "workspace",
-          "shorthand": "w",
-          "type": "string",
-          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
-        }
-      ]
-    },
-    {
-      "path": "caplo knowledge approve",
-      "use": "caplo knowledge approve <kb> [document]... [flags]",
-      "short": "Wait for extraction and approve documents for the next version, by default every one awaiting review",
-      "long": "Approving a document skips reviewing its extracted text in the console. It waits for documents still being extracted\nand fails when one fails to extract. It needs agents:publish.",
-      "example": "caplo knowledge approve \"Returns policy\"\n  caplo knowledge approve \"Returns policy\" refunds.md exchanges.pdf",
-      "runnable": true,
-      "flags": [
-        {
-          "name": "timeout",
-          "type": "duration",
-          "default": "15m0s",
-          "usage": "how long to wait for extraction"
-        }
+        "caplo knowledge search",
+        "caplo knowledge sync",
+        "caplo knowledge update"
       ],
       "inheritedFlags": [
         {
@@ -1301,26 +1758,230 @@
     },
     {
       "path": "caplo knowledge create",
-      "use": "caplo knowledge create <name> --owner <team> [flags]",
+      "use": "caplo knowledge create <name> [flags]",
       "short": "Create a knowledge base",
-      "long": "Creates a knowledge base. --owner names the team that owns its content. --audience verified_customer limits its\ncontent to customers who signed in; the default is public.",
-      "example": "caplo knowledge create \"Returns policy\" --owner support --description \"Return and refund rules\"\n  caplo knowledge create \"Account help\" --owner support --audience verified_customer",
+      "long": "Creates a knowledge base. --description says what it covers; an agent's model reads it to decide when searching\nis worth it. --audience verified_customer limits its content to customers who signed in; the default is public.",
+      "example": "caplo knowledge create \"Returns policy\" --description \"Return and refund rules\"\n  caplo knowledge create \"Account help\" --audience verified_customer",
       "runnable": true,
       "flags": [
         {
           "name": "audience",
           "type": "string",
-          "usage": "public (default) or verified_customer, for content only signed-in customers may get"
+          "usage": "public, or verified_customer for content only signed-in customers may get (default public)"
         },
         {
           "name": "description",
           "type": "string",
           "usage": "what the knowledge base covers"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo knowledge delete",
+      "use": "caplo knowledge delete <kb> [flags]",
+      "short": "Delete a knowledge base and all its files",
+      "long": "Deletes the knowledge base with its files and passages. A knowledge base that agents use cannot be deleted: the\ncommand prints which agents use it, and you remove it from them first. It asks for confirmation; --yes skips it.",
+      "example": "caplo knowledge delete \"Returns policy\" --yes",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "yes",
+          "shorthand": "y",
+          "type": "bool",
+          "usage": "delete without asking"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo knowledge files",
+      "use": "caplo knowledge files",
+      "short": "List, upload, replace, publish, unpublish, and delete a knowledge base's files",
+      "runnable": false,
+      "subcommands": [
+        "caplo knowledge files delete",
+        "caplo knowledge files list",
+        "caplo knowledge files passages",
+        "caplo knowledge files publish",
+        "caplo knowledge files replace",
+        "caplo knowledge files unpublish",
+        "caplo knowledge files upload"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo knowledge files delete",
+      "use": "caplo knowledge files delete <kb> <file-id> [flags]",
+      "short": "Delete a file from a knowledge base",
+      "long": "Deletes the file, with content still processing for it; agents stop finding it at once. It asks for confirmation;\n--yes skips it.",
+      "example": "caplo knowledge files delete \"Returns policy\" 3f9a1c2e-... --yes",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "yes",
+          "shorthand": "y",
+          "type": "bool",
+          "usage": "delete without asking"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo knowledge files list",
+      "use": "caplo knowledge files list <kb> [flags]",
+      "short": "List a knowledge base's files, newest first",
+      "example": "caplo knowledge files list \"Returns policy\"",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo knowledge files passages",
+      "use": "caplo knowledge files passages <kb> <file-id> [flags]",
+      "short": "Print the passages of a file's live content, as agents read them",
+      "example": "caplo knowledge files passages \"Returns policy\" 3f9a1c2e-...",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo knowledge files publish",
+      "use": "caplo knowledge files publish <kb> <file-id>",
+      "short": "Publish a file, so agents answer from it",
+      "long": "Publishes an unpublished file. Agents answer from it at once if its content is live, else as soon as it is\nprocessed. Publishing a published file changes nothing.",
+      "example": "caplo knowledge files publish \"Returns policy\" 3f9a1c2e-...",
+      "runnable": true,
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo knowledge files replace",
+      "use": "caplo knowledge files replace <kb> <file-id> <path> [flags]",
+      "short": "Replace a file's content",
+      "long": "Uploads new content for a file. Its current content keeps answering until the new content is live; if the new\ncontent cannot be read, the current content stays live and the file says why. An unpublished file stays\nunpublished. --wait waits until it is live or failed, and exits 3 with the reason when it failed.",
+      "example": "caplo knowledge files replace \"Returns policy\" 3f9a1c2e-... ./refunds-2027.pdf --wait",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "timeout",
+          "type": "duration",
+          "default": "15m0s",
+          "usage": "how long --wait waits"
         },
         {
-          "name": "owner",
+          "name": "wait",
+          "type": "bool",
+          "usage": "wait until the file is live or failed"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
           "type": "string",
-          "usage": "team that owns the content"
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo knowledge files unpublish",
+      "use": "caplo knowledge files unpublish <kb> <file-id>",
+      "short": "Unpublish a file, so agents stop answering from it",
+      "long": "Takes a file out of agents' answers at once. The file stays in the knowledge base, stored and indexed, so\ncaplo knowledge files publish makes it answer again at once. Replacing an unpublished file keeps it unpublished.\nUnpublishing an unpublished file changes nothing.",
+      "example": "caplo knowledge files unpublish \"Returns policy\" 3f9a1c2e-...",
+      "runnable": true,
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo knowledge files upload",
+      "use": "caplo knowledge files upload <kb> <path> [flags]",
+      "short": "Upload a file to a knowledge base",
+      "long": "Uploads and publishes a file, which goes live by itself once it is read and indexed. --wait waits until it is\nlive or failed, and exits 3 with the reason when it failed. A file whose content is already in the knowledge base\nis refused, and so is a file over one of the workspace's limits: files per knowledge base, stored bytes, and files\nwaiting to be processed.\nSupported types, up to 25 MiB: .txt .md .markdown .html .htm .pdf .docx .png .jpg .jpeg .webp.",
+      "example": "caplo knowledge files upload \"Returns policy\" ./refunds.pdf --wait",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "timeout",
+          "type": "duration",
+          "default": "15m0s",
+          "usage": "how long --wait waits"
+        },
+        {
+          "name": "wait",
+          "type": "bool",
+          "usage": "wait until the file is live or failed"
         }
       ],
       "inheritedFlags": [
@@ -1335,8 +1996,7 @@
     {
       "path": "caplo knowledge get",
       "use": "caplo knowledge get <kb> [flags]",
-      "short": "Show a knowledge base, its documents, and its versions",
-      "long": "Shows the knowledge base, its newest version, and its documents with their extraction and review state. -o json\nor yaml includes every version.",
+      "short": "Show a knowledge base",
       "example": "caplo knowledge get \"Returns policy\"",
       "runnable": true,
       "flags": [
@@ -1382,18 +2042,25 @@
       ]
     },
     {
-      "path": "caplo knowledge publish",
-      "use": "caplo knowledge publish <kb> [flags]",
-      "short": "Publish a version from the approved documents and wait for it to index",
-      "long": "Publishes a version from the approved documents, unless the newest version holds exactly them, and waits until it\nis ready. Agent releases published from then on use it. Exits 3 when there are no approved documents or the version\ndoes not become ready.",
-      "example": "caplo knowledge publish \"Returns policy\"\n  caplo knowledge publish \"Returns policy\" --timeout 30m",
+      "path": "caplo knowledge search",
+      "use": "caplo knowledge search <kb> <question> [flags]",
+      "short": "Search a knowledge base's live files as an agent would",
+      "long": "Prints the coverage, good, partial or none, and the passages an agent would get, each with its file, section,\npage and relevance.",
+      "example": "caplo knowledge search \"Returns policy\" \"How much is delivery to Lahore?\"",
       "runnable": true,
       "flags": [
         {
-          "name": "timeout",
-          "type": "duration",
-          "default": "15m0s",
-          "usage": "how long to wait for indexing"
+          "name": "limit",
+          "type": "int",
+          "default": "0",
+          "usage": "passages to return, 1 to 8 (default 6)"
+        },
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
         }
       ],
       "inheritedFlags": [
@@ -1408,37 +2075,65 @@
     {
       "path": "caplo knowledge sync",
       "use": "caplo knowledge sync <kb> <dir> [flags]",
-      "short": "Make a knowledge base's documents match a directory, and optionally approve and publish them",
-      "long": "Uploads the directory's new and changed documents and removes the ones whose file is gone. The older copy of a\nchanged file is removed once the new copy is approved, so a version never lacks the document; a document a published\nversion holds stays in that version. Files are matched by name and content, so an unchanged file is not uploaded\nagain. Documents are named by file name, so two files in the tree may not share one. Supported types, up to 25 MiB\neach: .txt .md .markdown .html .pdf .docx .png .jpg .jpeg .webp.\nOther files are skipped, and so are hidden files and directories.\n\n--approve waits for extraction and approves the directory's documents, which skips reviewing their extracted text in\nthe console; it needs agents:publish. --publish then publishes a version from the approved documents and waits for it\nto index. It asks for confirmation before removing documents; --yes skips it. --dry-run prints the changes only.",
-      "example": "caplo knowledge sync \"Returns policy\" ./docs/returns --dry-run\n  caplo knowledge sync \"Returns policy\" ./docs/returns --approve --publish --yes",
+      "short": "Make a knowledge base's files match a directory",
+      "long": "Uploads the directory's new files, replaces the files whose content changed, and deletes the files whose name is\ngone from the directory. Files are matched by name, so two files in the tree may not share one; an unchanged file\nis not uploaded again. A replaced file keeps answering with its previous content until the new content is live.\nSupported types, up to 25 MiB each: .txt .md .markdown .html .htm .pdf .docx .png .jpg .jpeg .webp.\nOther files are skipped, and so are hidden files and directories.\n\nIt asks for confirmation before deleting files; --yes skips it. --wait waits until every uploaded file is live or\nfailed, and exits 3 with the reasons when any failed. --dry-run prints the changes only.\n\nWhen the knowledge service refuses a file over one of the workspace's limits (files per knowledge base, stored\nbytes, files waiting to be processed), the sync stops there before deleting anything: the files already uploaded\nstay, and it prints the refusal and how many files were not uploaded. Any other refusal, such as a file whose\ncontent is already in the knowledge base, is printed for that file and the sync goes on with the rest; it then\ndeletes nothing and exits 1, saying how many files were refused.",
+      "example": "caplo knowledge sync \"Returns policy\" ./docs/returns --dry-run\n  caplo knowledge sync \"Returns policy\" ./docs/returns --yes --wait",
       "runnable": true,
       "flags": [
-        {
-          "name": "approve",
-          "type": "bool",
-          "usage": "wait for extraction and approve the directory's documents"
-        },
         {
           "name": "dry-run",
           "type": "bool",
           "usage": "show the changes without making them"
         },
         {
-          "name": "publish",
-          "type": "bool",
-          "usage": "publish a version from the approved documents and wait for it to index"
-        },
-        {
           "name": "timeout",
           "type": "duration",
           "default": "15m0s",
-          "usage": "how long --approve and --publish wait for extraction and indexing"
+          "usage": "how long --wait waits"
+        },
+        {
+          "name": "wait",
+          "type": "bool",
+          "usage": "wait until every uploaded file is live or failed"
         },
         {
           "name": "yes",
           "shorthand": "y",
           "type": "bool",
-          "usage": "remove documents without asking"
+          "usage": "delete files without asking"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo knowledge update",
+      "use": "caplo knowledge update <kb> [flags]",
+      "short": "Rename a knowledge base, or change its description or audience",
+      "long": "Changes the flags given and keeps the rest. Agent releases copy a knowledge base's name and description when\nthey are published, so publish the agents that use it for their model to see the change.",
+      "example": "caplo knowledge update \"Returns policy\" --name Returns --description \"Return, refund and exchange rules\"",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "audience",
+          "type": "string",
+          "usage": "public, or verified_customer for content only signed-in customers may get"
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "usage": "what the knowledge base covers"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "usage": "new name"
         }
       ],
       "inheritedFlags": [
