@@ -43,8 +43,8 @@ A cost is charged once the provider has reported it, usually within a minute of 
 
 ## Phone numbers
 
-- **Your own Twilio or Telnyx number:** your carrier bills you for the number and its calls. Caplo charges the voice minutes and any Caplo-managed speech and AI.
-- **Caplo phone number:** $3 a month for each number on Standard and Pro, charged for each day the workspace holds it. The Free trial can't add one. Calls on it pay the same voice minutes as any other call.
+- **Your own Twilio or Telnyx number:** Twilio or Telnyx bills you for the number and its calls. Caplo charges the voice minutes and any Caplo-managed speech and AI.
+- **Caplo phone number:** $18 a month for each number on Standard and Pro, charged to your balance for each day the workspace holds it. You buy one in the console when you create a phone channel, and release it when you no longer need it. The Free trial can't buy one. Incoming calls on it have no network charge, only the same voice minutes as any other call; outgoing calls aren't available yet.
 - **Extra phone calls at once** on Pro are $15 a month each, added to the plan fee and prorated from the day you add them.
 
 ## WhatsApp charges

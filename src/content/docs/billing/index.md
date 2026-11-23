@@ -19,7 +19,7 @@ Your plan, balance, payments and documents are on **Plan & billing**, under **Us
 | Platform fee per voice minute | $0.02 | $0.02 | $0.015 | Contract rate |
 | AI models and speech | List price, no markup | List price, no markup | List price, no markup | List price or negotiated |
 | Phone calls at once | 1, on your own number | 3 | 10, plus $15 a month for each extra | By contract |
-| Caplo phone numbers | Not included | $3 a month each | $3 a month each | By contract |
+| Caplo phone numbers | Not included | $18 a month each | $18 a month each | By contract |
 | Published agents | 1 | Unlimited | Unlimited | Unlimited |
 | Channels of each type | 1 | Unlimited | Unlimited | Unlimited |
 | Handoff destinations | None | Unlimited | Unlimited | Unlimited |
