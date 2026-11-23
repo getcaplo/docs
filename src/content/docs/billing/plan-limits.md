@@ -54,7 +54,7 @@ When the balance is used up, the workspace is paused or a [spend budget](/usage/
 - New phone calls are refused.
 - A budget pause lets conversations in progress finish. When the balance is used up or the workspace is paused, they get 15 more minutes; then the agent stops replying and calls end with the time-limit goodbye.
 
-Live tests and evaluations are never held back.
+Budget pauses and paused plans never hold back live tests and evaluations. A used-up balance stops them at once, without the 15 minutes, because they spend it.
 
 ## Related
 

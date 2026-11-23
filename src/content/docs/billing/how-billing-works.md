@@ -39,13 +39,13 @@ A cost is charged once the provider has reported it, usually within a minute of 
 ## What is free
 
 - **Building agents.** Editing, publishing and the console's assistance cost nothing.
-- **Live tests and evaluations** pay only for the AI and speech they use. They have no platform fee.
+- **Live tests and evaluations** pay only for the AI and speech they use. They have no platform fee, and they stop while the balance is used up.
 
 ## Phone numbers
 
 - **Your own Twilio or Telnyx number:** Twilio or Telnyx bills you for the number and its calls. Caplo charges the voice minutes and any Caplo-managed speech and AI.
 - **Caplo phone number:** $18 a month for each number on Standard and Pro, charged to your balance for each day the workspace holds it. You buy one in the console when you create a phone channel, and release it when you no longer need it. The Free trial can't buy one. Incoming calls on it have no network charge, only the same voice minutes as any other call; outgoing calls aren't available yet.
-- **Extra phone calls at once** on Pro are $15 a month each, added to the plan fee and prorated from the day you add them.
+- **Extra phone calls at once** on Pro are $15 a month each, added to the plan fee. Adding them starts a new period that day, less the unused part of the current fee.
 
 ## WhatsApp charges
 
