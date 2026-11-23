@@ -25,7 +25,7 @@ Each member has exactly one role in a workspace. Owners and Admins invite people
 | Read conversations | Yes | Yes | Yes | | Yes | Yes | Yes | |
 | Take over conversations, add notes, reveal participants | Yes | Yes | | | Yes | | | |
 | View usage | Yes | Yes | | | | Yes | | Yes |
-| Manage billing and spend budgets | Yes | | | | | | | Yes |
+| Manage the plan, payments, billing details and spend budgets | Yes | | | | | | | Yes |
 | Invite and manage members | Yes | Yes | | | | | | |
 | Workspace settings, SSO, customer identity, data retention | Yes | Yes | | | | | | |
 | Create API clients for CI and scripts | Yes | Yes | | Yes | | | | |
@@ -58,4 +58,4 @@ See [Workspaces in the CLI](/cli/workspaces/) for details.
 
 - [Agents and releases](/concepts/agents-and-releases/): what Builders and Admins create and publish.
 - [Conversations and handoff](/concepts/conversations-and-handoff/): what Supervisors do in the inbox.
-- [Spend budgets](/usage/spend-budgets/): what the Billing role manages.
+- [Plans](/billing/) and [spend budgets](/usage/spend-budgets/): what the Billing role manages.

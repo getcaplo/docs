@@ -58,10 +58,10 @@ Owners, Admins and Developers can change key sources and manage keys. Other role
 
 ## Billing effect
 
-- **Caplo Managed** usage appears on your Caplo bill at the provider's list price plus your plan's markup.
-- **Your key** usage is billed to you by the provider and adds no AI usage charge from Caplo. Caplo's platform fees (per voice minute and per AI reply) still apply.
+- **Caplo Managed** usage appears on your Caplo bill at the provider's list price, with no markup on a plan.
+- **Your key** usage is billed to you by the provider and adds no AI usage charge from Caplo. Caplo's platform fees still apply. Your own keys need the Standard plan or higher.
 
-See [How Caplo charges](/usage/).
+See [How your bill works](/billing/how-billing-works/).
 
 ## Related
 
