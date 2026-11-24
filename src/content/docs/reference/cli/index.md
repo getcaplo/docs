@@ -8,7 +8,7 @@ sidebar:
 ---
 
 :::note[Generated reference]
-Generated from `caplo` v0.4.1, the latest release. `caplo --help` prints the same text.
+Generated from `caplo` v0.5.1, the latest release. `caplo --help` prints the same text.
 :::
 
 Install the CLI with the [installation guide](/cli/install/). Task guides are under [CLI](/cli/workflow/).
@@ -39,7 +39,7 @@ caplo [flags]
 | [`caplo agent`](/reference/cli/agent/) | Build, test, evaluate, and publish one agent |
 | [`caplo channel`](/reference/cli/channel/) | List channels and deploy agent releases to them |
 | [`caplo identity`](/reference/cli/identity/) | Generate keys and sign or check host sign-in assertions locally |
-| [`caplo knowledge`](/reference/cli/knowledge/) | Manage knowledge bases and sync their documents from a directory |
+| [`caplo knowledge`](/reference/cli/knowledge/) | Manage knowledge bases and their files, and search them |
 | [`caplo mcp`](/reference/cli/mcp/) | Connect remote MCP servers and publish their reviewed tools |
 | [`caplo secret`](/reference/cli/secret/) | Manage workspace secrets that package secrets bind to |
 | [`caplo tool`](/reference/cli/tool/) | Build, test, publish, and run tool packages |
@@ -49,6 +49,7 @@ caplo [flags]
 | Command | Description |
 | --- | --- |
 | [`caplo auth`](/reference/cli/auth/) | Log in, log out, and show the session |
+| [`caplo billing`](/reference/cli/billing/) | See and change the workspace's plan, balance, billing details and documents |
 | [`caplo config`](/reference/cli/config/) | Show and change CLI settings |
 | [`caplo workspace`](/reference/cli/workspace/) | List, show, create, and select workspaces |
 
