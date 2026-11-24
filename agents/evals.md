@@ -121,8 +121,8 @@ Running evals needs an Owner or Admin, or an API key with the `agents:publish` s
 
 Publishing runs the gate against the exact saved draft and the current case list:
 
-* Every case must pass in a run of that draft and those cases. Editing either one needs a new run.
-* Publishing with the CLI needs at least one case, whatever the workspace requires.
+* While the workspace requires evals, every case must pass in a run of that draft and those cases, and an agent with no cases cannot publish. Editing either one needs a new run.
+* With the requirement off, the console and the CLI still run the cases and show the results, but failed cases do not block publishing, and an agent with no cases publishes.
 * A release does not pin eval cases. When only the cases change, `caplo publish` runs them against the released draft and keeps the release.
 * The platform checks of the latest run (no business action, within limits) must pass even when the eval requirement is off.
 

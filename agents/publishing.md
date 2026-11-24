@@ -40,7 +40,7 @@ Both pin tool versions, check readiness, run the eval cases, show what will chan
 
 `caplo agent publish` needs the agent’s sub-agents to have releases already. `caplo publish` releases a project’s agents in the right order for you. See [The CLI workflow](/cli/workflow/).
 
-The first release is `1.0.0`. Releases are listed on the agent’s **Releases** tab and with `caplo agent release list "Support Desk"`; `caplo agent release get "Support Desk" 1.2.0` shows one with its tools, sub-agent releases and eval gate.
+The first release is `1.0.0`. Releases are listed on the agent’s **Releases** tab and with `caplo agent release list "Support Desk"`; `caplo agent release get "Support Desk" 1.2.0` shows one with its manifest and graph digests, tools, sub-agent releases and the eval gate it was published under. Add `--manifest` to print the exact manifest that channels run, or `-o json` for the whole release.
 
 ## Version bumps
 

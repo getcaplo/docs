@@ -66,11 +66,11 @@ The command exits with status 1 if a message or decision could not be sent, and,
 Each test chat holds a test session, and a workspace has limited test capacity. A chat closes its session when it ends. If a chat stops abruptly or capacity runs out, `caplo agent chat` reports that no test session is free. List and close your open sessions:
 
 ```plaintext
-caplo agent test list
-caplo agent test close 4d2f8b1e-6c3a-4f7e-9d05-1a2b3c4d5e6f
+caplo agent sessions list
+caplo agent sessions close 4d2f8b1e-6c3a-4f7e-9d05-1a2b3c4d5e6f
 ```
 
-`caplo agent test list` shows each of your open sessions across agents with its agent, last activity and how long it may keep running. You can list and close only your own sessions.
+`caplo agent sessions list` shows each of your open sessions across agents with its agent, last activity and how long it may keep running. You can list and close only your own sessions.
 
 ## What to test
 

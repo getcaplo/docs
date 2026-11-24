@@ -1727,8 +1727,8 @@ Running evals needs an Owner or Admin, or an API key with the `agents:publish` s
 
 Publishing runs the gate against the exact saved draft and the current case list:
 
-* Every case must pass in a run of that draft and those cases. Editing either one needs a new run.
-* Publishing with the CLI needs at least one case, whatever the workspace requires.
+* While the workspace requires evals, every case must pass in a run of that draft and those cases, and an agent with no cases cannot publish. Editing either one needs a new run.
+* With the requirement off, the console and the CLI still run the cases and show the results, but failed cases do not block publishing, and an agent with no cases publishes.
 * A release does not pin eval cases. When only the cases change, `caplo publish` runs them against the released draft and keeps the release.
 * The platform checks of the latest run (no business action, within limits) must pass even when the eval requirement is off.
 
@@ -2290,7 +2290,7 @@ Publishing needs an Owner or Admin, or an API key with the `agents:publish` and 
 
   `caplo agent publish` needs the agent’s sub-agents to have releases already. `caplo publish` releases a project’s agents in the right order for you. See [The CLI workflow](/cli/workflow/).
 
-The first release is `1.0.0`. Releases are listed on the agent’s **Releases** tab and with `caplo agent release list "Support Desk"`; `caplo agent release get "Support Desk" 1.2.0` shows one with its tools, sub-agent releases and eval gate.
+The first release is `1.0.0`. Releases are listed on the agent’s **Releases** tab and with `caplo agent release list "Support Desk"`; `caplo agent release get "Support Desk" 1.2.0` shows one with its manifest and graph digests, tools, sub-agent releases and the eval gate it was published under. Add `--manifest` to print the exact manifest that channels run, or `-o json` for the whole release.
 
 ## Version bumps
 
@@ -2642,11 +2642,11 @@ The command exits with status 1 if a message or decision could not be sent, and,
 Each test chat holds a test session, and a workspace has limited test capacity. A chat closes its session when it ends. If a chat stops abruptly or capacity runs out, `caplo agent chat` reports that no test session is free. List and close your open sessions:
 
 ```plaintext
-caplo agent test list
-caplo agent test close 4d2f8b1e-6c3a-4f7e-9d05-1a2b3c4d5e6f
+caplo agent sessions list
+caplo agent sessions close 4d2f8b1e-6c3a-4f7e-9d05-1a2b3c4d5e6f
 ```
 
-`caplo agent test list` shows each of your open sessions across agents with its agent, last activity and how long it may keep running. You can list and close only your own sessions.
+`caplo agent sessions list` shows each of your open sessions across agents with its agent, last activity and how long it may keep running. You can list and close only your own sessions.
 
 ## What to test
 
@@ -5384,7 +5384,7 @@ These need a person’s login and do not work with an API key:
 * `caplo workspace` commands, including `caplo workspace api-client`: an API client cannot manage workspaces or other clients.
 * `caplo secret set` and `delete`, and `caplo tool secret bind` and `unbind`: managing workspace secrets needs a member with the secrets permission.
 * `caplo mcp add`, `update`, `remove`, `check`, `connect` and `refresh`: connecting remote MCP servers needs a member who can manage integrations.
-* `caplo agent chat` and `caplo agent test`: test conversations belong to a person.
+* `caplo agent chat` and `caplo agent sessions`: test conversations belong to a person.
 
 If the API refuses a key, the CLI says that an API key cannot do this or that it was revoked. Check the scopes with `caplo auth status`.
 
@@ -6454,7 +6454,7 @@ caplo publish --yes
 2. **Child agents.** Each sub-agent’s draft is saved, pinned to the package versions just published, its eval cases run, and it is published as a release.
 3. **Parent agents.** Each parent’s draft is saved pinned to its children’s new releases, evaluated and published, until the top of the project.
 
-Every agent it publishes needs at least one eval case, and every case must pass. If a step fails, publishing stops there; what was already published stays published.
+While the workspace requires evals, every agent it publishes needs at least one eval case, and every case must pass; with the requirement off, failed cases are reported but do not stop the publish (see [Publication requirements](/agents/evals/#publication-requirements)). If a step fails, publishing stops there; what was already published stays published.
 
 ### What gets a new release
 
