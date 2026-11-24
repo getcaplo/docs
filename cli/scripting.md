@@ -83,7 +83,7 @@ An environment’s `apiKeyEnv` in `caplo.yaml` names one more variable per envir
 
 ## Run without a terminal
 
-Commands that change something important ask first: `caplo publish`, `caplo agent publish`, `caplo channel deploy` and `rollback`, `caplo knowledge sync` when it removes documents, release and version revokes, archive, delete and remove commands, and secret unset, unbind and delete. Pass `--yes` (`-y`) to skip the question.
+Commands that change something important ask first: `caplo publish`, `caplo agent publish`, `caplo channel deploy` and `rollback`, `caplo knowledge sync` when it deletes files, release and version revokes, archive, delete and remove commands, and secret unset, unbind and delete. Pass `--yes` (`-y`) to skip the question.
 
 When standard input is not a terminal, these commands do not read an answer from it. Without `--yes` they stop with exit code 2, so piping `y` into them does not work. `caplo publish` also requires `--yes` on a project’s first publish to a workspace, even in a terminal.
 

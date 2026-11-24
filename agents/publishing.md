@@ -61,12 +61,12 @@ A release freezes everything the agent needs to behave the same way every time:
 * The whole configuration: instructions, greeting, model and its settings, actions, routing, suggested replies and ratings.
 * The policy, with each field you left out filled with the platform default of the day.
 * Each tool package at its latest published version, with each tool’s schema and read or write effect. See [Give an agent tools](/agents/tools/#how-releases-pin-tool-versions).
-* Each knowledge base at its ready version. See [Add knowledge](/agents/knowledge/#versions-and-agent-releases).
+* Each knowledge base’s name and description. Its files are not pinned; see [Knowledge and agent releases](/agents/knowledge/#knowledge-and-agent-releases).
 * Each sub-agent at an exact release. See [Release pinning](/agents/sub-agents-and-routing/#release-pinning).
 
 A release does not pin eval cases. When only the cases change, `caplo publish` runs them against the released draft and keeps the release.
 
-To pick up newer tool package versions without other changes, run `caplo agent publish` or `caplo publish`: they save a new draft revision and publish it. A newer knowledge version or child release needs a draft change to publish.
+To pick up newer tool package versions without other changes, run `caplo agent publish` or `caplo publish`: they save a new draft revision and publish it. A new child release, or a knowledge base’s new name or description, needs a draft change to publish.
 
 ## Deploy a release to channels
 

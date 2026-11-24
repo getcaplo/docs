@@ -15,7 +15,7 @@ Editing the draft never changes a published release. The console marks an agent 
 Publishing turns the saved draft into a release. An Owner or Admin publishes from **Publish agent** in the console or with `caplo publish` or `caplo agent publish`. Caplo then:
 
 1. Checks the configuration, such as the greeting, the model and every reference.
-2. Pins the newest published version of each tool package the agent uses, and the newest published version of each knowledge base it attaches.
+2. Pins the newest published version of each tool package the agent uses, and records the name and description of each knowledge base it attaches.
 3. Runs the agent’s eval cases against this exact candidate and applies the workspace’s publication requirements. See [Evaluations](/concepts/evaluations/).
 4. Checks that the agent’s instructions, tools and knowledge fit within what its model can handle.
 5. Freezes the result as a numbered release with a semantic version (`1.0.0`, then a major, minor or patch bump) and your release note.
@@ -28,7 +28,7 @@ A release is immutable. It records:
 
 * The configuration as it was when published.
 * The exact tool package versions. A newer tool version reaches customers only when you publish the agent again.
-* The exact knowledge base versions. Publishing a new knowledge version does not change live answers until the agent is published again.
+* The knowledge bases it uses, with their names and descriptions. Their files are not pinned: the agent searches their live files, so file changes reach answers without a new release. See [Knowledge](/concepts/knowledge/#knowledge-is-live).
 * The exact release of each sub-agent. See [Multi-agent](/concepts/multi-agent/).
 
 Eval cases are not part of a release. You can change them without republishing, and the next publish runs the current set.

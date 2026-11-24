@@ -13,18 +13,18 @@ Caplo is a platform for building AI agents that talk to your customers. An agent
 | Workspace      | Your team’s space in Caplo. It holds every agent, tool, knowledge base, channel and conversation, plus members, roles, provider keys and billing.                   |
 | Agent          | An assistant with instructions, a greeting, a model, and optionally knowledge bases, tools and sub-agents.                                                          |
 | Draft          | The editable version of an agent. You change and test the draft; customers never talk to it.                                                                        |
-| Release        | A frozen, numbered copy of a draft. Publishing creates a release and pins the exact tool and knowledge versions it uses.                                            |
+| Release        | A frozen, numbered copy of a draft. Publishing creates a release and pins the exact tool versions it uses.                                                          |
 | Tool package   | Code that gives agents tools, such as looking up an order or booking an appointment. You can also connect a remote MCP server. Each published version is immutable. |
-| Knowledge base | Documents you upload, review and approve. Published versions are what agents search to answer questions.                                                            |
+| Knowledge base | Files you upload that agents search to answer questions. Each file is used as soon as it is live.                                                                   |
 | Channel        | Where customers reach an agent: a website widget, a WhatsApp number, a Messenger page, an Instagram account or a phone number. A channel serves one agent release.  |
 | Conversation   | One customer’s chat or call on a channel. It keeps the release it started with, and your team can read it and take over.                                            |
 
 ## How they fit together
 
 1. You create an agent in a workspace and write its instructions and greeting.
-2. You attach published knowledge bases and tools, and link other agents as sub-agents if one agent should delegate to specialists.
+2. You attach knowledge bases and tools, and link other agents as sub-agents if one agent should delegate to specialists.
 3. You test the draft in a private test chat and add eval cases: example customer messages with the outcome you expect.
-4. You publish. Caplo checks the draft, runs the eval cases, pins every tool and knowledge version, and creates an immutable release.
+4. You publish. Caplo checks the draft, runs the eval cases, pins every tool version, and creates an immutable release.
 5. You point a channel at that release. New conversations on the channel use it; conversations already in progress keep the release they started with.
 6. You watch conversations in the console, step in when a person is needed, and publish new releases as you improve the agent.
 
