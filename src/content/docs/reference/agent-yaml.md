@@ -7,7 +7,7 @@ sidebar:
 ---
 
 :::note[Generated reference]
-Generated from the schema in `caplo` v0.4.1. Guide: [Agent YAML](/agents/agent-yaml/).
+Generated from the schema in `caplo` v0.6.0. Guide: [Agent YAML](/agents/agent-yaml/).
 :::
 
 For validation and completion in your editor, add this first line to the file (YAML language server, used by VS Code and others):
@@ -37,7 +37,7 @@ A file with `kind: Agent` edits or creates one agent.
 | `actions` | array of `"transfer"`, `"end"` |  | Agent-level conversation actions. Channel-specific workflows stay on the entry point. |
 | `subAgents` | array of object |  | Links to reusable agents. A linked agent may have sub-agents of its own. See [`subAgents`](#subagents). |
 | `routing` | object |  | How this agent picks a sub-agent. Omitted means model. See [`routing`](#routing). |
-| `policy` | object |  | How the agent loop runs. Omitted fields take the platform defaults; an empty guidance or style turns that block off. See [`policy`](#policy). |
+| `policy` | object |  | How the agent loop runs. Omitted fields take the platform defaults; an empty guidance, style or language turns that block off. See [`policy`](#policy). |
 | `suggestedReplies` | object |  | Short next messages offered under the replies this agent writes itself, on channels that can show them. Omit to turn them off. See [`suggestedReplies`](#suggestedreplies). |
 | `visitorFeedback` | boolean |  | Let website visitors rate this agent's replies with a thumbs up or down and an optional reason; operators see the ratings in Conversations and the agent never does. Omit to turn it off. |
 
@@ -118,13 +118,14 @@ Other fields are refused.
 
 ### `policy`
 
-How the agent loop runs. Omitted fields take the platform defaults; an empty guidance or style turns that block off.
+How the agent loop runs. Omitted fields take the platform defaults; an empty guidance, style or language turns that block off.
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
 | `guidance` | string |  | Platform guidance that follows the instructions. At most 4000 characters. |
 | `chatStyle` | string |  | Reply style for chat turns. At most 2000 characters. |
 | `voiceStyle` | string |  | Reply style for voice calls. At most 2000 characters. |
+| `language` | string |  | Which language and writing system replies use. At most 2000 characters. |
 | `history` | object |  |  See [`policy.history`](#policyhistory). |
 | `knowledgePassages` | integer |  | Passages one knowledge search returns. Default 6. From 1 to 8. |
 | `maxModelCalls` | integer |  | Model calls of the whole agent graph per turn. Default 16. From 1 to 48. |
@@ -196,7 +197,7 @@ Other fields are refused.
 | `subAgents` | array of object |  | Links to reusable agents. A linked agent may have sub-agents of its own. See [`agents.subAgents`](#agentssubagents). |
 | `routing` | object |  | How this agent picks a sub-agent. Omitted means model. See [`agents.routing`](#agentsrouting). |
 | `evals` | object |  |  See [`agents.evals`](#agentsevals). |
-| `policy` | object |  | How the agent loop runs. Omitted fields take the platform defaults; an empty guidance or style turns that block off. See [`agents.policy`](#agentspolicy). |
+| `policy` | object |  | How the agent loop runs. Omitted fields take the platform defaults; an empty guidance, style or language turns that block off. See [`agents.policy`](#agentspolicy). |
 | `suggestedReplies` | object |  | Short next messages offered under the replies this agent writes itself, on channels that can show them. Omit to turn them off. See [`agents.suggestedReplies`](#agentssuggestedreplies). |
 | `visitorFeedback` | boolean |  | Let website visitors rate this agent's replies with a thumbs up or down and an optional reason; operators see the ratings in Conversations and the agent never does. Omit to turn it off. |
 
@@ -277,13 +278,14 @@ Other fields are refused.
 
 #### `agents.policy`
 
-How the agent loop runs. Omitted fields take the platform defaults; an empty guidance or style turns that block off.
+How the agent loop runs. Omitted fields take the platform defaults; an empty guidance, style or language turns that block off.
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
 | `guidance` | string |  | Platform guidance that follows the instructions. At most 4000 characters. |
 | `chatStyle` | string |  | Reply style for chat turns. At most 2000 characters. |
 | `voiceStyle` | string |  | Reply style for voice calls. At most 2000 characters. |
+| `language` | string |  | Which language and writing system replies use. At most 2000 characters. |
 | `history` | object |  |  See [`agents.policy.history`](#agentspolicyhistory). |
 | `knowledgePassages` | integer |  | Passages one knowledge search returns. Default 6. From 1 to 8. |
 | `maxModelCalls` | integer |  | Model calls of the whole agent graph per turn. Default 16. From 1 to 48. |

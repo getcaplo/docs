@@ -8,7 +8,7 @@ sidebar:
 ---
 
 :::note[Generated reference]
-Generated from `caplo` v0.4.1, the latest release. `caplo <command> --help` prints the same text.
+Generated from `caplo` v0.6.0, the latest release. `caplo <command> --help` prints the same text.
 :::
 
 These commands work on the project around the current directory, or the one `-C` names. See [Projects](/cli/projects/).
@@ -133,7 +133,7 @@ Validate, push, test, evaluate, and publish bottom up: tools, then child agents,
 caplo publish [agent/<name> | tool/<name>]... [flags]
 ```
 
-Publishes the selection, or the whole project, bottom up. Changed packages are pushed, built, tested with their fixtures on the workspace's test runner, and published first. Then agents publish with children before parents: each draft is saved pinned to its children's new releases, its eval cases run, and it is published. An agent publishes when its file changed, its saved draft is unpublished, or a package or release: latest sub-agent it uses publishes. A release does not pin eval cases, so an agent whose cases alone changed since its release is evaluated and keeps the release. A published agent needs at least one eval case, and every case must pass.
+Publishes the selection, or the whole project, bottom up. Changed packages are pushed, built, tested with their fixtures on the workspace's test runner, and published first. Then agents publish with children before parents: each draft is saved pinned to its children's new releases, its eval cases run, and it is published. An agent publishes when its file changed, its saved draft is unpublished, or a package or release: latest sub-agent it uses publishes. A release does not pin eval cases, so an agent whose cases alone changed since its release is evaluated and keeps the release. The workspace's publication requirements decide what eval results mean: while it requires passing evals, the default, an agent needs at least one eval case and every case must pass. With the requirement off, the cases still run and print but do not block publishing, and the platform checks of the run must still pass.
 
 It validates the project, prints the plan and diffs, and asks before publishing; --yes skips the question. Without a terminal, and on a project's first publish to a workspace, it needs --yes. --dry-run prints the plan only. --prune archives the agents an earlier publish of this project created that it no longer defines; it takes no selectors.
 
