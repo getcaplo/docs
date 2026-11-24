@@ -8,7 +8,7 @@ sidebar:
 ---
 
 :::note[Generated reference]
-Generated from `caplo` v0.4.1, the latest release. `caplo agent --help` prints the same text.
+Generated from `caplo` v0.6.0, the latest release. `caplo agent --help` prints the same text.
 :::
 
 Build, test, evaluate, and publish one agent.
@@ -39,7 +39,7 @@ caplo agent publish "Support"
 - [`caplo agent pull`](#caplo-agent-pull)
 - [`caplo agent push`](#caplo-agent-push)
 - [`caplo agent release`](#caplo-agent-release)
-- [`caplo agent test`](#caplo-agent-test)
+- [`caplo agent sessions`](#caplo-agent-sessions)
 - [`caplo agent validate`](#caplo-agent-validate)
 
 ## caplo agent chat
@@ -54,7 +54,7 @@ Starts a private test conversation with the agent's saved draft, or with a relea
 
 A write awaiting a decision is shown as its review, as a review of the whole plan, or as a write that can only be declined: one with no review here, or one waiting for the customer to sign in. /confirm or /cancel decides the write shown last, as the widget's buttons do; ordinary text never approves a write. If the write changed meanwhile, the current one is shown to answer again, and a refused (409) message or decision is reported without ending the chat. A message or decision that was not sent makes the command exit 1 at its end; without a terminal, a failed turn makes it exit 3.
 
-Replies arrive on the agent-test event stream. It resumes after the last event when it reconnects, reloads the history on a reset, reconnects with a fresh token when asked to reauthenticate, and retries network failures, 429, and 5xx, but not an unknown host, a rejected TLS certificate, or another 4xx. When no test session is free, caplo agent test list and caplo agent test close free one.
+Replies arrive on the agent-test event stream. It resumes after the last event when it reconnects, reloads the history on a reset, reconnects with a fresh token when asked to reauthenticate, and retries network failures, 429, and 5xx, but not an unknown host, a rejected TLS certificate, or another 4xx. When no test session is free, caplo agent sessions list and caplo agent sessions close free one.
 
 **Examples**
 
@@ -227,7 +227,9 @@ Pin tools, run the evals, and publish the agent's saved draft as a release.
 caplo agent publish <agent> [flags]
 ```
 
-Publishes the saved draft of a workspace agent: it pins the draft's tool versions, checks that the draft is ready, runs its eval cases, and publishes it. The agent needs at least one eval case, and every case must pass. Its sub-agents must have releases already; caplo publish releases a project's agents together.
+Publishes the saved draft of a workspace agent: it pins the draft's tool versions, checks that the draft is ready, runs its eval cases, and publishes it. Its sub-agents must have releases already; caplo publish releases a project's agents together.
+
+The workspace's publication requirements decide what eval results mean. While the workspace requires passing evals, the default, the agent needs at least one eval case and every case must pass. With the requirement off, the cases still run and print but do not block publishing, and the platform checks of the run must still pass.
 
 A released draft is published again only when its packages have newer versions. When its eval cases changed since its release, they run against it and the release is kept.
 
@@ -319,23 +321,27 @@ caplo agent release revoke "Shop Concierge" 2.1.0 --reason "wrong refund policy"
 
 ## caplo agent release get
 
-Show a release: version, tools, sub-agent releases, and eval gate.
+Show a release: version, manifest and graph digests, tools, sub-agent releases, and eval gate.
 
 ```sh
 caplo agent release get <agent> <release> [flags]
 ```
+
+Shows a release with its manifest and graph digests, runtime profile, pinned tools, sub-agent releases, and the eval gate it was published under, with the workspace's eval requirement at the time. -o json and -o yaml print the release as the registry stores it, with its whole manifest and gate. --manifest prints only the manifest, the configuration that channels and parents run, as the registry returned it.
 
 **Examples**
 
 ```sh
 caplo agent release get "Shop Concierge" 2.1.0
 caplo agent release get "Shop Concierge" 7 -o json
+caplo agent release get "Shop Concierge" 2.1.0 --manifest > manifest.json
 ```
 
 **Flags**
 
 | Flag | Value | Default | Description |
 | --- | --- | --- | --- |
+| `--manifest` |  |  | print only the release's manifest as JSON |
 | `--output`, `-o` | string | `table` | output format: table, json, or yaml |
 
 ## caplo agent release list
@@ -381,12 +387,12 @@ caplo agent release revoke "Shop Concierge" 2.1.0 --reason "wrong refund policy"
 | `--reason` | string |  | why the release is revoked (required) |
 | `--yes`, `-y` |  |  | do not ask for confirmation |
 
-## caplo agent test
+## caplo agent sessions
 
-Manage your private test sessions.
+List and close your private test sessions.
 
 ```sh
-caplo agent test
+caplo agent sessions
 ```
 
 Each caplo agent chat runs in a private test session, which holds test capacity until it is closed. The chat closes its session when it ends; list and close find and free sessions left open.
@@ -394,41 +400,41 @@ Each caplo agent chat runs in a private test session, which holds test capacity 
 **Examples**
 
 ```sh
-caplo agent test list
-caplo agent test close 4d2f8b1e-6c3a-4f7e-9d05-1a2b3c4d5e6f
+caplo agent sessions list
+caplo agent sessions close 4d2f8b1e-6c3a-4f7e-9d05-1a2b3c4d5e6f
 ```
 
 **Commands**
 
-- [`caplo agent test close`](#caplo-agent-test-close)
-- [`caplo agent test list`](#caplo-agent-test-list)
+- [`caplo agent sessions close`](#caplo-agent-sessions-close)
+- [`caplo agent sessions list`](#caplo-agent-sessions-list)
 
-## caplo agent test close
+## caplo agent sessions close
 
 Close one of your private test sessions and release its capacity.
 
 ```sh
-caplo agent test close <session-id>
+caplo agent sessions close <session-id>
 ```
 
 **Examples**
 
 ```sh
-caplo agent test close 4d2f8b1e-6c3a-4f7e-9d05-1a2b3c4d5e6f
+caplo agent sessions close 4d2f8b1e-6c3a-4f7e-9d05-1a2b3c4d5e6f
 ```
 
-## caplo agent test list
+## caplo agent sessions list
 
 List your open test sessions across agents in this workspace.
 
 ```sh
-caplo agent test list
+caplo agent sessions list
 ```
 
 **Examples**
 
 ```sh
-caplo agent test list
+caplo agent sessions list
 ```
 
 ## caplo agent validate

@@ -7,7 +7,7 @@ sidebar:
 ---
 
 :::note[Generated reference]
-Generated from the schema in `caplo` v0.4.1. Guide: [Test tools](/tools/testing/).
+Generated from the schema in `caplo` v0.6.0. Guide: [Test tools](/tools/testing/).
 :::
 
 For validation and completion in your editor, add this first line to the file (YAML language server, used by VS Code and others):
