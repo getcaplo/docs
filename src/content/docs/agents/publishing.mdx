@@ -50,7 +50,7 @@ Publishing needs an Owner or Admin, or an API key with the `agents:publish` and 
   </TabItem>
 </Tabs>
 
-The first release is `1.0.0`. Releases are listed on the agent's **Releases** tab and with `caplo agent release list "Support Desk"`; `caplo agent release get "Support Desk" 1.2.0` shows one with its tools, sub-agent releases and eval gate.
+The first release is `1.0.0`. Releases are listed on the agent's **Releases** tab and with `caplo agent release list "Support Desk"`; `caplo agent release get "Support Desk" 1.2.0` shows one with its manifest and graph digests, tools, sub-agent releases and the eval gate it was published under. Add `--manifest` to print the exact manifest that channels run, or `-o json` for the whole release.
 
 ## Version bumps
 

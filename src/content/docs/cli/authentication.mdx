@@ -171,7 +171,7 @@ These need a person's login and do not work with an API key:
 - `caplo workspace` commands, including `caplo workspace api-client`: an API client cannot manage workspaces or other clients.
 - `caplo secret set` and `delete`, and `caplo tool secret bind` and `unbind`: managing workspace secrets needs a member with the secrets permission.
 - `caplo mcp add`, `update`, `remove`, `check`, `connect` and `refresh`: connecting remote MCP servers needs a member who can manage integrations.
-- `caplo agent chat` and `caplo agent test`: test conversations belong to a person.
+- `caplo agent chat` and `caplo agent sessions`: test conversations belong to a person.
 
 If the API refuses a key, the CLI says that an API key cannot do this or that it was revoked. Check the scopes with `caplo auth status`.
 

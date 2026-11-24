@@ -104,7 +104,7 @@ caplo publish --yes
 3. **Parent agents.** Each parent's draft is saved pinned to its children's new releases, evaluated and published, until the top of the project.
 </Steps>
 
-Every agent it publishes needs at least one eval case, and every case must pass. If a step fails, publishing stops there; what was already published stays published.
+While the workspace requires evals, every agent it publishes needs at least one eval case, and every case must pass; with the requirement off, failed cases are reported but do not stop the publish (see [Publication requirements](/agents/evals/#publication-requirements)). If a step fails, publishing stops there; what was already published stays published.
 
 ### What gets a new release
 
