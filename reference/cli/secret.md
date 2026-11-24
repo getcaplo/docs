@@ -4,7 +4,7 @@
 
 Generated reference
 
-Generated from `caplo` v0.4.1, the latest release. `caplo secret --help` prints the same text.
+Generated from `caplo` v0.6.0, the latest release. `caplo secret --help` prints the same text.
 
 Manage workspace secrets that package secrets bind to.
 

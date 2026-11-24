@@ -73,6 +73,7 @@
 	"/reference/cli/",
 	"/reference/cli/agent/",
 	"/reference/cli/auth/",
+	"/reference/cli/billing/",
 	"/reference/cli/channel/",
 	"/reference/cli/config/",
 	"/reference/cli/identity/",

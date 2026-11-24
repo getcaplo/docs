@@ -390,7 +390,7 @@
     },
     "policy": {
       "type": "object",
-      "description": "How the agent loop runs. Omitted fields take the platform defaults; an empty guidance or style turns that block off.",
+      "description": "How the agent loop runs. Omitted fields take the platform defaults; an empty guidance, style or language turns that block off.",
       "additionalProperties": false,
       "properties": {
         "guidance": {
@@ -407,6 +407,11 @@
           "type": "string",
           "maxLength": 2000,
           "description": "Reply style for voice calls."
+        },
+        "language": {
+          "type": "string",
+          "maxLength": 2000,
+          "description": "Which language and writing system replies use."
         },
         "history": {
           "type": "object",
