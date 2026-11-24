@@ -15,8 +15,8 @@ Each member has exactly one role in a workspace. Owners and Admins invite people
 
 | What you can do | Owner | Admin | Builder | Developer | Supervisor | Auditor | Viewer | Billing |
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| Create, edit and test agents; upload knowledge | Yes | Yes | Yes | | | | | |
-| Publish agents; approve knowledge and publish its versions | Yes | Yes | | | | | | |
+| Create, edit and test agents; manage knowledge bases and their files | Yes | Yes | Yes | | | | | |
+| Publish agents | Yes | Yes | | | | | | |
 | Build and publish tool packages | Yes | Yes | | Yes | | | | |
 | Manage workspace secrets and bind them to tools | Yes | Yes | | | | | | |
 | Configure channels and widget designs | Yes | Yes | Yes | | | | | |

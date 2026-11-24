@@ -1,29 +1,27 @@
 ---
 title: Knowledge
-description: How knowledge bases, documents, review, versions and audiences work, and how agents use them to answer.
+description: How knowledge bases, live files and audiences work, and how agents use them to answer.
 sidebar:
   order: 5
 ---
 
-A **knowledge base** is a set of documents your agents can search to answer questions, such as product guides, policies or FAQs. An agent with knowledge looks up relevant passages while it answers, instead of relying on what its model already knows.
+A **knowledge base** is a set of files your agents can search to answer questions, such as product guides, policies, price lists or FAQs. An agent with knowledge looks up relevant passages while it answers, instead of relying on what its model already knows.
 
 Knowledge bases belong to the workspace, not to one agent. You manage them under **Knowledge** in the console, and any number of agents can attach the same base.
 
-## Documents and review
+## Files
 
-You add documents to a knowledge base as files: PDF, DOCX, HTML, Markdown, plain text, and PNG, JPG or WebP images, up to 25 MB each. Each file goes through the same steps before agents can use it:
+You add files to a knowledge base: PDF, DOCX, HTML, Markdown, plain text, and PNG, JPG or WebP images, up to 25 MB each. Caplo reads each file, including text in images and the page layout, cuts it into passages and indexes them. The file then goes **Live** by itself, and agents find it from the next question on.
 
-1. **Extract.** Caplo extracts the text, including text in images and the page layout.
-2. **Review.** You check the extracted text and the passages (chunks) agents will retrieve. Look for missing pages, broken tables, unreadable images and anything sensitive that should not be there.
-3. **Approve.** An Owner or Admin approves the document.
+Owners, Admins and Builders manage files. They can read the text agents get from each file, try a customer's question to see which passages it finds, and:
 
-Builders can create knowledge bases and upload files, but only Owners and Admins approve documents and publish versions. This keeps a person accountable for what agents tell customers.
+- **Replace** a file. Its current content keeps answering until the new content is live, and stays live if the new content cannot be read.
+- **Unpublish** a file to take it out of answers at once while keeping it stored, and **Publish** it again later.
+- **Delete** a file, which agents stop finding at once.
 
-## Versions
+## Knowledge is live
 
-Approved documents become available to agents only when an Owner or Admin publishes a **version** of the knowledge base. Caplo indexes the version, and once it is ready agents can search it. Versions are immutable: files you add or change later stay in the draft until you review them and publish another version.
-
-When you publish an agent, its release pins the knowledge version that was current at that moment. A new knowledge version does not change live answers until you publish the agent again. This means you can review exactly what a release knows, and an upload can never silently change what customers are told. See [Agents and releases](/concepts/agents-and-releases/).
+Knowledge is not pinned to an agent release. A release records which knowledge bases the agent uses, with their names and descriptions, and every search reads the bases' live, published files. Uploading, replacing, unpublishing or deleting a file changes answers in every agent that uses the base, without publishing the agent again. A new name or description reaches the agent when it is published again. See [Agents and releases](/concepts/agents-and-releases/).
 
 ## Audience
 
@@ -34,14 +32,14 @@ Each knowledge base has an **Audience**:
 | **Public** | Anyone talking to the agent. |
 | **Verified customers only** | Only customers who have signed in during the conversation, on a channel that allows customer sign-in. Use it for content that should not reach anonymous visitors, such as account-specific procedures. |
 
-A change of audience applies from the next published version.
+A change of audience applies from the next search.
 
 ## Keeping knowledge in sync
 
-To keep a knowledge base in step with a folder of files in your repository, use `caplo knowledge sync`. It uploads new and changed files, removes ones that are gone, and with `--approve` and `--publish` approves them and publishes a version in one step. Approving this way skips reviewing the extracted text, so use it for content you already trust.
+To keep a knowledge base in step with a folder of files in your repository, use `caplo knowledge sync`. It uploads new files, replaces changed ones and deletes the ones that are gone, so a CI job can keep agents answering from the files your team maintains.
 
 ## Related
 
-- [Give an agent knowledge](/agents/knowledge/)
-- [Evaluations](/concepts/evaluations/): add eval cases that check answers drawn from your documents.
+- [Add knowledge](/agents/knowledge/)
+- [Evaluations](/concepts/evaluations/): add eval cases that check answers drawn from your files.
 - [`caplo knowledge sync`](/reference/cli/knowledge/#caplo-knowledge-sync)
