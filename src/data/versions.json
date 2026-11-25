@@ -1,11 +1,11 @@
 {
   "versions": {
     "agent-registry": "1.1.66",
-    "agent-runtime": "1.4.65",
+    "agent-runtime": "1.4.67",
     "agent-runtime-voice": "1.4.63",
     "caplo-cli": "0.6.0",
     "channel-deployment": "1.3.27",
-    "conversation-orchestrator": "1.3.76",
+    "conversation-orchestrator": "1.3.78",
     "evaluation": "1.2.3",
     "execution-insights": "1.0.72",
     "identity-workspace": "1.4.51",
