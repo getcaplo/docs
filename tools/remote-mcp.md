@@ -33,7 +33,7 @@ Tokens, header values and client secrets are write-only. Caplo stores them encry
 
 **Console**
 
-1. Open **Tools**, select **Add tools**, then **Connect MCP server**.
+1. Open **Connectors**, select **Add connector**, then **Custom connection (MCP)**.
 
 2. **Server.** Enter the **Server URL**, for example `https://mcp.example.com/mcp`, and select **Check server**. Caplo reports whether the endpoint speaks MCP, how many tools it lists, and whether it asks for OAuth. Checking saves nothing. Leave **Transport** on **Detect automatically** unless you know the server only speaks one. Select **Continue**.
 
@@ -48,7 +48,7 @@ Tokens, header values and client secrets are write-only. Caplo stores them encry
 
 5. In the review, enable each tool agents may use and set its **Effect** (**Read only** or **Writes data**), its **Confirmation** for writes (**Customer confirms** or **No confirmation**) and its **Timeout**. Select **Save review**, then the publish button, which names how many tools it publishes, such as **Publish 2 tools**.
 
-The server’s section on the **Tools** page shows its status, authentication and how many tools are published, with **Connect** or **Reconnect** (OAuth), **Review tools** (or **Review changes**), **Check now**, **Edit** and **Remove**.
+The server’s row under **Custom connections (MCP)** on the **Connectors** page shows its status. Select **Manage** to see its authentication and how many tools are published, with **Connect** or **Reconnect** (OAuth), **Review tools** (or **Review changes**), **Check now**, **Edit** and **Remove**.
 
 **CLI**
 
