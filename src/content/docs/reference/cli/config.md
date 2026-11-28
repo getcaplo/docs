@@ -8,7 +8,7 @@ sidebar:
 ---
 
 :::note[Generated reference]
-Generated from `caplo` v0.6.0, the latest release. `caplo config --help` prints the same text.
+Generated from `caplo` v0.8.0, the latest release. `caplo config --help` prints the same text.
 :::
 
 Show and change CLI settings.
@@ -71,17 +71,18 @@ caplo config list -o json
 
 ## caplo config set
 
-Change one setting: api-url, issuer, client-id, credential-storage.
+Change one setting: api-url, console-url, issuer, client-id, credential-storage.
 
 ```sh
 caplo config set <key> <value>
 ```
 
-Changes a saved setting: api-url, issuer, client-id (the OAuth client, caplo-cli by default), or credential-storage (keychain or file). Changing api-url clears the selected workspace. Run caplo auth login afterwards to start a session with the new setting.
+Changes a saved setting: api-url, console-url (the web console that pages such as connectors open in, https://app.caplo.si for the default API), issuer, client-id (the OAuth client, caplo-cli by default), or credential-storage (keychain or file). Changing api-url clears the selected workspace. Run caplo auth login afterwards to start a session with the new setting.
 
 **Examples**
 
 ```sh
 caplo config set credential-storage file
 caplo config set api-url https://api.staging.example.com
+caplo config set console-url https://app.staging.example.com
 ```

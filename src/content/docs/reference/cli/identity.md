@@ -3,12 +3,12 @@ title: "caplo identity"
 description: "Generate keys and sign or check host sign-in assertions locally."
 editUrl: false
 sidebar:
-  order: 7
+  order: 8
   label: "identity"
 ---
 
 :::note[Generated reference]
-Generated from `caplo` v0.6.0, the latest release. `caplo identity --help` prints the same text.
+Generated from `caplo` v0.8.0, the latest release. `caplo identity --help` prints the same text.
 :::
 
 Generate keys and sign or check host sign-in assertions locally.

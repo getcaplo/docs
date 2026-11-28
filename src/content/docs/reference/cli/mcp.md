@@ -3,12 +3,12 @@ title: "caplo mcp"
 description: "Connect remote MCP servers and publish their reviewed tools."
 editUrl: false
 sidebar:
-  order: 9
+  order: 10
   label: "mcp"
 ---
 
 :::note[Generated reference]
-Generated from `caplo` v0.6.0, the latest release. `caplo mcp --help` prints the same text.
+Generated from `caplo` v0.8.0, the latest release. `caplo mcp --help` prints the same text.
 :::
 
 Connect remote MCP servers and publish their reviewed tools.

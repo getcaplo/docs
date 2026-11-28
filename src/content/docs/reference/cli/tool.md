@@ -3,12 +3,12 @@ title: "caplo tool"
 description: "Build, test, publish, and run tool packages."
 editUrl: false
 sidebar:
-  order: 11
+  order: 12
   label: "tool"
 ---
 
 :::note[Generated reference]
-Generated from `caplo` v0.6.0, the latest release. `caplo tool --help` prints the same text.
+Generated from `caplo` v0.8.0, the latest release. `caplo tool --help` prints the same text.
 :::
 
 Build, test, publish, and run tool packages.
@@ -281,7 +281,7 @@ List the workspace's tool packages.
 caplo tool list [flags]
 ```
 
-Lists the packages with their type, latest active version, latest build, and draft revision. Remote MCP servers are packages of type remote_mcp.
+Lists the packages with their type, latest active version, latest build, and draft revision. Remote MCP servers are packages of type remote_mcp, and connectors of type connector.
 
 **Examples**
 
@@ -296,7 +296,7 @@ caplo tool list --type mcp --archived
 | --- | --- | --- | --- |
 | `--archived` |  |  | include archived packages |
 | `--output`, `-o` | string | `table` | output format: table, json, or yaml |
-| `--type`, `-t` | string |  | only packages of this type: function, mcp, or remote_mcp |
+| `--type`, `-t` | string |  | only packages of this type: function, mcp, remote_mcp, or connector |
 
 ## caplo tool logs
 

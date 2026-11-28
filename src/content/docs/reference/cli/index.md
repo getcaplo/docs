@@ -8,7 +8,7 @@ sidebar:
 ---
 
 :::note[Generated reference]
-Generated from `caplo` v0.6.0, the latest release. `caplo --help` prints the same text.
+Generated from `caplo` v0.8.0, the latest release. `caplo --help` prints the same text.
 :::
 
 Install the CLI with the [installation guide](/cli/install/). Task guides are under [CLI](/cli/workflow/).
@@ -38,6 +38,7 @@ caplo [flags]
 | --- | --- |
 | [`caplo agent`](/reference/cli/agent/) | Build, test, evaluate, and publish one agent |
 | [`caplo channel`](/reference/cli/channel/) | List channels and deploy agent releases to them |
+| [`caplo connector`](/reference/cli/connector/) | Let agents use your connected accounts, such as a Google, Outlook, or Calendly calendar |
 | [`caplo identity`](/reference/cli/identity/) | Generate keys and sign or check host sign-in assertions locally |
 | [`caplo knowledge`](/reference/cli/knowledge/) | Manage knowledge bases and their files, and search them |
 | [`caplo mcp`](/reference/cli/mcp/) | Connect remote MCP servers and publish their reviewed tools |

@@ -8,7 +8,7 @@ sidebar:
 ---
 
 :::note[Generated reference]
-Generated from `caplo` v0.6.0, the latest release. `caplo channel --help` prints the same text.
+Generated from `caplo` v0.8.0, the latest release. `caplo channel --help` prints the same text.
 :::
 
 List channels and deploy agent releases to them.
