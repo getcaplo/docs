@@ -8,7 +8,7 @@ sidebar:
 ---
 
 :::note[Generated reference]
-Generated from `caplo` v0.6.0, the latest release. `caplo <command> --help` prints the same text.
+Generated from `caplo` v0.8.0, the latest release. `caplo <command> --help` prints the same text.
 :::
 
 These commands work on the project around the current directory, or the one `-C` names. See [Projects](/cli/projects/).
@@ -95,8 +95,9 @@ child runs with its own release's tools and knowledge.
 
 ```sh
 tools name <package>/<tool> for a project package, <server>/<tool> for a published tool of a workspace remote
-MCP server (caplo mcp), or <package ID>/<tool>; a package alone selects all its tools. A name that is no
-project package is looked up as a remote MCP server when the project is diffed, pushed, or published.
+MCP server (caplo mcp), <connector>/<tool> for a connector's tool (caplo connector), or <package ID>/<tool>; a
+package alone selects all its tools. A name that is no project package is looked up as a remote MCP server or
+connector when the project is diffed, pushed, or published.
 ```
 
 ```sh
@@ -194,7 +195,7 @@ caplo pull agent/<name> [dir] [flags]
 
 Writes a workspace agent, named by name or ID, and every sub-agent it links, with their drafts and eval cases, as agent files of a project. The project is the one at dir; a dir without caplo.yaml becomes a new project unless it is inside another one. Without dir it is the project above --dir, or a new one in --dir. Agents the project defines are written to their own files, others to new files in the directory the agents glob names.
 
-Packages the agents use that the project lacks are pulled from their workspace drafts into the directory the tools glob names; remote MCP server tools stay &lt;server&gt;/&lt;tool&gt;. Links name the release the draft pins, since a draft does not record release: latest.
+Packages the agents use that the project lacks are pulled from their workspace drafts into the directory the tools glob names; remote MCP server and connector tools stay &lt;server&gt;/&lt;tool&gt; and &lt;connector&gt;/&lt;tool&gt;. Links name the release the draft pins, since a draft does not record release: latest.
 
 **Examples**
 
@@ -277,7 +278,7 @@ Check the project offline: schemas, references, link cycles, and the depth limit
 caplo validate [flags]
 ```
 
-Checks the project without calling the workspace: caplo.yaml and each package's caplo.yaml, every agent file against the agent schema, unique agent names and file keys, references to project agents and packages, the tools an mcp package declares, sub-agent link cycles, and each agent's depth limit: at most policy.maxDepth (1 to 4, default 3) sub-agent links below it. Tools of remote MCP servers are checked when the project is diffed, pushed, or published.
+Checks the project without calling the workspace: caplo.yaml and each package's caplo.yaml, every agent file against the agent schema, unique agent names and file keys, references to project agents and packages, the tools an mcp package declares, sub-agent link cycles, and each agent's depth limit: at most policy.maxDepth (1 to 4, default 3) sub-agent links below it. Tools of remote MCP servers and connectors are checked when the project is diffed, pushed, or published.
 
 An agent with routing mode fast needs at least one sub-agent and doNotUseWhen on every link. When its file lists evals, each sub-agent also needs two cases that set routedBy and name it in subAgent.
 

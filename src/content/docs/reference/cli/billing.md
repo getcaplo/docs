@@ -8,7 +8,7 @@ sidebar:
 ---
 
 :::note[Generated reference]
-Generated from `caplo` v0.6.0, the latest release. `caplo billing --help` prints the same text.
+Generated from `caplo` v0.8.0, the latest release. `caplo billing --help` prints the same text.
 :::
 
 See and change the workspace's plan, balance, billing details and documents.

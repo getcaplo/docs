@@ -3,12 +3,12 @@ title: "caplo workspace"
 description: "List, show, create, and select workspaces."
 editUrl: false
 sidebar:
-  order: 12
+  order: 13
   label: "workspace"
 ---
 
 :::note[Generated reference]
-Generated from `caplo` v0.6.0, the latest release. `caplo workspace --help` prints the same text.
+Generated from `caplo` v0.8.0, the latest release. `caplo workspace --help` prints the same text.
 :::
 
 List, show, create, and select workspaces.

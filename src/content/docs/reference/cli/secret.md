@@ -3,12 +3,12 @@ title: "caplo secret"
 description: "Manage workspace secrets that package secrets bind to."
 editUrl: false
 sidebar:
-  order: 10
+  order: 11
   label: "secret"
 ---
 
 :::note[Generated reference]
-Generated from `caplo` v0.6.0, the latest release. `caplo secret --help` prints the same text.
+Generated from `caplo` v0.8.0, the latest release. `caplo secret --help` prints the same text.
 :::
 
 Manage workspace secrets that package secrets bind to.

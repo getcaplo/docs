@@ -3,12 +3,12 @@ title: "caplo knowledge"
 description: "Manage knowledge bases and their files, and search them."
 editUrl: false
 sidebar:
-  order: 8
+  order: 9
   label: "knowledge"
 ---
 
 :::note[Generated reference]
-Generated from `caplo` v0.6.0, the latest release. `caplo knowledge --help` prints the same text.
+Generated from `caplo` v0.8.0, the latest release. `caplo knowledge --help` prints the same text.
 :::
 
 Manage knowledge bases and their files, and search them.

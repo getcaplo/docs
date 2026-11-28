@@ -1,11 +1,11 @@
 {
-  "version": "0.6.0",
+  "version": "0.8.0",
   "commands": [
     {
       "path": "caplo",
       "use": "caplo [flags]",
-      "short": "Build, test, and publish Caplo agents and tool packages, and manage workspaces, remote MCP servers, secrets, and customer identity keys",
-      "long": "caplo builds, tests, and publishes Caplo agents and tool packages from a project folder, and manages a\nworkspace's agents, tool packages, remote MCP servers, secrets, knowledge bases, channels, API clients,\ncustomer identity keys, and subscription billing.\n\nA person logs in with caplo auth login. CI and automation set CAPLO_API_KEY to an API client's key and\nCAPLO_WORKSPACE to its workspace ID instead; see caplo workspace api-client. Commands act on the workspace that\n--workspace or CAPLO_WORKSPACE names, else the one selected with caplo workspace use.\n\nThe configuration directory is CAPLO_CONFIG_DIR, else ~/.config/caplo ($XDG_CONFIG_HOME/caplo), or %AppData%\\caplo\non Windows. It holds config.yaml: the API URL, issuer, OAuth client, credential storage, and selected workspace.\nUse a separate CAPLO_CONFIG_DIR for each Caplo installation you log in to.\n\nExit codes: 0 for success, 1 for an error, 2 for a usage error (including a confirmation that needs --yes when\nthere is no terminal), 3 when a check fails (validation, tool fixtures, eval cases, or assertion checks), 130 when\nCtrl-C interrupts a command or a prompt, and 143 for SIGTERM. A second Ctrl-C ends the process at once.",
+      "short": "Build, test, and publish Caplo agents and tool packages, and manage workspaces, remote MCP servers, connectors, secrets, and customer identity keys",
+      "long": "caplo builds, tests, and publishes Caplo agents and tool packages from a project folder, and manages a\nworkspace's agents, tool packages, remote MCP servers, connectors, secrets, knowledge bases, channels, API\nclients, customer identity keys, and subscription billing.\n\nA person logs in with caplo auth login. CI and automation set CAPLO_API_KEY to an API client's key and\nCAPLO_WORKSPACE to its workspace ID instead; see caplo workspace api-client. Commands act on the workspace that\n--workspace or CAPLO_WORKSPACE names, else the one selected with caplo workspace use.\n\nThe configuration directory is CAPLO_CONFIG_DIR, else ~/.config/caplo ($XDG_CONFIG_HOME/caplo), or %AppData%\\caplo\non Windows. It holds config.yaml: the API and console URLs, issuer, OAuth client, credential storage, and selected\nworkspace. Use a separate CAPLO_CONFIG_DIR for each Caplo installation you log in to.\n\nExit codes: 0 for success, 1 for an error, 2 for a usage error (including a confirmation that needs --yes when\nthere is no terminal), 3 when a check fails (validation, tool fixtures, eval cases, or assertion checks), 130 when\nCtrl-C interrupts a command or a prompt, and 143 for SIGTERM. A second Ctrl-C ends the process at once.",
       "example": "caplo auth login\n  caplo init shop --template summit\n  caplo publish --env prod --yes",
       "runnable": false,
       "subcommands": [
@@ -15,6 +15,7 @@
         "caplo channel",
         "caplo completion",
         "caplo config",
+        "caplo connector",
         "caplo diff",
         "caplo eval",
         "caplo identity",
@@ -1420,10 +1421,161 @@
     {
       "path": "caplo config set",
       "use": "caplo config set <key> <value>",
-      "short": "Change one setting: api-url, issuer, client-id, credential-storage",
-      "long": "Changes a saved setting: api-url, issuer, client-id (the OAuth client, caplo-cli by default), or\ncredential-storage (keychain or file). Changing api-url clears the selected workspace. Run caplo auth login\nafterwards to start a session with the new setting.",
-      "example": "caplo config set credential-storage file\n  caplo config set api-url https://api.staging.example.com",
+      "short": "Change one setting: api-url, console-url, issuer, client-id, credential-storage",
+      "long": "Changes a saved setting: api-url, console-url (the web console that pages such as connectors open in,\nhttps://app.caplo.si for the default API), issuer, client-id (the OAuth client, caplo-cli by default), or\ncredential-storage (keychain or file). Changing api-url clears the selected workspace. Run caplo auth login\nafterwards to start a session with the new setting.",
+      "example": "caplo config set credential-storage file\n  caplo config set api-url https://api.staging.example.com\n  caplo config set console-url https://app.staging.example.com",
       "runnable": true,
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo connector",
+      "use": "caplo connector",
+      "short": "Let agents use your connected accounts, such as a Google, Outlook, or Calendly calendar",
+      "long": "A connector gives agents ready-made tools for an account you connect, such as a calendar: checking when you\nare free, suggesting open times, and, for Calendly, booking appointments. You sign in to the account in the Caplo\nconsole, which caplo connector add opens; the connector's tools are then published, ready to add to agents.\n\nAgent files name a connector's tools <connector>/<tool>, or the connector alone for all its tools, just like a\nremote MCP server's. A connector is named by its name or ID; caplo connector list shows them. Choose which tools\nagents may use with caplo connector tools --enable, and stop agents using an account with caplo connector remove.",
+      "example": "caplo connector add --open\n  caplo connector list\n  caplo connector tools sales-calendar --enable check_availability,find_slots",
+      "group": "Workspace resources",
+      "runnable": false,
+      "subcommands": [
+        "caplo connector add",
+        "caplo connector get",
+        "caplo connector list",
+        "caplo connector remove",
+        "caplo connector tools"
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo connector add",
+      "use": "caplo connector add [flags]",
+      "short": "Show where to connect an account, such as a calendar, in the Caplo console",
+      "long": "Accounts are connected in the browser, where you sign in to them yourself, so this command prints the Connectors\npage of the Caplo console for the workspace; --open opens it. There, choose the kind of account, sign in to it, and\nadd it as a connector. Its tools are published at once; caplo connector list then shows it.\n\nThe page is on the console the CLI is set up for: https://app.caplo.si, or the console-url setting\n(caplo config set console-url) for another Caplo installation.",
+      "example": "caplo connector add\n  caplo connector add --open",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "open",
+          "type": "bool",
+          "usage": "open the page in the default browser"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo connector get",
+      "use": "caplo connector get <name|id> [flags]",
+      "short": "Show a connector and its tools",
+      "long": "Shows a connector's account type and account ID, its published version, and its tools: what each does, whether\nagents may use it, whether it only reads or also makes changes, and whether the customer must confirm it first.",
+      "example": "caplo connector get sales-calendar\n  caplo connector get sales-calendar -o json",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo connector list",
+      "use": "caplo connector list [flags]",
+      "short": "List the workspace's connectors",
+      "long": "Lists each connector with its account type, how many of its tools agents may use, and its published version.",
+      "example": "caplo connector list",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo connector remove",
+      "use": "caplo connector remove <name|id> [flags]",
+      "short": "Remove a connector: agents can no longer use its tools",
+      "long": "Removes a connector. Its tools stop working for every agent that uses them. The account itself stays connected\nin the console and can be added as a connector again later; the connector's name stays reserved. It asks first;\n--yes skips the question.",
+      "example": "caplo connector remove sales-calendar --yes",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "yes",
+          "shorthand": "y",
+          "type": "bool",
+          "usage": "do not ask for confirmation"
+        }
+      ],
+      "inheritedFlags": [
+        {
+          "name": "workspace",
+          "shorthand": "w",
+          "type": "string",
+          "usage": "workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use)"
+        }
+      ]
+    },
+    {
+      "path": "caplo connector tools",
+      "use": "caplo connector tools <name|id> [flags]",
+      "short": "List a connector's tools, or choose which ones agents may use",
+      "long": "Lists a connector's tools. With --enable, agents may use exactly the tools it names, and no others: the connector\npublishes a new version with them. Agents switch to the new version when they are published again. Name at least\none tool; to stop agents using the account altogether, remove the connector.",
+      "example": "caplo connector tools sales-calendar\n  caplo connector tools sales-calendar --enable check_availability,find_slots",
+      "runnable": true,
+      "flags": [
+        {
+          "name": "enable",
+          "type": "stringSlice",
+          "usage": "the tools agents may use, comma-separated or repeated; all others are turned off"
+        },
+        {
+          "name": "output",
+          "shorthand": "o",
+          "type": "string",
+          "default": "table",
+          "usage": "output format: table, json, or yaml"
+        }
+      ],
       "inheritedFlags": [
         {
           "name": "workspace",
@@ -1710,7 +1862,7 @@
       "path": "caplo init",
       "use": "caplo init [dir] [flags]",
       "short": "Create a project: caplo.yaml, agent files, and tool packages",
-      "long": "Creates a project in dir (default: the current directory), which must be missing or empty. The blank\ntemplate has one agent; summit is a sample shop with a concierge agent, three sub-agents, and two tool packages.\nEach tool package gets package.json and tsconfig.json from the @caplo/tools templates; run npm install in it\nbefore testing it.\n\nA project is a folder with caplo.yaml: apiVersion v1, kind Project, a name, and the agents and tools globs\n(default agents/*.yaml and tools/*). Project commands find it by walking up from the current directory or --dir.\nEach agent file is an agent YAML document with apiVersion v2.0.0, the format of the console's Export YAML; v1\nfiles are refused. The file name without .yaml is the agent's key, which links and selectors use. Each tool\npackage is a directory with its own caplo.yaml, as caplo tool init makes it.\n\nIn an agent file:\n\n  subAgents link a project agent with local: <file key>, or any workspace agent with agentId. With release:\n  latest, or no release, the link pins the child's newest release that is not revoked whenever the parent is\n  pushed or published, so a child's new release publishes its parents again. A version pins that release. The\n  child runs with its own release's tools and knowledge.\n\n  tools name <package>/<tool> for a project package, <server>/<tool> for a published tool of a workspace remote\n  MCP server (caplo mcp), or <package ID>/<tool>; a package alone selects all its tools. A name that is no\n  project package is looked up as a remote MCP server when the project is diffed, pushed, or published.\n\n  knowledgeBases name a workspace knowledge base by name or ID. A name resolves in the workspace the command acts\n  on, so one file works in every environment.\n\n  evals are the agent's eval cases; see caplo eval.\n\nWorkspace agents and packages are matched by name: a missing one is created and an existing one updated. Nothing\nis deleted; caplo publish --prune archives agents the project no longer defines.",
+      "long": "Creates a project in dir (default: the current directory), which must be missing or empty. The blank\ntemplate has one agent; summit is a sample shop with a concierge agent, three sub-agents, and two tool packages.\nEach tool package gets package.json and tsconfig.json from the @caplo/tools templates; run npm install in it\nbefore testing it.\n\nA project is a folder with caplo.yaml: apiVersion v1, kind Project, a name, and the agents and tools globs\n(default agents/*.yaml and tools/*). Project commands find it by walking up from the current directory or --dir.\nEach agent file is an agent YAML document with apiVersion v2.0.0, the format of the console's Export YAML; v1\nfiles are refused. The file name without .yaml is the agent's key, which links and selectors use. Each tool\npackage is a directory with its own caplo.yaml, as caplo tool init makes it.\n\nIn an agent file:\n\n  subAgents link a project agent with local: <file key>, or any workspace agent with agentId. With release:\n  latest, or no release, the link pins the child's newest release that is not revoked whenever the parent is\n  pushed or published, so a child's new release publishes its parents again. A version pins that release. The\n  child runs with its own release's tools and knowledge.\n\n  tools name <package>/<tool> for a project package, <server>/<tool> for a published tool of a workspace remote\n  MCP server (caplo mcp), <connector>/<tool> for a connector's tool (caplo connector), or <package ID>/<tool>; a\n  package alone selects all its tools. A name that is no project package is looked up as a remote MCP server or\n  connector when the project is diffed, pushed, or published.\n\n  knowledgeBases name a workspace knowledge base by name or ID. A name resolves in the workspace the command acts\n  on, so one file works in every environment.\n\n  evals are the agent's eval cases; see caplo eval.\n\nWorkspace agents and packages are matched by name: a missing one is created and an existing one updated. Nothing\nis deleted; caplo publish --prune archives agents the project no longer defines.",
       "example": "caplo init shop --template summit\n  cd shop && (cd tools/order-desk && npm install) && (cd tools/store-stock && npm install)\n  caplo init --name support",
       "group": "Project",
       "runnable": true,
@@ -2664,7 +2816,7 @@
       "path": "caplo pull",
       "use": "caplo pull agent/<name> [dir] [flags]",
       "short": "Write a workspace agent, its sub-agents, and their packages into a project",
-      "long": "Writes a workspace agent, named by name or ID, and every sub-agent it links, with their drafts and eval cases, as\nagent files of a project. The project is the one at dir; a dir without caplo.yaml becomes a new project unless it is\ninside another one. Without dir it is the project above --dir, or a new one in --dir. Agents the project defines\nare written to their own files, others to new files in the directory the agents glob names.\n\nPackages the agents use that the project lacks are pulled from their workspace drafts into the directory the tools\nglob names; remote MCP server tools stay <server>/<tool>. Links name the release the draft pins, since a draft does\nnot record release: latest.",
+      "long": "Writes a workspace agent, named by name or ID, and every sub-agent it links, with their drafts and eval cases, as\nagent files of a project. The project is the one at dir; a dir without caplo.yaml becomes a new project unless it is\ninside another one. Without dir it is the project above --dir, or a new one in --dir. Agents the project defines\nare written to their own files, others to new files in the directory the agents glob names.\n\nPackages the agents use that the project lacks are pulled from their workspace drafts into the directory the tools\nglob names; remote MCP server and connector tools stay <server>/<tool> and <connector>/<tool>. Links name the release the draft pins, since a draft does\nnot record release: latest.",
       "example": "caplo pull \"agent/Shop Concierge\"\n  caplo pull agent/concierge ./shop",
       "group": "Project",
       "runnable": true,
@@ -3214,7 +3366,7 @@
       "path": "caplo tool list",
       "use": "caplo tool list [flags]",
       "short": "List the workspace's tool packages",
-      "long": "Lists the packages with their type, latest active version, latest build, and draft revision. Remote MCP servers\nare packages of type remote_mcp.",
+      "long": "Lists the packages with their type, latest active version, latest build, and draft revision. Remote MCP servers\nare packages of type remote_mcp, and connectors of type connector.",
       "example": "caplo tool list\n  caplo tool list --type mcp --archived",
       "runnable": true,
       "flags": [
@@ -3234,7 +3386,7 @@
           "name": "type",
           "shorthand": "t",
           "type": "string",
-          "usage": "only packages of this type: function, mcp, or remote_mcp"
+          "usage": "only packages of this type: function, mcp, remote_mcp, or connector"
         }
       ],
       "inheritedFlags": [
@@ -3737,7 +3889,7 @@
       "path": "caplo validate",
       "use": "caplo validate [flags]",
       "short": "Check the project offline: schemas, references, link cycles, and the depth limit",
-      "long": "Checks the project without calling the workspace: caplo.yaml and each package's caplo.yaml, every agent file\nagainst the agent schema, unique agent names and file keys, references to project agents and packages, the tools an\nmcp package declares, sub-agent link cycles, and each agent's depth limit: at most policy.maxDepth (1 to 4, default\n3) sub-agent links below it. Tools of remote MCP servers are checked when the project is diffed, pushed, or\npublished.\n\nAn agent with routing mode fast needs at least one sub-agent and doNotUseWhen on every link. When its file lists\nevals, each sub-agent also needs two cases that set routedBy and name it in subAgent.\n\nEvery environment in caplo.yaml is checked: the agent keys it names and its agent fields merged over each file.\nWith --env, the agents are checked as that environment publishes them. Problems are printed and the command\nexits 3.",
+      "long": "Checks the project without calling the workspace: caplo.yaml and each package's caplo.yaml, every agent file\nagainst the agent schema, unique agent names and file keys, references to project agents and packages, the tools an\nmcp package declares, sub-agent link cycles, and each agent's depth limit: at most policy.maxDepth (1 to 4, default\n3) sub-agent links below it. Tools of remote MCP servers and connectors are checked when the project is diffed,\npushed, or published.\n\nAn agent with routing mode fast needs at least one sub-agent and doNotUseWhen on every link. When its file lists\nevals, each sub-agent also needs two cases that set routedBy and name it in subAgent.\n\nEvery environment in caplo.yaml is checked: the agent keys it names and its agent fields merged over each file.\nWith --env, the agents are checked as that environment publishes them. Problems are printed and the command\nexits 3.",
       "example": "caplo validate\n  caplo validate --env prod\n  caplo validate -C ~/src/shop",
       "group": "Project",
       "runnable": true,
