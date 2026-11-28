@@ -76,6 +76,7 @@
 	"/reference/cli/billing/",
 	"/reference/cli/channel/",
 	"/reference/cli/config/",
+	"/reference/cli/connector/",
 	"/reference/cli/identity/",
 	"/reference/cli/knowledge/",
 	"/reference/cli/mcp/",

@@ -4,7 +4,7 @@
 
 Generated reference
 
-Generated from `caplo` v0.6.0, the latest release. `caplo knowledge --help` prints the same text.
+Generated from `caplo` v0.8.0, the latest release. `caplo knowledge --help` prints the same text.
 
 Manage knowledge bases and their files, and search them.
 

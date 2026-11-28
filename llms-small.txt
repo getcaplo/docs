@@ -2453,7 +2453,7 @@ Install the CLI with the [installation guide](/cli/install/). Task guides are un
 ```plaintext
 caplo [flags]
 ```
- ## Commands [Section titled “Commands”](#commands) ### Project [Section titled “Project”](#project) | Command | Description | | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------- | | [`caplo diff`](/reference/cli/project/#caplo-diff) | Show how the project differs from the workspace drafts | | [`caplo eval`](/reference/cli/project/#caplo-eval) | Push the selection, then run each selected agent’s eval cases against its draft | | [`caplo init`](/reference/cli/project/#caplo-init) | Create a project: caplo.yaml, agent files, and tool packages | | [`caplo publish`](/reference/cli/project/#caplo-publish) | Validate, push, test, evaluate, and publish bottom up: tools, then child agents, then parents | | [`caplo pull`](/reference/cli/project/#caplo-pull) | Write a workspace agent, its sub-agents, and their packages into a project | | [`caplo push`](/reference/cli/project/#caplo-push) | Create or update the workspace drafts, children first, so you can live test them | | [`caplo test`](/reference/cli/project/#caplo-test) | Run the selected tool packages’ fixtures locally, like caplo tool test | | [`caplo validate`](/reference/cli/project/#caplo-validate) | Check the project offline: schemas, references, link cycles, and the depth limit | ### Workspace resources [Section titled “Workspace resources”](#workspace-resources) | Command | Description | | ---------------------------------------------- | --------------------------------------------------------------- | | [`caplo agent`](/reference/cli/agent/) | Build, test, evaluate, and publish one agent | | [`caplo channel`](/reference/cli/channel/) | List channels and deploy agent releases to them | | [`caplo identity`](/reference/cli/identity/) | Generate keys and sign or check host sign-in assertions locally | | [`caplo knowledge`](/reference/cli/knowledge/) | Manage knowledge bases and their files, and search them | | [`caplo mcp`](/reference/cli/mcp/) | Connect remote MCP servers and publish their reviewed tools | | [`caplo secret`](/reference/cli/secret/) | Manage workspace secrets that package secrets bind to | | [`caplo tool`](/reference/cli/tool/) | Build, test, publish, and run tool packages | ### Account [Section titled “Account”](#account) | Command | Description | | ---------------------------------------------- | --------------------------------------------------------------------------- | | [`caplo auth`](/reference/cli/auth/) | Log in, log out, and show the session | | [`caplo billing`](/reference/cli/billing/) | See and change the workspace’s plan, balance, billing details and documents | | [`caplo config`](/reference/cli/config/) | Show and change CLI settings | | [`caplo workspace`](/reference/cli/workspace/) | List, show, create, and select workspaces | ### Other [Section titled “Other”](#other) | Command | Description | | ------------------------------------------------------ | ---------------------------------------------------------- | | [`caplo completion`](/reference/cli/#caplo-completion) | Generate the autocompletion script for the specified shell | | [`caplo version`](/reference/cli/#caplo-version) | Show the caplo version | ## Global flags [Section titled “Global flags”](#global-flags) These flags work with every command. | Flag | Value | Default | Description | | ------------------- | ------ | ------- | ------------------------------------------------------------------------------------------------ | | `--workspace`, `-w` | string | | workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use) | ## Environment variables [Section titled “Environment variables”](#environment-variables) | Variable | Description | | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------- | | `CAPLO_API_KEY` | Authenticate as an API client instead of the login session, for CI and automation. Create one with caplo workspace api-client. | | `CAPLO_WORKSPACE` | Workspace ID or name for every command, unless –workspace is given. | | `CAPLO_ENV` | Project environment from caplo.yaml, unless –env is given. | | `CAPLO_API_URL` | API base URL used by caplo auth login, unless –api-url is given. | | `CAPLO_ISSUER` | OpenID issuer used by caplo auth login, unless –issuer is given. | | `CAPLO_CONFIG_DIR` | Directory for the CLI configuration and session, instead of \~/.config/caplo ($XDG_CONFIG_HOME/caplo), or %AppData%\caplo on Windows. | | `XDG_CONFIG_HOME` | Base configuration directory when CAPLO_CONFIG_DIR is not set. | ## Exit codes [Section titled “Exit codes”](#exit-codes) | Code | Meaning | | ----- | ------------------------------------------------------------------------------------------ | | `0` | Success. | | `1` | An error: the API refused the request, a file could not be read, or the command failed. | | `2` | A usage error: an unknown command or flag, a wrong argument, or a publish that needs –yes. | | `3` | A failed gate: validation, tool fixtures, or eval cases did not pass. | | `130` | Interrupted with Ctrl-C (SIGINT). A second Ctrl-C ends the process at once. | | `143` | Terminated with SIGTERM. | ## caplo completion [Section titled “caplo completion”](#caplo-completion) Generate the autocompletion script for the specified shell. 
+ ## Commands [Section titled “Commands”](#commands) ### Project [Section titled “Project”](#project) | Command | Description | | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------- | | [`caplo diff`](/reference/cli/project/#caplo-diff) | Show how the project differs from the workspace drafts | | [`caplo eval`](/reference/cli/project/#caplo-eval) | Push the selection, then run each selected agent’s eval cases against its draft | | [`caplo init`](/reference/cli/project/#caplo-init) | Create a project: caplo.yaml, agent files, and tool packages | | [`caplo publish`](/reference/cli/project/#caplo-publish) | Validate, push, test, evaluate, and publish bottom up: tools, then child agents, then parents | | [`caplo pull`](/reference/cli/project/#caplo-pull) | Write a workspace agent, its sub-agents, and their packages into a project | | [`caplo push`](/reference/cli/project/#caplo-push) | Create or update the workspace drafts, children first, so you can live test them | | [`caplo test`](/reference/cli/project/#caplo-test) | Run the selected tool packages’ fixtures locally, like caplo tool test | | [`caplo validate`](/reference/cli/project/#caplo-validate) | Check the project offline: schemas, references, link cycles, and the depth limit | ### Workspace resources [Section titled “Workspace resources”](#workspace-resources) | Command | Description | | ---------------------------------------------- | --------------------------------------------------------------------------------------- | | [`caplo agent`](/reference/cli/agent/) | Build, test, evaluate, and publish one agent | | [`caplo channel`](/reference/cli/channel/) | List channels and deploy agent releases to them | | [`caplo connector`](/reference/cli/connector/) | Let agents use your connected accounts, such as a Google, Outlook, or Calendly calendar | | [`caplo identity`](/reference/cli/identity/) | Generate keys and sign or check host sign-in assertions locally | | [`caplo knowledge`](/reference/cli/knowledge/) | Manage knowledge bases and their files, and search them | | [`caplo mcp`](/reference/cli/mcp/) | Connect remote MCP servers and publish their reviewed tools | | [`caplo secret`](/reference/cli/secret/) | Manage workspace secrets that package secrets bind to | | [`caplo tool`](/reference/cli/tool/) | Build, test, publish, and run tool packages | ### Account [Section titled “Account”](#account) | Command | Description | | ---------------------------------------------- | --------------------------------------------------------------------------- | | [`caplo auth`](/reference/cli/auth/) | Log in, log out, and show the session | | [`caplo billing`](/reference/cli/billing/) | See and change the workspace’s plan, balance, billing details and documents | | [`caplo config`](/reference/cli/config/) | Show and change CLI settings | | [`caplo workspace`](/reference/cli/workspace/) | List, show, create, and select workspaces | ### Other [Section titled “Other”](#other) | Command | Description | | ------------------------------------------------------ | ---------------------------------------------------------- | | [`caplo completion`](/reference/cli/#caplo-completion) | Generate the autocompletion script for the specified shell | | [`caplo version`](/reference/cli/#caplo-version) | Show the caplo version | ## Global flags [Section titled “Global flags”](#global-flags) These flags work with every command. | Flag | Value | Default | Description | | ------------------- | ------ | ------- | ------------------------------------------------------------------------------------------------ | | `--workspace`, `-w` | string | | workspace ID or name (default: $CAPLO_WORKSPACE, else the one selected with caplo workspace use) | ## Environment variables [Section titled “Environment variables”](#environment-variables) | Variable | Description | | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------- | | `CAPLO_API_KEY` | Authenticate as an API client instead of the login session, for CI and automation. Create one with caplo workspace api-client. | | `CAPLO_WORKSPACE` | Workspace ID or name for every command, unless –workspace is given. | | `CAPLO_ENV` | Project environment from caplo.yaml, unless –env is given. | | `CAPLO_API_URL` | API base URL used by caplo auth login, unless –api-url is given. | | `CAPLO_ISSUER` | OpenID issuer used by caplo auth login, unless –issuer is given. | | `CAPLO_CONFIG_DIR` | Directory for the CLI configuration and session, instead of \~/.config/caplo ($XDG_CONFIG_HOME/caplo), or %AppData%\caplo on Windows. | | `XDG_CONFIG_HOME` | Base configuration directory when CAPLO_CONFIG_DIR is not set. | ## Exit codes [Section titled “Exit codes”](#exit-codes) | Code | Meaning | | ----- | ------------------------------------------------------------------------------------------ | | `0` | Success. | | `1` | An error: the API refused the request, a file could not be read, or the command failed. | | `2` | A usage error: an unknown command or flag, a wrong argument, or a publish that needs –yes. | | `3` | A failed gate: validation, tool fixtures, or eval cases did not pass. | | `130` | Interrupted with Ctrl-C (SIGINT). A second Ctrl-C ends the process at once. | | `143` | Terminated with SIGTERM. | ## caplo completion [Section titled “caplo completion”](#caplo-completion) Generate the autocompletion script for the specified shell. 
 ```plaintext
 caplo completion
 ```
@@ -2978,15 +2978,75 @@ caplo config list [flags]
 caplo config list
 caplo config list -o json
 ```
- **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo config set [Section titled “caplo config set”](#caplo-config-set) Change one setting: api-url, issuer, client-id, credential-storage. 
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo config set [Section titled “caplo config set”](#caplo-config-set) Change one setting: api-url, console-url, issuer, client-id, credential-storage. 
 ```plaintext
 caplo config set <key> <value>
 ```
- Changes a saved setting: api-url, issuer, client-id (the OAuth client, caplo-cli by default), or credential-storage (keychain or file). Changing api-url clears the selected workspace. Run caplo auth login afterwards to start a session with the new setting. **Examples** 
+ Changes a saved setting: api-url, console-url (the web console that pages such as connectors open in, <https://app.caplo.si> for the default API), issuer, client-id (the OAuth client, caplo-cli by default), or credential-storage (keychain or file). Changing api-url clears the selected workspace. Run caplo auth login afterwards to start a session with the new setting. **Examples** 
 ```plaintext
 caplo config set credential-storage file
 caplo config set api-url https://api.staging.example.com
+caplo config set console-url https://app.staging.example.com
 ```
+
+# caplo connector
+
+> Let agents use your connected accounts, such as a Google, Outlook, or Calendly calendar.
+
+Let agents use your connected accounts, such as a Google, Outlook, or Calendly calendar. 
+```plaintext
+caplo connector
+```
+ A connector gives agents ready-made tools for an account you connect, such as a calendar: checking when you are free, suggesting open times, and, for Calendly, booking appointments. You sign in to the account in the Caplo console, which caplo connector add opens; the connector’s tools are then published, ready to add to agents. Agent files name a connector’s tools \<connector>/\<tool>, or the connector alone for all its tools, just like a remote MCP server’s. A connector is named by its name or ID; caplo connector list shows them. Choose which tools agents may use with caplo connector tools –enable, and stop agents using an account with caplo connector remove. **Examples** 
+```plaintext
+caplo connector add --open
+caplo connector list
+caplo connector tools sales-calendar --enable check_availability,find_slots
+```
+ **Commands** * [`caplo connector add`](#caplo-connector-add) * [`caplo connector get`](#caplo-connector-get) * [`caplo connector list`](#caplo-connector-list) * [`caplo connector remove`](#caplo-connector-remove) * [`caplo connector tools`](#caplo-connector-tools) ## caplo connector add [Section titled “caplo connector add”](#caplo-connector-add) Show where to connect an account, such as a calendar, in the Caplo console. 
+```plaintext
+caplo connector add [flags]
+```
+ Accounts are connected in the browser, where you sign in to them yourself, so this command prints the Connectors page of the Caplo console for the workspace; –open opens it. There, choose the kind of account, sign in to it, and add it as a connector. Its tools are published at once; caplo connector list then shows it. The page is on the console the CLI is set up for: <https://app.caplo.si>, or the console-url setting (caplo config set console-url) for another Caplo installation. **Examples** 
+```plaintext
+caplo connector add
+caplo connector add --open
+```
+ **Flags** | Flag | Value | Default | Description | | -------- | ----- | ------- | ------------------------------------ | | `--open` | | | open the page in the default browser | ## caplo connector get [Section titled “caplo connector get”](#caplo-connector-get) Show a connector and its tools. 
+```plaintext
+caplo connector get <name|id> [flags]
+```
+ Shows a connector’s account type and account ID, its published version, and its tools: what each does, whether agents may use it, whether it only reads or also makes changes, and whether the customer must confirm it first. **Examples** 
+```plaintext
+caplo connector get sales-calendar
+caplo connector get sales-calendar -o json
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo connector list [Section titled “caplo connector list”](#caplo-connector-list) List the workspace’s connectors. 
+```plaintext
+caplo connector list [flags]
+```
+ Lists each connector with its account type, how many of its tools agents may use, and its published version. **Examples** 
+```plaintext
+caplo connector list
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ----------------------------------- | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | ## caplo connector remove [Section titled “caplo connector remove”](#caplo-connector-remove) Remove a connector: agents can no longer use its tools. 
+```plaintext
+caplo connector remove <name|id> [flags]
+```
+ Removes a connector. Its tools stop working for every agent that uses them. The account itself stays connected in the console and can be added as a connector again later; the connector’s name stays reserved. It asks first; –yes skips the question. **Examples** 
+```plaintext
+caplo connector remove sales-calendar --yes
+```
+ **Flags** | Flag | Value | Default | Description | | ------------- | ----- | ------- | --------------------------- | | `--yes`, `-y` | | | do not ask for confirmation | ## caplo connector tools [Section titled “caplo connector tools”](#caplo-connector-tools) List a connector’s tools, or choose which ones agents may use. 
+```plaintext
+caplo connector tools <name|id> [flags]
+```
+ Lists a connector’s tools. With –enable, agents may use exactly the tools it names, and no others: the connector publishes a new version with them. Agents switch to the new version when they are published again. Name at least one tool; to stop agents using the account altogether, remove the connector. **Examples** 
+```plaintext
+caplo connector tools sales-calendar
+caplo connector tools sales-calendar --enable check_availability,find_slots
+```
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ----------- | ------- | -------------------------------------------------------------------------------- | | `--enable` | stringSlice | | the tools agents may use, comma-separated or repeated; all others are turned off | | `--output`, `-o` | string | `table` | output format: table, json, or yaml |
 
 # caplo identity
 
@@ -3324,8 +3384,9 @@ child runs with its own release's tools and knowledge.
  
 ```plaintext
 tools name <package>/<tool> for a project package, <server>/<tool> for a published tool of a workspace remote
-MCP server (caplo mcp), or <package ID>/<tool>; a package alone selects all its tools. A name that is no
-project package is looked up as a remote MCP server when the project is diffed, pushed, or published.
+MCP server (caplo mcp), <connector>/<tool> for a connector's tool (caplo connector), or <package ID>/<tool>; a
+package alone selects all its tools. A name that is no project package is looked up as a remote MCP server or
+connector when the project is diffed, pushed, or published.
 ```
  
 ```plaintext
@@ -3372,7 +3433,7 @@ caplo publish --prune
 ```plaintext
 caplo pull agent/<name> [dir] [flags]
 ```
- Writes a workspace agent, named by name or ID, and every sub-agent it links, with their drafts and eval cases, as agent files of a project. The project is the one at dir; a dir without caplo.yaml becomes a new project unless it is inside another one. Without dir it is the project above –dir, or a new one in –dir. Agents the project defines are written to their own files, others to new files in the directory the agents glob names. Packages the agents use that the project lacks are pulled from their workspace drafts into the directory the tools glob names; remote MCP server tools stay \<server>/\<tool>. Links name the release the draft pins, since a draft does not record release: latest. **Examples** 
+ Writes a workspace agent, named by name or ID, and every sub-agent it links, with their drafts and eval cases, as agent files of a project. The project is the one at dir; a dir without caplo.yaml becomes a new project unless it is inside another one. Without dir it is the project above –dir, or a new one in –dir. Agents the project defines are written to their own files, others to new files in the directory the agents glob names. Packages the agents use that the project lacks are pulled from their workspace drafts into the directory the tools glob names; remote MCP server and connector tools stay \<server>/\<tool> and \<connector>/\<tool>. Links name the release the draft pins, since a draft does not record release: latest. **Examples** 
 ```plaintext
 caplo pull "agent/Shop Concierge"
 caplo pull agent/concierge ./shop
@@ -3401,7 +3462,7 @@ caplo test agent/orders
 ```plaintext
 caplo validate [flags]
 ```
- Checks the project without calling the workspace: caplo.yaml and each package’s caplo.yaml, every agent file against the agent schema, unique agent names and file keys, references to project agents and packages, the tools an mcp package declares, sub-agent link cycles, and each agent’s depth limit: at most policy.maxDepth (1 to 4, default 3) sub-agent links below it. Tools of remote MCP servers are checked when the project is diffed, pushed, or published. An agent with routing mode fast needs at least one sub-agent and doNotUseWhen on every link. When its file lists evals, each sub-agent also needs two cases that set routedBy and name it in subAgent. Every environment in caplo.yaml is checked: the agent keys it names and its agent fields merged over each file. With –env, the agents are checked as that environment publishes them. Problems are printed and the command exits 3. **Examples** 
+ Checks the project without calling the workspace: caplo.yaml and each package’s caplo.yaml, every agent file against the agent schema, unique agent names and file keys, references to project agents and packages, the tools an mcp package declares, sub-agent link cycles, and each agent’s depth limit: at most policy.maxDepth (1 to 4, default 3) sub-agent links below it. Tools of remote MCP servers and connectors are checked when the project is diffed, pushed, or published. An agent with routing mode fast needs at least one sub-agent and doNotUseWhen on every link. When its file lists evals, each sub-agent also needs two cases that set routedBy and name it in subAgent. Every environment in caplo.yaml is checked: the agent keys it names and its agent fields merged over each file. With –env, the agents are checked as that environment publishes them. Problems are printed and the command exits 3. **Examples** 
 ```plaintext
 caplo validate
 caplo validate --env prod
@@ -3561,12 +3622,12 @@ caplo tool init tools/weather --type function
 ```plaintext
 caplo tool list [flags]
 ```
- Lists the packages with their type, latest active version, latest build, and draft revision. Remote MCP servers are packages of type remote_mcp. **Examples** 
+ Lists the packages with their type, latest active version, latest build, and draft revision. Remote MCP servers are packages of type remote_mcp, and connectors of type connector. **Examples** 
 ```plaintext
 caplo tool list
 caplo tool list --type mcp --archived
 ```
- **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | -------------------------------------------------------- | | `--archived` | | | include archived packages | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | | `--type`, `-t` | string | | only packages of this type: function, mcp, or remote_mcp | ## caplo tool logs [Section titled “caplo tool logs”](#caplo-tool-logs) Show recent live invocations of the package with their log lines; the runners keep the last hour. 
+ **Flags** | Flag | Value | Default | Description | | ---------------- | ------ | ------- | ------------------------------------------------------------------- | | `--archived` | | | include archived packages | | `--output`, `-o` | string | `table` | output format: table, json, or yaml | | `--type`, `-t` | string | | only packages of this type: function, mcp, remote_mcp, or connector | ## caplo tool logs [Section titled “caplo tool logs”](#caplo-tool-logs) Show recent live invocations of the package with their log lines; the runners keep the last hour. 
 ```plaintext
 caplo tool logs [package] [flags]
 ```

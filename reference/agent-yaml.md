@@ -4,7 +4,7 @@
 
 Generated reference
 
-Generated from the schema in `caplo` v0.6.0. Guide: [Agent YAML](/agents/agent-yaml/).
+Generated from the schema in `caplo` v0.8.0. Guide: [Agent YAML](/agents/agent-yaml/).
 
 For validation and completion in your editor, add this first line to the file (YAML language server, used by VS Code and others):
 

@@ -4,7 +4,7 @@
 
 Generated reference
 
-Generated from `caplo` v0.6.0, the latest release. `caplo agent --help` prints the same text.
+Generated from `caplo` v0.8.0, the latest release. `caplo agent --help` prints the same text.
 
 Build, test, evaluate, and publish one agent.
 
