@@ -1,18 +1,35 @@
 ---
 title: Give an agent tools
-description: Attach tool package tools and remote MCP server tools to an agent, name them in agent YAML, and understand how releases pin tool versions.
+description: Attach tool package tools, connected calendars and remote MCP server tools to an agent, name them in agent YAML, and understand how releases pin tool versions.
 sidebar:
   order: 3
 ---
 
 import { Tabs, TabItem, Steps, Aside } from '@astrojs/starlight/components';
 
-Tools let an agent look things up and act in your systems: find an order, check stock, book an appointment. An agent can use two kinds of tools:
+Tools let an agent look things up and act in your systems: find an order, check stock, book an appointment. An agent can use three kinds of tools:
 
 - **Tool package tools**: code you write and publish in the workspace with the Caplo tool SDK. See [Build tools](/tools/).
-- **Remote MCP server tools**: tools of an MCP server you connect to the workspace and publish after review. See [Connect a remote MCP server](/tools/remote-mcp/).
+- **Connector tools**: the tools of a calendar you connect on the **Connectors** page. See [Connect a calendar](#connect-a-calendar).
+- **Remote MCP server tools**: tools of an MCP server you connect on the **Connectors** page and publish after review. See [Connect a remote MCP server](/tools/remote-mcp/).
 
-Both appear in the same list on the agent. A tool must be published before an agent release can use it.
+Tool package tools are chosen under **Tools** on the agent's **Abilities** step; calendars and MCP servers under **Connectors** on the same step. A tool must be published before an agent release can use it.
+
+## Connect a calendar
+
+Agents can check availability and offer open times from Google Calendar and Outlook Calendar, and also book appointments through Calendly. Each connected account is its own connector, so you can connect several accounts of the same service, for example one calendar per location or per person.
+
+<Steps>
+
+1. Open **Connectors** and select **Add connector**, then the calendar service.
+2. Give the connector a name, such as **Front desk** or **Dr. Ahmed**, and continue to the service's sign-in. Caplo uses the account's main calendar.
+3. On the connector's page, set **Working hours** (days, hours and time zone). Agents only offer times inside them, and changes apply straight away. For Calendly, choose the **Appointment type** agents check and book.
+4. Under **What agents can do**, turn each ability on or off: **Check availability**, **Suggest open times** and, for Calendly, **Book appointments**. The customer confirms a booking's time, name and email before it is made.
+5. Open the agent, go to the **Abilities** step, select **Add** under **Connectors**, choose the connector, then publish the agent.
+
+</Steps>
+
+A published agent keeps the abilities it was published with. When you turn one on or off, **Agents using this** on the connector's page lists the agents to publish again. **Disconnect** removes the connector's tools from every agent and disconnects the account from Caplo.
 
 ## Attach tools
 
@@ -51,10 +68,10 @@ Both appear in the same list on the agent. A tool must be published before an ag
 | --- | --- |
 | `<package>/<tool>` | One tool of a tool package in your project (`tools/<package>/caplo.yaml`). |
 | `<package>` | Every tool of that project package, including tools added in later versions. |
-| `<server>/<tool>` | One published tool of a workspace remote MCP server, by the server's name. |
+| `<server>/<tool>` | One published tool of a workspace remote MCP server or connector, by its name. |
 | `<package ID>/<tool>` or `<package ID>` | A workspace tool package by its ID. This is the form the console's **Export YAML** writes. |
 
-Inside a project, a name that is not a project package is looked up as a remote MCP server when you run `caplo diff`, `caplo push` or `caplo publish`. Outside a project, names refer to remote MCP servers, and packages are named by ID. Tool names are lowercase letters, digits and underscores, starting with a letter. An agent can reference at most 32 tools or packages.
+Inside a project, a name that is not a project package is looked up as a remote MCP server or connector when you run `caplo diff`, `caplo push` or `caplo publish`. Outside a project, names refer to remote MCP servers and connectors, and packages are named by ID. Tool names are lowercase letters, digits and underscores, starting with a letter. An agent can reference at most 32 tools or packages.
 
 ## How releases pin tool versions
 
